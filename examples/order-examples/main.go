@@ -1,10 +1,3 @@
-# seller-partner-api-sdk
-
-amazon seller partner api by golang
-
-## Getting Started
-
-```golang
 package main
 
 import (
@@ -73,5 +66,3 @@ func main() {
 	}
 	log.Println(response.HTTPResponse.StatusCode)
 }
-
-```
