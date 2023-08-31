@@ -561,7 +561,7 @@ type Order struct {
 	IsPrime *bool `json:"IsPrime,omitempty"`
 
 	// IsReplacementOrder When true, this is a replacement order.
-	IsReplacementOrder *bool `json:"IsReplacementOrder,omitempty"`
+	IsReplacementOrder *string `json:"IsReplacementOrder,omitempty"`
 
 	// IsSoldByAB When true, the item within this order was bought and re-sold by Amazon Business EU SARL (ABEU). By buying and instantly re-selling your items, ABEU becomes the seller of record, making your inventory available for sale to customers who would not otherwise purchase from a third-party seller.
 	IsSoldByAB *bool `json:"IsSoldByAB,omitempty"`
@@ -730,7 +730,7 @@ type OrderItem struct {
 	IossNumber *string `json:"IossNumber,omitempty"`
 
 	// IsGift When true, the item is a gift.
-	IsGift *bool `json:"IsGift,omitempty"`
+	IsGift *string `json:"IsGift,omitempty"`
 
 	// IsTransparency When true, transparency codes are required.
 	IsTransparency *bool `json:"IsTransparency,omitempty"`
@@ -982,7 +982,7 @@ type PreferredDeliveryTime struct {
 // ProductInfoDetail Product information on the number of items.
 type ProductInfoDetail struct {
 	// NumberOfItems The total number of items that are included in the ASIN.
-	NumberOfItems *int `json:"NumberOfItems,omitempty"`
+	NumberOfItems *string `json:"NumberOfItems,omitempty"`
 }
 
 // PromotionIdList A list of promotion identifiers provided by the seller when the promotions were created.

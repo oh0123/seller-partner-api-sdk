@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.21.0
 	github.com/aws/smithy-go v1.14.2
 	github.com/google/uuid v1.3.1
-	github.com/oh0123/seller-partner-api-sdk v0.0.0-20230826073034-3cfbfb25958c
+	github.com/oh0123/seller-partner-api-sdk v1.0.1
 )
 
 require (
@@ -54,3 +54,5 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/oh0123/seller-partner-api-sdk v1.0.1 => ../../ 

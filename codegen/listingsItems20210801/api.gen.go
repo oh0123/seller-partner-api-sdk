@@ -195,10 +195,7 @@ type ItemOfferByMarketplaceOfferType string
 type ItemOffers = []ItemOfferByMarketplace
 
 // ItemProcurement Vendor procurement information for the listings item.
-type ItemProcurement struct {
-	// CostPrice The currency type and the amount.
-	CostPrice Money `json:"costPrice"`
-}
+type ItemProcurement = []interface{}
 
 // ItemSummaries Summary details of a listings item.
 type ItemSummaries = []ItemSummaryByMarketplace
