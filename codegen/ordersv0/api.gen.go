@@ -253,7 +253,7 @@ type BuyerRequestedCancel struct {
 	BuyerCancelReason *string `json:"BuyerCancelReason,omitempty"`
 
 	// IsBuyerRequestedCancel When true, the buyer has requested cancellation.
-	IsBuyerRequestedCancel *bool `json:"IsBuyerRequestedCancel,omitempty"`
+	IsBuyerRequestedCancel *string `json:"IsBuyerRequestedCancel,omitempty"`
 }
 
 // BuyerTaxInfo Tax information about the buyer.
