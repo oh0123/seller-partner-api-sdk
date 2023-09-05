@@ -493,8 +493,8 @@ type FBALiquidationEvent struct {
 // FBALiquidationEventList A list of FBA inventory liquidation payment events.
 type FBALiquidationEventList = []FBALiquidationEvent
 
-// FailedAdhocDisbursementEventList Failed ad hoc disbursement event list.
-type FailedAdhocDisbursementEventList struct {
+// FailedAdhocDisbursementEvent Failed ad hoc disbursement event list.
+type FailedAdhocDisbursementEvent struct {
 	// DisbursementId The disbursement identifier.
 	DisbursementId *string `json:"DisbursementId,omitempty"`
 
@@ -522,6 +522,9 @@ type FailedAdhocDisbursementEventList struct {
 	// TransferId The transfer identifier.
 	TransferId *string `json:"TransferId,omitempty"`
 }
+
+// FailedAdhocDisbursementEventList A list of failed adhoc disbursement events.
+type FailedAdhocDisbursementEventList = []FailedAdhocDisbursementEvent
 
 // FeeComponent A fee associated with the event.
 type FeeComponent struct {
@@ -612,7 +615,7 @@ type FinancialEvents struct {
 	// FBALiquidationEventList A list of FBA inventory liquidation payment events.
 	FBALiquidationEventList *FBALiquidationEventList `json:"FBALiquidationEventList,omitempty"`
 
-	// FailedAdhocDisbursementEventList Failed ad hoc disbursement event list.
+	// FailedAdhocDisbursementEventList A list of failed adhoc disbursement events.
 	FailedAdhocDisbursementEventList *FailedAdhocDisbursementEventList `json:"FailedAdhocDisbursementEventList,omitempty"`
 
 	// GuaranteeClaimEventList A list of shipment event information.
@@ -678,7 +681,7 @@ type FinancialEvents struct {
 	// TrialShipmentEventList A list of information about trial shipment financial events.
 	TrialShipmentEventList *TrialShipmentEventList `json:"TrialShipmentEventList,omitempty"`
 
-	// ValueAddedServiceChargeEventList An event related to a value added service charge.
+	// ValueAddedServiceChargeEventList A list of value added service charge events.
 	ValueAddedServiceChargeEventList *ValueAddedServiceChargeEventList `json:"ValueAddedServiceChargeEventList,omitempty"`
 }
 
@@ -1542,8 +1545,8 @@ type TrialShipmentEvent struct {
 // TrialShipmentEventList A list of information about trial shipment financial events.
 type TrialShipmentEventList = []TrialShipmentEvent
 
-// ValueAddedServiceChargeEventList An event related to a value added service charge.
-type ValueAddedServiceChargeEventList struct {
+// ValueAddedServiceChargeEvent An event related to a value added service charge.
+type ValueAddedServiceChargeEvent struct {
 	// Description A short description of the service charge event.
 	Description *string `json:"Description,omitempty"`
 
@@ -1558,6 +1561,9 @@ type ValueAddedServiceChargeEventList struct {
 	// Example: 'Other Support Service fees'
 	TransactionType *string `json:"TransactionType,omitempty"`
 }
+
+// ValueAddedServiceChargeEventList A list of value added service charge events.
+type ValueAddedServiceChargeEventList = []ValueAddedServiceChargeEvent
 
 // ListFinancialEventGroupsParams defines parameters for ListFinancialEventGroups.
 type ListFinancialEventGroupsParams struct {
