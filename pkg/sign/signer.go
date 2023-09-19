@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"io"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -18,13 +17,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/smithy-go/logging"
 	"github.com/google/uuid"
+	"github.com/valyala/bytebufferpool"
 )
-
-var bufferPool = sync.Pool{
-	New: func() any {
-		return &bytes.Buffer{}
-	},
-}
 
 const (
 	ServiceName = "execute-api"
@@ -129,24 +123,21 @@ func (s *AWSSigV4Signer) Sign(r *http.Request) error {
 
 	r.Header.Add("X-Amz-Security-Token", *s.awsStsAssumeRoleOutput.Credentials.SessionToken)
 
-	var body []byte
+	bp := bytebufferpool.Get()
+	defer bytebufferpool.Put(bp)
+	bp.Reset()
 
 	if r.Body != nil {
-		buf := bufferPool.Get().(*bytes.Buffer)
-		defer bufferPool.Put(buf)
-		buf.Reset()
-		_, err = io.Copy(buf, r.Body)
+		_, err := bp.ReadFrom(r.Body)
 		if err != nil {
 			return err
 		}
-		body = buf.Bytes()
-		r.Body = io.NopCloser(buf)
-	} else {
-		body = []byte("")
+		r.ContentLength = int64(bp.Len())
+		r.Body = io.NopCloser(bytes.NewReader(bp.Bytes()))
 	}
 
 	t := time.Now().UTC()
-	sum := sha256.Sum256(body)
+	sum := sha256.Sum256(bp.Bytes())
 	payloadHash := hex.EncodeToString(sum[:])
 
 	return s.aws4Signer.SignHTTP(ctx, *s.awsCredentials, r, payloadHash, ServiceName, s.cfg.Region, t)
