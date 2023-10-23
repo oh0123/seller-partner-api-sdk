@@ -85,6 +85,7 @@ func (s *AWSSigV4Signer) autoRefreshCredentials(ctx context.Context) error {
 	return nil
 }
 
+// Deprecated: Util 20231231. Use new_signer instead.
 func (s *AWSSigV4Signer) Sign(r *http.Request) error {
 
 	var clientLogMode aws.ClientLogMode
