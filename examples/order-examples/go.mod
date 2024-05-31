@@ -1,6 +1,6 @@
 module order-examples
 
-go 1.21.0
+go 1.22.0
 
 replace github.com/oh0123/seller-partner-api-sdk v1.0.0 => ../../
 
