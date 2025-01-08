@@ -92,7 +92,7 @@ func (t *LwaAuthCredentials) GetRotateAccessTokenFromEndpoint(ctx context.Contex
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "x-www-form-urlencoded;charset=UTF-8")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
