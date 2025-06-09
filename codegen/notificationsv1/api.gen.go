@@ -14,7 +14,6 @@ import (
 	runt "runtime"
 	"strings"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -649,7 +648,7 @@ func NewGetDestinationsRequest(server string) (*http.Request, error) {
 // NewCreateDestinationRequest calls the generic CreateDestination builder with application/json body
 func NewCreateDestinationRequest(server string, body CreateDestinationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -813,7 +812,7 @@ func NewGetSubscriptionRequest(server string, notificationType NotificationType,
 // NewCreateSubscriptionRequest calls the generic CreateSubscription builder with application/json body
 func NewCreateSubscriptionRequest(server string, notificationType NotificationType, body CreateSubscriptionJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

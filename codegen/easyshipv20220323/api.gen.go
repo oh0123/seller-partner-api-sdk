@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -733,7 +732,7 @@ func NewGetScheduledPackageRequest(server string, params *GetScheduledPackagePar
 // NewUpdateScheduledPackagesRequest calls the generic UpdateScheduledPackages builder with application/json body
 func NewUpdateScheduledPackagesRequest(server string, body UpdateScheduledPackagesJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -773,7 +772,7 @@ func NewUpdateScheduledPackagesRequestWithBody(server string, contentType string
 // NewCreateScheduledPackageRequest calls the generic CreateScheduledPackage builder with application/json body
 func NewCreateScheduledPackageRequest(server string, body CreateScheduledPackageJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -813,7 +812,7 @@ func NewCreateScheduledPackageRequestWithBody(server string, contentType string,
 // NewCreateScheduledPackageBulkRequest calls the generic CreateScheduledPackageBulk builder with application/json body
 func NewCreateScheduledPackageBulkRequest(server string, body CreateScheduledPackageBulkJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -853,7 +852,7 @@ func NewCreateScheduledPackageBulkRequestWithBody(server string, contentType str
 // NewListHandoverSlotsRequest calls the generic ListHandoverSlots builder with application/json body
 func NewListHandoverSlotsRequest(server string, body ListHandoverSlotsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@
 package warehousingdistributionv20240509
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -34,6 +35,12 @@ const (
 	PALLET DistributionPackageType = "PALLET"
 )
 
+// Defines values for InboundEligibilityStatus.
+const (
+	ELIGIBLE   InboundEligibilityStatus = "ELIGIBLE"
+	INELIGIBLE InboundEligibilityStatus = "INELIGIBLE"
+)
+
 // Defines values for InboundShipmentStatus.
 const (
 	InboundShipmentStatusCANCELLED InboundShipmentStatus = "CANCELLED"
@@ -45,11 +52,59 @@ const (
 	InboundShipmentStatusSHIPPED   InboundShipmentStatus = "SHIPPED"
 )
 
+// Defines values for InboundStatus.
+const (
+	InboundStatusCANCELLED  InboundStatus = "CANCELLED"
+	InboundStatusCLOSED     InboundStatus = "CLOSED"
+	InboundStatusCONFIRMED  InboundStatus = "CONFIRMED"
+	InboundStatusDRAFT      InboundStatus = "DRAFT"
+	InboundStatusEXPIRED    InboundStatus = "EXPIRED"
+	InboundStatusVALIDATING InboundStatus = "VALIDATING"
+)
+
 // Defines values for InventoryUnitOfMeasurement.
 const (
 	CASES        InventoryUnitOfMeasurement = "CASES"
 	PALLETS      InventoryUnitOfMeasurement = "PALLETS"
 	PRODUCTUNITS InventoryUnitOfMeasurement = "PRODUCT_UNITS"
+)
+
+// Defines values for LabelOwner.
+const (
+	LabelOwnerAMAZON LabelOwner = "AMAZON"
+	LabelOwnerSELF   LabelOwner = "SELF"
+)
+
+// Defines values for LabelStatus.
+const (
+	GENERATED        LabelStatus = "GENERATED"
+	GENERATING       LabelStatus = "GENERATING"
+	GENERATIONFAILED LabelStatus = "GENERATION_FAILED"
+	NOTREADY         LabelStatus = "NOT_READY"
+)
+
+// Defines values for PrepCategory.
+const (
+	ADULT      PrepCategory = "ADULT"
+	BABY       PrepCategory = "BABY"
+	FCPROVIDED PrepCategory = "FC_PROVIDED"
+	FRAGILE    PrepCategory = "FRAGILE"
+	GRANULAR   PrepCategory = "GRANULAR"
+	HANGER     PrepCategory = "HANGER"
+	LIQUID     PrepCategory = "LIQUID"
+	NOPREP     PrepCategory = "NO_PREP"
+	PERFORATED PrepCategory = "PERFORATED"
+	SET        PrepCategory = "SET"
+	SHARP      PrepCategory = "SHARP"
+	SMALL      PrepCategory = "SMALL"
+	TEXTILE    PrepCategory = "TEXTILE"
+	UNKNOWN    PrepCategory = "UNKNOWN"
+)
+
+// Defines values for PrepOwner.
+const (
+	PrepOwnerAMAZON PrepOwner = "AMAZON"
+	PrepOwnerSELF   PrepOwner = "SELF"
 )
 
 // Defines values for VolumeUnitOfMeasurement.
@@ -79,19 +134,31 @@ const (
 
 // Defines values for ListInboundShipmentsParamsShipmentStatus.
 const (
-	ListInboundShipmentsParamsShipmentStatusCANCELLED ListInboundShipmentsParamsShipmentStatus = "CANCELLED"
-	ListInboundShipmentsParamsShipmentStatusCLOSED    ListInboundShipmentsParamsShipmentStatus = "CLOSED"
-	ListInboundShipmentsParamsShipmentStatusCREATED   ListInboundShipmentsParamsShipmentStatus = "CREATED"
-	ListInboundShipmentsParamsShipmentStatusDELIVERED ListInboundShipmentsParamsShipmentStatus = "DELIVERED"
-	ListInboundShipmentsParamsShipmentStatusINTRANSIT ListInboundShipmentsParamsShipmentStatus = "IN_TRANSIT"
-	ListInboundShipmentsParamsShipmentStatusRECEIVING ListInboundShipmentsParamsShipmentStatus = "RECEIVING"
-	ListInboundShipmentsParamsShipmentStatusSHIPPED   ListInboundShipmentsParamsShipmentStatus = "SHIPPED"
+	CANCELLED ListInboundShipmentsParamsShipmentStatus = "CANCELLED"
+	CLOSED    ListInboundShipmentsParamsShipmentStatus = "CLOSED"
+	CREATED   ListInboundShipmentsParamsShipmentStatus = "CREATED"
+	DELIVERED ListInboundShipmentsParamsShipmentStatus = "DELIVERED"
+	INTRANSIT ListInboundShipmentsParamsShipmentStatus = "IN_TRANSIT"
+	RECEIVING ListInboundShipmentsParamsShipmentStatus = "RECEIVING"
+	SHIPPED   ListInboundShipmentsParamsShipmentStatus = "SHIPPED"
 )
 
 // Defines values for GetInboundShipmentParamsSkuQuantities.
 const (
 	GetInboundShipmentParamsSkuQuantitiesHIDE GetInboundShipmentParamsSkuQuantities = "HIDE"
 	GetInboundShipmentParamsSkuQuantitiesSHOW GetInboundShipmentParamsSkuQuantities = "SHOW"
+)
+
+// Defines values for GetInboundShipmentLabelsParamsPageType.
+const (
+	LETTER6       GetInboundShipmentLabelsParamsPageType = "LETTER_6"
+	PLAINPAPER    GetInboundShipmentLabelsParamsPageType = "PLAIN_PAPER"
+	THERMALNONPCP GetInboundShipmentLabelsParamsPageType = "THERMAL_NONPCP"
+)
+
+// Defines values for GetInboundShipmentLabelsParamsFormatType.
+const (
+	PDF GetInboundShipmentLabelsParamsFormatType = "PDF"
 )
 
 // Defines values for ListInventoryParamsSortOrder.
@@ -154,6 +221,18 @@ type CarrierCode struct {
 // CarrierCodeType Denotes the type for the carrier.
 type CarrierCodeType string
 
+// DestinationDetails Destination details of an inbound order based on the assigned region and DC for the order.
+type DestinationDetails struct {
+	// DestinationAddress Shipping address that represents the origin or destination location.
+	DestinationAddress *Address `json:"destinationAddress,omitempty"`
+
+	// DestinationRegion Assigned region where the order will be shipped. This can differ from what was passed as preference. AWD currently supports following region IDs: [us-west, us-east, us-southcentral, us-southeast]
+	DestinationRegion *string `json:"destinationRegion,omitempty"`
+
+	// ShipmentId Unique ID of the confirmed shipment being shipped to the assigned destination. This will be available only after an inbound order is confirmed and can be used to track the shipment.
+	ShipmentId *string `json:"shipmentId,omitempty"`
+}
+
 // DimensionUnitOfMeasurement Unit of measurement for package dimensions.
 type DimensionUnitOfMeasurement string
 
@@ -208,6 +287,96 @@ type ErrorList struct {
 	Errors []Error `json:"errors"`
 }
 
+// ExpirationDetails The expiration details of the inventory. This object will only appear if the details parameter in the request is set to `SHOW`.
+type ExpirationDetails struct {
+	// Expiration The expiration date of the SKU.
+	Expiration *time.Time `json:"expiration,omitempty"`
+
+	// OnhandQuantity The quantity that is present in AWD.
+	OnhandQuantity *int64 `json:"onhandQuantity,omitempty"`
+}
+
+// InboundEligibility Represents the eligibility status of the inbound packages.
+type InboundEligibility struct {
+	// IneligibilityReasons If there are order level eligibility issues, then this list will contain those error codes and descriptions.
+	IneligibilityReasons *[]OrderIneligibilityReason `json:"ineligibilityReasons,omitempty"`
+
+	// PackagesToInbound Details on SKU eligibility for each inbound package.
+	PackagesToInbound []SkuEligibility `json:"packagesToInbound"`
+
+	// PreviewedAt Timestamp when the eligibility check is performed.
+	PreviewedAt time.Time `json:"previewedAt"`
+
+	// Status Enum denoting the package inbound eligibility.
+	Status InboundEligibilityStatus `json:"status"`
+}
+
+// InboundEligibilityStatus Enum denoting the package inbound eligibility.
+type InboundEligibilityStatus string
+
+// InboundOrder Represents an AWD inbound order.
+type InboundOrder struct {
+	// CreatedAt Date when this order was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DestinationDetails Destination details of an inbound order based on the assigned region and DC for the order.
+	DestinationDetails *DestinationDetails `json:"destinationDetails,omitempty"`
+
+	// ExternalReferenceId Reference ID that can be used to correlate the order with partner resources.
+	ExternalReferenceId *string `json:"externalReferenceId,omitempty"`
+
+	// OrderId Inbound order ID.
+	OrderId string `json:"orderId"`
+
+	// OrderStatus The supported statuses for an inbound order.
+	OrderStatus InboundStatus `json:"orderStatus"`
+
+	// OriginAddress Shipping address that represents the origin or destination location.
+	OriginAddress Address `json:"originAddress"`
+
+	// PackagesToInbound List of packages to be inbounded.
+	PackagesToInbound []DistributionPackageQuantity `json:"packagesToInbound"`
+
+	// Preferences Preferences that can be passed in context of an inbound order
+	Preferences *InboundPreferences `json:"preferences,omitempty"`
+
+	// UpdatedAt Date when this order was last updated.
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+}
+
+// InboundOrderCreationData Payload for creating an inbound order.
+type InboundOrderCreationData struct {
+	// ExternalReferenceId Reference ID that can be used to correlate the order with partner resources.
+	ExternalReferenceId *string `json:"externalReferenceId,omitempty"`
+
+	// OriginAddress Shipping address that represents the origin or destination location.
+	OriginAddress Address `json:"originAddress"`
+
+	// PackagesToInbound List of packages to be inbounded.
+	PackagesToInbound []DistributionPackageQuantity `json:"packagesToInbound"`
+
+	// Preferences Preferences that can be passed in context of an inbound order
+	Preferences *InboundPreferences `json:"preferences,omitempty"`
+}
+
+// InboundOrderReference A response that contains the reference identifiers for the newly created or updated inbound order. Consists of an order ID and version.
+type InboundOrderReference struct {
+	// OrderId Order ID of the inbound order.
+	OrderId string `json:"orderId"`
+}
+
+// InboundPackages Represents the packages to inbound.
+type InboundPackages struct {
+	// PackagesToInbound List of packages to be inbounded.
+	PackagesToInbound []DistributionPackageQuantity `json:"packagesToInbound"`
+}
+
+// InboundPreferences Preferences that can be passed in context of an inbound order
+type InboundPreferences struct {
+	// DestinationRegion Pass a preferred region so that the inbound order can be shipped to an AWD warehouse located in that region. This doesn't guarantee the order to be assigned in the specified destination region as it depends on warehouse capacity availability. AWD currently supports following region IDs: [us-west, us-east, us-southcentral, us-southeast]
+	DestinationRegion *string `json:"destinationRegion,omitempty"`
+}
+
 // InboundShipment Represents an AWD inbound shipment.
 type InboundShipment struct {
 	// CarrierCode Identifies the carrier that will deliver the shipment.
@@ -218,6 +387,9 @@ type InboundShipment struct {
 
 	// DestinationAddress Shipping address that represents the origin or destination location.
 	DestinationAddress Address `json:"destinationAddress"`
+
+	// DestinationRegion Assigned region where the order will be shipped. This can differ from what was passed as preference. AWD currently supports following region IDs: [us-west, us-east, us-southcentral, us-southeast]
+	DestinationRegion *string `json:"destinationRegion,omitempty"`
 
 	// ExternalReferenceId Client-provided reference ID that can correlate this shipment to client resources. For example, to map this shipment to an internal bookkeeping order record.
 	ExternalReferenceId *string `json:"externalReferenceId,omitempty"`
@@ -280,10 +452,16 @@ type InboundShipmentSummary struct {
 	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 }
 
+// InboundStatus The supported statuses for an inbound order.
+type InboundStatus string
+
 // InventoryDetails Additional inventory details. This object is only displayed if the details parameter in the request is set to `SHOW`.
 type InventoryDetails struct {
 	// AvailableDistributableQuantity Quantity that is available for downstream channel replenishment.
 	AvailableDistributableQuantity *int64 `json:"availableDistributableQuantity,omitempty"`
+
+	// ReplenishmentQuantity Quantity that is in transit from AWD and has not yet been received at FBA.
+	ReplenishmentQuantity *int64 `json:"replenishmentQuantity,omitempty"`
 
 	// ReservedDistributableQuantity Quantity that is reserved for a downstream channel replenishment order that is being prepared for shipment.
 	ReservedDistributableQuantity *int64 `json:"reservedDistributableQuantity,omitempty"`
@@ -294,7 +472,7 @@ type InventoryListing struct {
 	// Inventory List of inventory summaries.
 	Inventory []InventorySummary `json:"inventory"`
 
-	// NextToken Token to retrieve the next set of paginated results.
+	// NextToken A token that is used to retrieve the next page of results. The response includes `nextToken` when the number of results exceeds the specified `maxResults` value. To get the next page of results, call the operation with this token and include the same arguments as the call that produced the token. To get a complete list, call this operation until `nextToken` is null. Note that this operation can return empty pages.
 	NextToken *string `json:"nextToken,omitempty"`
 }
 
@@ -309,6 +487,9 @@ type InventoryQuantity struct {
 
 // InventorySummary Summary of inventory per SKU.
 type InventorySummary struct {
+	// ExpirationDetails The expiration details of the inventory. This object will only appear if the `details` parameter in the request is set to `SHOW`.
+	ExpirationDetails *[]ExpirationDetails `json:"expirationDetails,omitempty"`
+
 	// InventoryDetails Additional inventory details. This object is only displayed if the details parameter in the request is set to `SHOW`.
 	InventoryDetails *InventoryDetails `json:"inventoryDetails,omitempty"`
 
@@ -325,6 +506,12 @@ type InventorySummary struct {
 // InventoryUnitOfMeasurement Unit of measurement for the inventory.
 type InventoryUnitOfMeasurement string
 
+// LabelOwner The entity that labels the products.
+type LabelOwner string
+
+// LabelStatus The status of your label.
+type LabelStatus string
+
 // MeasurementData Package weight and dimension.
 type MeasurementData struct {
 	// Dimensions Dimensions of the package.
@@ -335,6 +522,15 @@ type MeasurementData struct {
 
 	// Weight Represents the weight of the package with a unit of measurement.
 	Weight PackageWeight `json:"weight"`
+}
+
+// OrderIneligibilityReason Represents one ineligibility reason for the order (there can be multiple reasons).
+type OrderIneligibilityReason struct {
+	// Code Code for the order ineligibility.
+	Code string `json:"code"`
+
+	// Description Description detailing the ineligibility reason of the order.
+	Description string `json:"description"`
 }
 
 // PackageDimensions Dimensions of the package.
@@ -370,6 +566,37 @@ type PackageWeight struct {
 	Weight float64 `json:"weight"`
 }
 
+// PrepCategory The preparation category for shipping an item to Amazon's fulfillment network.
+type PrepCategory string
+
+// PrepDetails The preparation details for a product. This contains the prep category, prep owner, and label owner.
+// Prep instructions are generated based on the specified category.
+type PrepDetails struct {
+	// LabelOwner The entity that labels the products.
+	LabelOwner *LabelOwner `json:"labelOwner,omitempty"`
+
+	// PrepCategory The preparation category for shipping an item to Amazon's fulfillment network.
+	PrepCategory *PrepCategory `json:"prepCategory,omitempty"`
+
+	// PrepInstructions Contains information about the preparation of the inbound products. The system auto-generates this field with the use of the `prepCategory`, and if you attempt to pass a value for this field, the system will ignore it.
+	PrepInstructions *[]PrepInstruction `json:"prepInstructions,omitempty"`
+
+	// PrepOwner The owner of the preparations, if special preparations are required.
+	PrepOwner *PrepOwner `json:"prepOwner,omitempty"`
+}
+
+// PrepInstruction Information pertaining to the preparation of inbound products.
+type PrepInstruction struct {
+	// PrepOwner The owner of the preparations, if special preparations are required.
+	PrepOwner *PrepOwner `json:"prepOwner,omitempty"`
+
+	// PrepType The type of preparation to be done. For more information about preparing items, refer to [Prep guidance](https://sellercentral.amazon.com/help/hub/reference/external/GF4G7547KSLDX2KC) on Seller Central.
+	PrepType *string `json:"prepType,omitempty"`
+}
+
+// PrepOwner The owner of the preparations, if special preparations are required.
+type PrepOwner string
+
 // ProductAttribute Product instance attribute that is not described at the SKU level in the catalog.
 type ProductAttribute struct {
 	// Name Product attribute name.
@@ -381,8 +608,15 @@ type ProductAttribute struct {
 
 // ProductQuantity Represents a product with the SKU details and the corresponding quantity.
 type ProductQuantity struct {
-	// Attributes Attributes for this instance of the product. For example, already-prepped, or other attributes that distinguish the product beyond the SKU.
+	// Attributes Contains attributes for this instance of the product. For example, item color, or other attributes that distinguish the product beyond the SKU. This is metadata for the product and Amazon does not process this data.
 	Attributes *[]ProductAttribute `json:"attributes,omitempty"`
+
+	// Expiration The expiration date for the SKU. Values are in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	Expiration *time.Time `json:"expiration,omitempty"`
+
+	// PrepDetails The preparation details for a product. This contains the prep category, prep owner, and label owner.
+	// Prep instructions are generated based on the specified category.
+	PrepDetails *PrepDetails `json:"prepDetails,omitempty"`
 
 	// Quantity Product quantity.
 	Quantity int32 `json:"quantity"`
@@ -391,13 +625,43 @@ type ProductQuantity struct {
 	Sku string `json:"sku"`
 }
 
+// ShipmentLabels Shipment labels.
+type ShipmentLabels struct {
+	// LabelDownloadURL The URL to download shipment labels. The URL is active for 600 seconds from generation.
+	LabelDownloadURL *string `json:"labelDownloadURL,omitempty"`
+
+	// LabelStatus The status of your label.
+	LabelStatus LabelStatus `json:"labelStatus"`
+}
+
 // ShipmentListing A list of inbound shipment summaries filtered by the attributes specified in the request.
 type ShipmentListing struct {
-	// NextToken Token to retrieve the next set of paginated results.
+	// NextToken A token that is used to retrieve the next page of results. The response includes `nextToken` when the number of results exceeds the specified `maxResults` value. To get the next page of results, call the operation with this token and include the same arguments as the call that produced the token. To get a complete list, call this operation until `nextToken` is null. Note that this operation can return empty pages.
 	NextToken *string `json:"nextToken,omitempty"`
 
 	// Shipments List of inbound shipment summaries.
 	Shipments *[]InboundShipmentSummary `json:"shipments,omitempty"`
+}
+
+// SkuEligibility Represents eligibility of one SKU.
+type SkuEligibility struct {
+	// IneligibilityReasons If not eligible, these are list of error codes and descriptions.
+	IneligibilityReasons *[]SkuIneligibilityReason `json:"ineligibilityReasons,omitempty"`
+
+	// PackageQuantity Represents a distribution package with its respective quantity.
+	PackageQuantity DistributionPackageQuantity `json:"packageQuantity"`
+
+	// Status Enum denoting the package inbound eligibility.
+	Status InboundEligibilityStatus `json:"status"`
+}
+
+// SkuIneligibilityReason Represents the ineligibility reason for one SKU.
+type SkuIneligibilityReason struct {
+	// Code Code for the SKU ineligibility.
+	Code string `json:"code"`
+
+	// Description Detailed description of the SKU ineligibility.
+	Description string `json:"description"`
 }
 
 // SkuQuantity Quantity details for a SKU as part of a shipment
@@ -410,6 +674,21 @@ type SkuQuantity struct {
 
 	// Sku The merchant stock keeping unit
 	Sku string `json:"sku"`
+}
+
+// TrackingDetails Tracking details for the shipment. If using SPD transportation, this can be for each case. If not using SPD transportation, this is a single tracking entry for the entire shipment.
+type TrackingDetails struct {
+	// BookingId The identifier that is received from transportation to uniquely identify a booking.
+	BookingId string `json:"bookingId"`
+
+	// CarrierCode Identifies the carrier that will deliver the shipment.
+	CarrierCode *CarrierCode `json:"carrierCode,omitempty"`
+}
+
+// TransportationDetails Transportation details for the shipment.
+type TransportationDetails struct {
+	// TrackingDetails Tracking details for the shipment. If using SPD transportation, this can be for each case. If not using SPD transportation, this is a single tracking entry for the entire shipment.
+	TrackingDetails []TrackingDetails `json:"trackingDetails"`
 }
 
 // VolumeUnitOfMeasurement Unit of measurement for the package volume.
@@ -438,7 +717,7 @@ type ListInboundShipmentsParams struct {
 	// MaxResults Maximum number of results to return.
 	MaxResults *int32 `form:"maxResults,omitempty" json:"maxResults,omitempty"`
 
-	// NextToken Token to retrieve the next set of paginated results.
+	// NextToken A token that is used to retrieve the next page of results. The response includes `nextToken` when the number of results exceeds the specified `maxResults` value. To get the next page of results, call the operation with this token and include the same arguments as the call that produced the token. To get a complete list, call this operation until `nextToken` is null. Note that this operation can return empty pages.
 	NextToken *string `form:"nextToken,omitempty" json:"nextToken,omitempty"`
 }
 
@@ -462,6 +741,21 @@ type GetInboundShipmentParams struct {
 // GetInboundShipmentParamsSkuQuantities defines parameters for GetInboundShipment.
 type GetInboundShipmentParamsSkuQuantities string
 
+// GetInboundShipmentLabelsParams defines parameters for GetInboundShipmentLabels.
+type GetInboundShipmentLabelsParams struct {
+	// PageType Page type for the generated labels. The default is `PLAIN_PAPER`.
+	PageType *GetInboundShipmentLabelsParamsPageType `form:"pageType,omitempty" json:"pageType,omitempty"`
+
+	// FormatType The format type of the output file that contains your labels. The default format type is `PDF`.
+	FormatType *GetInboundShipmentLabelsParamsFormatType `form:"formatType,omitempty" json:"formatType,omitempty"`
+}
+
+// GetInboundShipmentLabelsParamsPageType defines parameters for GetInboundShipmentLabels.
+type GetInboundShipmentLabelsParamsPageType string
+
+// GetInboundShipmentLabelsParamsFormatType defines parameters for GetInboundShipmentLabels.
+type GetInboundShipmentLabelsParamsFormatType string
+
 // ListInventoryParams defines parameters for ListInventory.
 type ListInventoryParams struct {
 	// Sku Filter by seller or merchant SKU for the item.
@@ -473,7 +767,7 @@ type ListInventoryParams struct {
 	// Details Set to `SHOW` to return summaries with additional inventory details. Defaults to `HIDE,` which returns only inventory summary totals.
 	Details *ListInventoryParamsDetails `form:"details,omitempty" json:"details,omitempty"`
 
-	// NextToken Token to retrieve the next set of paginated results.
+	// NextToken A token that is used to retrieve the next page of results. The response includes `nextToken` when the number of results exceeds the specified `maxResults` value. To get the next page of results, call the operation with this token and include the same arguments as the call that produced the token. To get a complete list, call this operation until `nextToken` is null. Note that this operation can return empty pages.
 	NextToken *string `form:"nextToken,omitempty" json:"nextToken,omitempty"`
 
 	// MaxResults Maximum number of results to return.
@@ -485,6 +779,18 @@ type ListInventoryParamsSortOrder string
 
 // ListInventoryParamsDetails defines parameters for ListInventory.
 type ListInventoryParamsDetails string
+
+// CheckInboundEligibilityJSONRequestBody defines body for CheckInboundEligibility for application/json ContentType.
+type CheckInboundEligibilityJSONRequestBody = InboundPackages
+
+// CreateInboundJSONRequestBody defines body for CreateInbound for application/json ContentType.
+type CreateInboundJSONRequestBody = InboundOrderCreationData
+
+// UpdateInboundJSONRequestBody defines body for UpdateInbound for application/json ContentType.
+type UpdateInboundJSONRequestBody = InboundOrder
+
+// UpdateInboundShipmentTransportDetailsJSONRequestBody defines body for UpdateInboundShipmentTransportDetails for application/json ContentType.
+type UpdateInboundShipmentTransportDetailsJSONRequestBody = TransportationDetails
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -582,14 +888,226 @@ func WithResponseEditorFn(fn ResponseEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// CheckInboundEligibilityWithBody request with any body
+	CheckInboundEligibilityWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error)
+
+	CheckInboundEligibility(ctx context.Context, body CheckInboundEligibilityJSONRequestBody) (*http.Response, error)
+
+	// CreateInboundWithBody request with any body
+	CreateInboundWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error)
+
+	CreateInbound(ctx context.Context, body CreateInboundJSONRequestBody) (*http.Response, error)
+
+	// GetInbound request
+	GetInbound(ctx context.Context, orderId string) (*http.Response, error)
+
+	// UpdateInboundWithBody request with any body
+	UpdateInboundWithBody(ctx context.Context, orderId string, contentType string, body io.Reader) (*http.Response, error)
+
+	UpdateInbound(ctx context.Context, orderId string, body UpdateInboundJSONRequestBody) (*http.Response, error)
+
+	// CancelInbound request
+	CancelInbound(ctx context.Context, orderId string) (*http.Response, error)
+
+	// ConfirmInbound request
+	ConfirmInbound(ctx context.Context, orderId string) (*http.Response, error)
+
 	// ListInboundShipments request
 	ListInboundShipments(ctx context.Context, params *ListInboundShipmentsParams) (*http.Response, error)
 
 	// GetInboundShipment request
 	GetInboundShipment(ctx context.Context, shipmentId string, params *GetInboundShipmentParams) (*http.Response, error)
 
+	// GetInboundShipmentLabels request
+	GetInboundShipmentLabels(ctx context.Context, shipmentId string, params *GetInboundShipmentLabelsParams) (*http.Response, error)
+
+	// UpdateInboundShipmentTransportDetailsWithBody request with any body
+	UpdateInboundShipmentTransportDetailsWithBody(ctx context.Context, shipmentId string, contentType string, body io.Reader) (*http.Response, error)
+
+	UpdateInboundShipmentTransportDetails(ctx context.Context, shipmentId string, body UpdateInboundShipmentTransportDetailsJSONRequestBody) (*http.Response, error)
+
 	// ListInventory request
 	ListInventory(ctx context.Context, params *ListInventoryParams) (*http.Response, error)
+}
+
+func (c *Client) CheckInboundEligibilityWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewCheckInboundEligibilityRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) CheckInboundEligibility(ctx context.Context, body CheckInboundEligibilityJSONRequestBody) (*http.Response, error) {
+	req, err := NewCheckInboundEligibilityRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) CreateInboundWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewCreateInboundRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) CreateInbound(ctx context.Context, body CreateInboundJSONRequestBody) (*http.Response, error) {
+	req, err := NewCreateInboundRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GetInbound(ctx context.Context, orderId string) (*http.Response, error) {
+	req, err := NewGetInboundRequest(c.Server, orderId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) UpdateInboundWithBody(ctx context.Context, orderId string, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewUpdateInboundRequestWithBody(c.Server, orderId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) UpdateInbound(ctx context.Context, orderId string, body UpdateInboundJSONRequestBody) (*http.Response, error) {
+	req, err := NewUpdateInboundRequest(c.Server, orderId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) CancelInbound(ctx context.Context, orderId string) (*http.Response, error) {
+	req, err := NewCancelInboundRequest(c.Server, orderId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) ConfirmInbound(ctx context.Context, orderId string) (*http.Response, error) {
+	req, err := NewConfirmInboundRequest(c.Server, orderId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
 }
 
 func (c *Client) ListInboundShipments(ctx context.Context, params *ListInboundShipmentsParams) (*http.Response, error) {
@@ -632,6 +1150,66 @@ func (c *Client) GetInboundShipment(ctx context.Context, shipmentId string, para
 	return rsp, nil
 }
 
+func (c *Client) GetInboundShipmentLabels(ctx context.Context, shipmentId string, params *GetInboundShipmentLabelsParams) (*http.Response, error) {
+	req, err := NewGetInboundShipmentLabelsRequest(c.Server, shipmentId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) UpdateInboundShipmentTransportDetailsWithBody(ctx context.Context, shipmentId string, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewUpdateInboundShipmentTransportDetailsRequestWithBody(c.Server, shipmentId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) UpdateInboundShipmentTransportDetails(ctx context.Context, shipmentId string, body UpdateInboundShipmentTransportDetailsJSONRequestBody) (*http.Response, error) {
+	req, err := NewUpdateInboundShipmentTransportDetailsRequest(c.Server, shipmentId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
 func (c *Client) ListInventory(ctx context.Context, params *ListInventoryParams) (*http.Response, error) {
 	req, err := NewListInventoryRequest(c.Server, params)
 	if err != nil {
@@ -650,6 +1228,235 @@ func (c *Client) ListInventory(ctx context.Context, params *ListInventoryParams)
 		return nil, err
 	}
 	return rsp, nil
+}
+
+// NewCheckInboundEligibilityRequest calls the generic CheckInboundEligibility builder with application/json body
+func NewCheckInboundEligibilityRequest(server string, body CheckInboundEligibilityJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCheckInboundEligibilityRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCheckInboundEligibilityRequestWithBody generates requests for CheckInboundEligibility with any type of body
+func NewCheckInboundEligibilityRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/awd/2024-05-09/inboundEligibility")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateInboundRequest calls the generic CreateInbound builder with application/json body
+func NewCreateInboundRequest(server string, body CreateInboundJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateInboundRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateInboundRequestWithBody generates requests for CreateInbound with any type of body
+func NewCreateInboundRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/awd/2024-05-09/inboundOrders")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetInboundRequest generates requests for GetInbound
+func NewGetInboundRequest(server string, orderId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orderId", runtime.ParamLocationPath, orderId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/awd/2024-05-09/inboundOrders/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateInboundRequest calls the generic UpdateInbound builder with application/json body
+func NewUpdateInboundRequest(server string, orderId string, body UpdateInboundJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateInboundRequestWithBody(server, orderId, "application/json", bodyReader)
+}
+
+// NewUpdateInboundRequestWithBody generates requests for UpdateInbound with any type of body
+func NewUpdateInboundRequestWithBody(server string, orderId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orderId", runtime.ParamLocationPath, orderId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/awd/2024-05-09/inboundOrders/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCancelInboundRequest generates requests for CancelInbound
+func NewCancelInboundRequest(server string, orderId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orderId", runtime.ParamLocationPath, orderId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/awd/2024-05-09/inboundOrders/%s/cancellation", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewConfirmInboundRequest generates requests for ConfirmInbound
+func NewConfirmInboundRequest(server string, orderId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orderId", runtime.ParamLocationPath, orderId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/awd/2024-05-09/inboundOrders/%s/confirmation", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewListInboundShipmentsRequest generates requests for ListInboundShipments
@@ -853,6 +1660,125 @@ func NewGetInboundShipmentRequest(server string, shipmentId string, params *GetI
 	return req, nil
 }
 
+// NewGetInboundShipmentLabelsRequest generates requests for GetInboundShipmentLabels
+func NewGetInboundShipmentLabelsRequest(server string, shipmentId string, params *GetInboundShipmentLabelsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "shipmentId", runtime.ParamLocationPath, shipmentId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/awd/2024-05-09/inboundShipments/%s/labels", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.PageType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "pageType", runtime.ParamLocationQuery, *params.PageType); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.FormatType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "formatType", runtime.ParamLocationQuery, *params.FormatType); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateInboundShipmentTransportDetailsRequest calls the generic UpdateInboundShipmentTransportDetails builder with application/json body
+func NewUpdateInboundShipmentTransportDetailsRequest(server string, shipmentId string, body UpdateInboundShipmentTransportDetailsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateInboundShipmentTransportDetailsRequestWithBody(server, shipmentId, "application/json", bodyReader)
+}
+
+// NewUpdateInboundShipmentTransportDetailsRequestWithBody generates requests for UpdateInboundShipmentTransportDetails with any type of body
+func NewUpdateInboundShipmentTransportDetailsRequestWithBody(server string, shipmentId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "shipmentId", runtime.ParamLocationPath, shipmentId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/awd/2024-05-09/inboundShipments/%s/transport", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewListInventoryRequest generates requests for ListInventory
 func NewListInventoryRequest(server string, params *ListInventoryParams) (*http.Request, error) {
 	var err error
@@ -1011,14 +1937,226 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// CheckInboundEligibilityWithBodyWithResponse request with any body
+	CheckInboundEligibilityWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*CheckInboundEligibilityResp, error)
+
+	CheckInboundEligibilityWithResponse(ctx context.Context, body CheckInboundEligibilityJSONRequestBody) (*CheckInboundEligibilityResp, error)
+
+	// CreateInboundWithBodyWithResponse request with any body
+	CreateInboundWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*CreateInboundResp, error)
+
+	CreateInboundWithResponse(ctx context.Context, body CreateInboundJSONRequestBody) (*CreateInboundResp, error)
+
+	// GetInboundWithResponse request
+	GetInboundWithResponse(ctx context.Context, orderId string) (*GetInboundResp, error)
+
+	// UpdateInboundWithBodyWithResponse request with any body
+	UpdateInboundWithBodyWithResponse(ctx context.Context, orderId string, contentType string, body io.Reader) (*UpdateInboundResp, error)
+
+	UpdateInboundWithResponse(ctx context.Context, orderId string, body UpdateInboundJSONRequestBody) (*UpdateInboundResp, error)
+
+	// CancelInboundWithResponse request
+	CancelInboundWithResponse(ctx context.Context, orderId string) (*CancelInboundResp, error)
+
+	// ConfirmInboundWithResponse request
+	ConfirmInboundWithResponse(ctx context.Context, orderId string) (*ConfirmInboundResp, error)
+
 	// ListInboundShipmentsWithResponse request
 	ListInboundShipmentsWithResponse(ctx context.Context, params *ListInboundShipmentsParams) (*ListInboundShipmentsResp, error)
 
 	// GetInboundShipmentWithResponse request
 	GetInboundShipmentWithResponse(ctx context.Context, shipmentId string, params *GetInboundShipmentParams) (*GetInboundShipmentResp, error)
 
+	// GetInboundShipmentLabelsWithResponse request
+	GetInboundShipmentLabelsWithResponse(ctx context.Context, shipmentId string, params *GetInboundShipmentLabelsParams) (*GetInboundShipmentLabelsResp, error)
+
+	// UpdateInboundShipmentTransportDetailsWithBodyWithResponse request with any body
+	UpdateInboundShipmentTransportDetailsWithBodyWithResponse(ctx context.Context, shipmentId string, contentType string, body io.Reader) (*UpdateInboundShipmentTransportDetailsResp, error)
+
+	UpdateInboundShipmentTransportDetailsWithResponse(ctx context.Context, shipmentId string, body UpdateInboundShipmentTransportDetailsJSONRequestBody) (*UpdateInboundShipmentTransportDetailsResp, error)
+
 	// ListInventoryWithResponse request
 	ListInventoryWithResponse(ctx context.Context, params *ListInventoryParams) (*ListInventoryResp, error)
+}
+
+type CheckInboundEligibilityResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *InboundEligibility
+	JSON400      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r CheckInboundEligibilityResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CheckInboundEligibilityResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateInboundResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *InboundOrderReference
+	JSON400      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateInboundResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateInboundResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetInboundResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *InboundOrder
+	JSON400      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r GetInboundResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetInboundResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateInboundResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON409      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateInboundResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateInboundResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CancelInboundResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON409      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r CancelInboundResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CancelInboundResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ConfirmInboundResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON409      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r ConfirmInboundResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ConfirmInboundResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type ListInboundShipmentsResp struct {
@@ -1081,6 +2219,65 @@ func (r GetInboundShipmentResp) StatusCode() int {
 	return 0
 }
 
+type GetInboundShipmentLabelsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ShipmentLabels
+	JSON400      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r GetInboundShipmentLabelsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetInboundShipmentLabelsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateInboundShipmentTransportDetailsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateInboundShipmentTransportDetailsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateInboundShipmentTransportDetailsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListInventoryResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -1111,6 +2308,84 @@ func (r ListInventoryResp) StatusCode() int {
 	return 0
 }
 
+// CheckInboundEligibilityWithBodyWithResponse request with arbitrary body returning *CheckInboundEligibilityResp
+func (c *ClientWithResponses) CheckInboundEligibilityWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*CheckInboundEligibilityResp, error) {
+	rsp, err := c.CheckInboundEligibilityWithBody(ctx, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCheckInboundEligibilityResp(rsp)
+}
+
+func (c *ClientWithResponses) CheckInboundEligibilityWithResponse(ctx context.Context, body CheckInboundEligibilityJSONRequestBody) (*CheckInboundEligibilityResp, error) {
+	rsp, err := c.CheckInboundEligibility(ctx, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCheckInboundEligibilityResp(rsp)
+}
+
+// CreateInboundWithBodyWithResponse request with arbitrary body returning *CreateInboundResp
+func (c *ClientWithResponses) CreateInboundWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*CreateInboundResp, error) {
+	rsp, err := c.CreateInboundWithBody(ctx, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateInboundResp(rsp)
+}
+
+func (c *ClientWithResponses) CreateInboundWithResponse(ctx context.Context, body CreateInboundJSONRequestBody) (*CreateInboundResp, error) {
+	rsp, err := c.CreateInbound(ctx, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateInboundResp(rsp)
+}
+
+// GetInboundWithResponse request returning *GetInboundResp
+func (c *ClientWithResponses) GetInboundWithResponse(ctx context.Context, orderId string) (*GetInboundResp, error) {
+	rsp, err := c.GetInbound(ctx, orderId)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetInboundResp(rsp)
+}
+
+// UpdateInboundWithBodyWithResponse request with arbitrary body returning *UpdateInboundResp
+func (c *ClientWithResponses) UpdateInboundWithBodyWithResponse(ctx context.Context, orderId string, contentType string, body io.Reader) (*UpdateInboundResp, error) {
+	rsp, err := c.UpdateInboundWithBody(ctx, orderId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateInboundResp(rsp)
+}
+
+func (c *ClientWithResponses) UpdateInboundWithResponse(ctx context.Context, orderId string, body UpdateInboundJSONRequestBody) (*UpdateInboundResp, error) {
+	rsp, err := c.UpdateInbound(ctx, orderId, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateInboundResp(rsp)
+}
+
+// CancelInboundWithResponse request returning *CancelInboundResp
+func (c *ClientWithResponses) CancelInboundWithResponse(ctx context.Context, orderId string) (*CancelInboundResp, error) {
+	rsp, err := c.CancelInbound(ctx, orderId)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCancelInboundResp(rsp)
+}
+
+// ConfirmInboundWithResponse request returning *ConfirmInboundResp
+func (c *ClientWithResponses) ConfirmInboundWithResponse(ctx context.Context, orderId string) (*ConfirmInboundResp, error) {
+	rsp, err := c.ConfirmInbound(ctx, orderId)
+	if err != nil {
+		return nil, err
+	}
+	return ParseConfirmInboundResp(rsp)
+}
+
 // ListInboundShipmentsWithResponse request returning *ListInboundShipmentsResp
 func (c *ClientWithResponses) ListInboundShipmentsWithResponse(ctx context.Context, params *ListInboundShipmentsParams) (*ListInboundShipmentsResp, error) {
 	rsp, err := c.ListInboundShipments(ctx, params)
@@ -1129,6 +2404,32 @@ func (c *ClientWithResponses) GetInboundShipmentWithResponse(ctx context.Context
 	return ParseGetInboundShipmentResp(rsp)
 }
 
+// GetInboundShipmentLabelsWithResponse request returning *GetInboundShipmentLabelsResp
+func (c *ClientWithResponses) GetInboundShipmentLabelsWithResponse(ctx context.Context, shipmentId string, params *GetInboundShipmentLabelsParams) (*GetInboundShipmentLabelsResp, error) {
+	rsp, err := c.GetInboundShipmentLabels(ctx, shipmentId, params)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetInboundShipmentLabelsResp(rsp)
+}
+
+// UpdateInboundShipmentTransportDetailsWithBodyWithResponse request with arbitrary body returning *UpdateInboundShipmentTransportDetailsResp
+func (c *ClientWithResponses) UpdateInboundShipmentTransportDetailsWithBodyWithResponse(ctx context.Context, shipmentId string, contentType string, body io.Reader) (*UpdateInboundShipmentTransportDetailsResp, error) {
+	rsp, err := c.UpdateInboundShipmentTransportDetailsWithBody(ctx, shipmentId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateInboundShipmentTransportDetailsResp(rsp)
+}
+
+func (c *ClientWithResponses) UpdateInboundShipmentTransportDetailsWithResponse(ctx context.Context, shipmentId string, body UpdateInboundShipmentTransportDetailsJSONRequestBody) (*UpdateInboundShipmentTransportDetailsResp, error) {
+	rsp, err := c.UpdateInboundShipmentTransportDetails(ctx, shipmentId, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateInboundShipmentTransportDetailsResp(rsp)
+}
+
 // ListInventoryWithResponse request returning *ListInventoryResp
 func (c *ClientWithResponses) ListInventoryWithResponse(ctx context.Context, params *ListInventoryParams) (*ListInventoryResp, error) {
 	rsp, err := c.ListInventory(ctx, params)
@@ -1136,6 +2437,498 @@ func (c *ClientWithResponses) ListInventoryWithResponse(ctx context.Context, par
 		return nil, err
 	}
 	return ParseListInventoryResp(rsp)
+}
+
+// ParseCheckInboundEligibilityResp parses an HTTP response from a CheckInboundEligibilityWithResponse call
+func ParseCheckInboundEligibilityResp(rsp *http.Response) (*CheckInboundEligibilityResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CheckInboundEligibilityResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest InboundEligibility
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateInboundResp parses an HTTP response from a CreateInboundWithResponse call
+func ParseCreateInboundResp(rsp *http.Response) (*CreateInboundResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateInboundResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest InboundOrderReference
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetInboundResp parses an HTTP response from a GetInboundWithResponse call
+func ParseGetInboundResp(rsp *http.Response) (*GetInboundResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetInboundResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest InboundOrder
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateInboundResp parses an HTTP response from a UpdateInboundWithResponse call
+func ParseUpdateInboundResp(rsp *http.Response) (*UpdateInboundResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateInboundResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCancelInboundResp parses an HTTP response from a CancelInboundWithResponse call
+func ParseCancelInboundResp(rsp *http.Response) (*CancelInboundResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CancelInboundResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseConfirmInboundResp parses an HTTP response from a ConfirmInboundWithResponse call
+func ParseConfirmInboundResp(rsp *http.Response) (*ConfirmInboundResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ConfirmInboundResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseListInboundShipmentsResp parses an HTTP response from a ListInboundShipmentsWithResponse call
@@ -1241,6 +3034,163 @@ func ParseGetInboundShipmentResp(rsp *http.Response) (*GetInboundShipmentResp, e
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetInboundShipmentLabelsResp parses an HTTP response from a GetInboundShipmentLabelsWithResponse call
+func ParseGetInboundShipmentLabelsResp(rsp *http.Response) (*GetInboundShipmentLabelsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetInboundShipmentLabelsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ShipmentLabels
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateInboundShipmentTransportDetailsResp parses an HTTP response from a UpdateInboundShipmentTransportDetailsWithResponse call
+func ParseUpdateInboundShipmentTransportDetailsResp(rsp *http.Response) (*UpdateInboundShipmentTransportDetailsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateInboundShipmentTransportDetailsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ErrorList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {

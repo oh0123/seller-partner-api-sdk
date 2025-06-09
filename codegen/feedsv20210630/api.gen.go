@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -471,7 +470,7 @@ func (c *Client) GetFeed(ctx context.Context, feedId string) (*http.Response, er
 // NewCreateFeedDocumentRequest calls the generic CreateFeedDocument builder with application/json body
 func NewCreateFeedDocumentRequest(server string, body CreateFeedDocumentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -690,7 +689,7 @@ func NewGetFeedsRequest(server string, params *GetFeedsParams) (*http.Request, e
 // NewCreateFeedRequest calls the generic CreateFeed builder with application/json body
 func NewCreateFeedRequest(server string, body CreateFeedJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

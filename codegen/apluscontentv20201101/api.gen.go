@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -106,14 +105,14 @@ const (
 
 // AplusPaginatedResponse defines model for AplusPaginatedResponse.
 type AplusPaginatedResponse struct {
-	// NextPageToken A page token that is returned when the results of the call exceed the page size. To get another page of results, call the operation again, passing in this value with the pageToken parameter.
+	// NextPageToken A token that you use to fetch a specific page when there are multiple pages of results.
 	NextPageToken *PageToken `json:"nextPageToken,omitempty"`
 
 	// Warnings A set of messages to the user, such as warnings or comments.
 	Warnings *MessageSet `json:"warnings,omitempty"`
 }
 
-// AplusResponse The base response data for all A+ Content operations when a request is successful or partially successful. Individual operations may extend this with additional data.
+// AplusResponse The base response data for all A+ Content operations when a request is successful or partially successful. Individual operations can extend this with additional data.
 type AplusResponse struct {
 	// Warnings A set of messages to the user, such as warnings or comments.
 	Warnings *MessageSet `json:"warnings,omitempty"`
@@ -122,13 +121,13 @@ type AplusResponse struct {
 // Asin The Amazon Standard Identification Number (ASIN).
 type Asin = string
 
-// AsinBadge A flag that provides additional information about an ASIN. This is contextual and may change depending on the request that generated it.
+// AsinBadge A flag that provides additional information about an ASIN. This is contextual and can change depending on the request that generated it.
 type AsinBadge string
 
 // AsinBadgeSet The set of ASIN badges.
 type AsinBadgeSet = []AsinBadge
 
-// AsinMetadata The A+ Content ASIN with additional metadata for content management. If you don't include the `includedDataSet` parameter in a call to the listContentDocumentAsinRelations operation, the related ASINs are returned without metadata.
+// AsinMetadata The A+ Content ASIN with additional metadata for content management. If you don't include the `includedDataSet` parameter in a call to the `listContentDocumentAsinRelations` operation, the related ASINs are returned without metadata.
 type AsinMetadata struct {
 	// Asin The Amazon Standard Identification Number (ASIN).
 	Asin Asin `json:"asin"`
@@ -155,7 +154,7 @@ type AsinMetadataSet = []AsinMetadata
 // AsinSet The set of ASINs.
 type AsinSet = []Asin
 
-// ColorType The relative color scheme of content.
+// ColorType The relative color scheme of your content.
 type ColorType string
 
 // ContentBadge A flag that provides additional information about an A+ Content document.
@@ -169,13 +168,13 @@ type ContentDocument struct {
 	// ContentModuleList A list of A+ Content modules.
 	ContentModuleList ContentModuleList `json:"contentModuleList"`
 
-	// ContentSubType The A+ Content document subtype. This represents a special-purpose type of an A+ Content document. Not every A+ Content document type will have a subtype, and subtypes may change at any time.
+	// ContentSubType The A+ Content document subtype. This represents a special-purpose type of an A+ Content document. Not every A+ Content document type has a subtype, and subtypes can change at any time.
 	ContentSubType *ContentSubType `json:"contentSubType,omitempty"`
 
 	// ContentType The A+ Content document type.
 	ContentType ContentType `json:"contentType"`
 
-	// Locale The IETF language tag. This only supports the primary language subtag with one secondary language subtag. The secondary language subtag is almost always a regional designation. This does not support additional subtags beyond the primary and secondary subtags.
+	// Locale The IETF language tag, which supports the primary language subtag and one secondary language subtag. The secondary language subtag is usually a regional designation. This doesn't support subtags other than the primary and secondary subtags.
 	// **Pattern:** ^[a-z]{2,}-[A-Z0-9]{2,}$
 	Locale LanguageTag `json:"locale"`
 
@@ -183,15 +182,15 @@ type ContentDocument struct {
 	Name string `json:"name"`
 }
 
-// ContentMetadata The metadata of an A+ Content document.
+// ContentMetadata The A+ Content document's metadata.
 type ContentMetadata struct {
 	// BadgeSet The set of content badges.
 	BadgeSet ContentBadgeSet `json:"badgeSet"`
 
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId MarketplaceId `json:"marketplaceId"`
 
-	// Name The A+ Content document name.
+	// Name The A+ Content document's name.
 	Name string `json:"name"`
 
 	// Status The submission status of the content document.
@@ -203,17 +202,17 @@ type ContentMetadata struct {
 
 // ContentMetadataRecord The metadata for an A+ Content document, with additional information for content management.
 type ContentMetadataRecord struct {
-	// ContentMetadata The metadata of an A+ Content document.
+	// ContentMetadata The A+ Content document's metadata.
 	ContentMetadata ContentMetadata `json:"contentMetadata"`
 
-	// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and may change in the future. A content reference key is not guaranteed to match any A+ content identifier.
+	// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and might change in the future. A content reference key is not guaranteed to match any A+ content identifier.
 	ContentReferenceKey ContentReferenceKey `json:"contentReferenceKey"`
 }
 
 // ContentMetadataRecordList A list of A+ Content metadata records.
 type ContentMetadataRecordList = []ContentMetadataRecord
 
-// ContentModule An A+ Content module. An A+ Content document is composed of content modules. The contentModuleType property selects which content module types to use.
+// ContentModule An A+ Content module. An A+ Content document is composed of content modules. The `contentModuleType` property selects which content module types to use.
 type ContentModule struct {
 	// ContentModuleType The type of A+ Content module.
 	ContentModuleType ContentModuleType `json:"contentModuleType"`
@@ -248,7 +247,7 @@ type ContentModule struct {
 	// StandardSingleImageHighlights A standard image with several paragraphs and a bulleted list.
 	StandardSingleImageHighlights *StandardSingleImageHighlightsModule `json:"standardSingleImageHighlights,omitempty"`
 
-	// StandardSingleImageSpecsDetail A standard image with paragraphs and a bulleted list, and extra space for technical details.
+	// StandardSingleImageSpecsDetail A standard image with paragraphs, a bulleted list, and extra space for technical details.
 	StandardSingleImageSpecsDetail *StandardSingleImageSpecsDetailModule `json:"standardSingleImageSpecsDetail,omitempty"`
 
 	// StandardSingleSideImage A standard headline and body text with an image on the side.
@@ -275,14 +274,14 @@ type ContentRecord struct {
 	// ContentDocument The A+ Content document. This is the enhanced content that is published to product detail pages.
 	ContentDocument *ContentDocument `json:"contentDocument,omitempty"`
 
-	// ContentMetadata The metadata of an A+ Content document.
+	// ContentMetadata The A+ Content document's metadata.
 	ContentMetadata *ContentMetadata `json:"contentMetadata,omitempty"`
 
-	// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and may change in the future. A content reference key is not guaranteed to match any A+ content identifier.
+	// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and might change in the future. A content reference key is not guaranteed to match any A+ content identifier.
 	ContentReferenceKey ContentReferenceKey `json:"contentReferenceKey"`
 }
 
-// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and may change in the future. A content reference key is not guaranteed to match any A+ content identifier.
+// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and might change in the future. A content reference key is not guaranteed to match any A+ content identifier.
 type ContentReferenceKey = string
 
 // ContentReferenceKeySet A set of content reference keys.
@@ -291,21 +290,21 @@ type ContentReferenceKeySet = []ContentReferenceKey
 // ContentStatus The submission status of the content document.
 type ContentStatus string
 
-// ContentSubType The A+ Content document subtype. This represents a special-purpose type of an A+ Content document. Not every A+ Content document type will have a subtype, and subtypes may change at any time.
+// ContentSubType The A+ Content document subtype. This represents a special-purpose type of an A+ Content document. Not every A+ Content document type has a subtype, and subtypes can change at any time.
 type ContentSubType = string
 
 // ContentType The A+ Content document type.
 type ContentType string
 
-// Decorator A decorator applied to a content string value in order to create rich text.
+// Decorator A decorator that is applied to a content string value in order to create rich text.
 type Decorator struct {
-	// Depth The relative intensity or variation of this decorator. Decorators such as bullet-points, for example, can have multiple indentation depths.
+	// Depth The relative intensity or variation of this decorator. Decorators, such as bullet-points, can have multiple indentation depths.
 	Depth *int `json:"depth,omitempty"`
 
-	// Length The number of content characters to alter with this decorator. Decorators such as line breaks can have zero length and fit between characters.
+	// Length The number of content characters to alter with this decorator. Decorators, such as line breaks, can have zero length and fit between characters.
 	Length *int `json:"length,omitempty"`
 
-	// Offset The starting character of this decorator within the content string. Use zero for the first character.
+	// Offset The starting value of this decorator within the content string. Use zero (`0`) for the first value.
 	Offset *int `json:"offset,omitempty"`
 
 	// Type The type of rich text decorator.
@@ -318,21 +317,21 @@ type DecoratorSet = []Decorator
 // DecoratorType The type of rich text decorator.
 type DecoratorType string
 
-// Error Error response returned when the request is unsuccessful.
+// Error The error response that is returned when the request is unsuccessful.
 type Error struct {
-	// Code The code that identifies the type of error condition.
+	// Code An error code that identifies the type of error that occurred.
 	Code string `json:"code"`
 
-	// Details Additional information, if available, to clarify the error condition.
+	// Details Additional details that can help the caller understand or fix the issue.
 	Details *string `json:"details,omitempty"`
 
-	// Message A human readable description of the error condition.
+	// Message A message that describes the error condition.
 	Message string `json:"message"`
 }
 
-// ErrorList The error response for when a request is unsuccessful.
+// ErrorList The error response that is returned when a request is unsuccessful.
 type ErrorList struct {
-	// Errors A list of error responses returned when a request is unsuccessful.
+	// Errors A list of error responses that are returned when a request is unsuccessful.
 	Errors []Error `json:"errors"`
 }
 
@@ -350,23 +349,23 @@ type ImageComponent struct {
 	// AltText The alternative text for the image.
 	AltText string `json:"altText"`
 
-	// ImageCropSpecification The instructions for optionally cropping an image. If no cropping is desired, set the dimensions to the original image size. If the image is cropped and no offset values are provided, then the coordinates of the top left corner of the cropped image, relative to the original image, are defaulted to (0,0).
+	// ImageCropSpecification The instructions for optionally cropping an image. If you don't want to crop the image, set the dimensions to the original image size. If the image is cropped and you don't include offset values, the coordinates of the top left corner of the cropped image are set to (0,0) by default.
 	ImageCropSpecification ImageCropSpecification `json:"imageCropSpecification"`
 
-	// UploadDestinationId This identifier is provided by the Selling Partner API for Uploads.
+	// UploadDestinationId This identifier is provided by the [Uploads API](https://developer-docs.amazon.com/sp-api/reference/welcome-to-api-references).
 	UploadDestinationId string `json:"uploadDestinationId"`
 }
 
-// ImageCropSpecification The instructions for optionally cropping an image. If no cropping is desired, set the dimensions to the original image size. If the image is cropped and no offset values are provided, then the coordinates of the top left corner of the cropped image, relative to the original image, are defaulted to (0,0).
+// ImageCropSpecification The instructions for optionally cropping an image. If you don't want to crop the image, set the dimensions to the original image size. If the image is cropped and you don't include offset values, the coordinates of the top left corner of the cropped image are set to (0,0) by default.
 type ImageCropSpecification struct {
 	// Offset The top left corner of the cropped image, specified in the original image's coordinate space.
 	Offset *ImageOffsets `json:"offset,omitempty"`
 
-	// Size The dimensions extending from the top left corner of the cropped image, or the top left corner of the original image if there is no cropping. Only `pixels` is allowed as the units value for ImageDimensions.
+	// Size The dimensions that extend from the top left corner of the image (this applies to cropped and uncropped images). `ImageDimensions` units must be in pixels.
 	Size ImageDimensions `json:"size"`
 }
 
-// ImageDimensions The dimensions extending from the top left corner of the cropped image, or the top left corner of the original image if there is no cropping. Only `pixels` is allowed as the units value for ImageDimensions.
+// ImageDimensions The dimensions that extend from the top left corner of the image (this applies to cropped and uncropped images). `ImageDimensions` units must be in pixels.
 type ImageDimensions struct {
 	// Height A whole number dimension and its unit of measurement. For example, this can represent 100 pixels.
 	Height IntegerWithUnits `json:"height"`
@@ -393,7 +392,7 @@ type IntegerWithUnits struct {
 	Value int `json:"value"`
 }
 
-// LanguageTag The IETF language tag. This only supports the primary language subtag with one secondary language subtag. The secondary language subtag is almost always a regional designation. This does not support additional subtags beyond the primary and secondary subtags.
+// LanguageTag The IETF language tag, which supports the primary language subtag and one secondary language subtag. The secondary language subtag is usually a regional designation. This doesn't support subtags other than the primary and secondary subtags.
 // **Pattern:** ^[a-z]{2,}-[A-Z0-9]{2,}$
 type LanguageTag = string
 
@@ -402,28 +401,28 @@ type ListContentDocumentAsinRelationsResponse struct {
 	// AsinMetadataSet The set of ASIN metadata.
 	AsinMetadataSet AsinMetadataSet `json:"asinMetadataSet"`
 
-	// NextPageToken A page token that is returned when the results of the call exceed the page size. To get another page of results, call the operation again, passing in this value with the pageToken parameter.
+	// NextPageToken A token that you use to fetch a specific page when there are multiple pages of results.
 	NextPageToken *PageToken `json:"nextPageToken,omitempty"`
 
 	// Warnings A set of messages to the user, such as warnings or comments.
 	Warnings *MessageSet `json:"warnings,omitempty"`
 }
 
-// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 type MarketplaceId = string
 
 // MessageSet A set of messages to the user, such as warnings or comments.
 type MessageSet = []Error
 
-// PageToken A page token that is returned when the results of the call exceed the page size. To get another page of results, call the operation again, passing in this value with the pageToken parameter.
+// PageToken A token that you use to fetch a specific page when there are multiple pages of results.
 type PageToken = string
 
-// ParagraphComponent A list of rich text content, usually presented in a text box.
+// ParagraphComponent A list of rich text content that is typically presented in a text box.
 type ParagraphComponent struct {
 	TextList []TextComponent `json:"textList"`
 }
 
-// PlainTextItem Plain positional text, used in collections of brief labels and descriptors.
+// PlainTextItem Plain positional text that is used in collections of brief labels and descriptors.
 type PlainTextItem struct {
 	// Position The rank or index of this text item within the collection. Different items cannot occupy the same position within a single collection.
 	Position int `json:"position"`
@@ -432,10 +431,10 @@ type PlainTextItem struct {
 	Value string `json:"value"`
 }
 
-// PositionType The relative positioning of content.
+// PositionType The content's relative positioning.
 type PositionType string
 
-// PostContentDocumentApprovalSubmissionResponse The base response data for all A+ Content operations when a request is successful or partially successful. Individual operations may extend this with additional data.
+// PostContentDocumentApprovalSubmissionResponse The base response data for all A+ Content operations when a request is successful or partially successful. Individual operations can extend this with additional data.
 type PostContentDocumentApprovalSubmissionResponse = AplusResponse
 
 // PostContentDocumentAsinRelationsRequest defines model for PostContentDocumentAsinRelationsRequest.
@@ -444,7 +443,7 @@ type PostContentDocumentAsinRelationsRequest struct {
 	AsinSet AsinSet `json:"asinSet"`
 }
 
-// PostContentDocumentAsinRelationsResponse The base response data for all A+ Content operations when a request is successful or partially successful. Individual operations may extend this with additional data.
+// PostContentDocumentAsinRelationsResponse The base response data for all A+ Content operations when a request is successful or partially successful. Individual operations can extend this with additional data.
 type PostContentDocumentAsinRelationsResponse = AplusResponse
 
 // PostContentDocumentRequest defines model for PostContentDocumentRequest.
@@ -455,14 +454,14 @@ type PostContentDocumentRequest struct {
 
 // PostContentDocumentResponse defines model for PostContentDocumentResponse.
 type PostContentDocumentResponse struct {
-	// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and may change in the future. A content reference key is not guaranteed to match any A+ content identifier.
+	// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and might change in the future. A content reference key is not guaranteed to match any A+ content identifier.
 	ContentReferenceKey ContentReferenceKey `json:"contentReferenceKey"`
 
 	// Warnings A set of messages to the user, such as warnings or comments.
 	Warnings *MessageSet `json:"warnings,omitempty"`
 }
 
-// PostContentDocumentSuspendSubmissionResponse The base response data for all A+ Content operations when a request is successful or partially successful. Individual operations may extend this with additional data.
+// PostContentDocumentSuspendSubmissionResponse The base response data for all A+ Content operations when a request is successful or partially successful. Individual operations can extend this with additional data.
 type PostContentDocumentSuspendSubmissionResponse = AplusResponse
 
 // PublishRecord The full context for an A+ Content publishing event.
@@ -470,20 +469,20 @@ type PublishRecord struct {
 	// Asin The Amazon Standard Identification Number (ASIN).
 	Asin Asin `json:"asin"`
 
-	// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and may change in the future. A content reference key is not guaranteed to match any A+ content identifier.
+	// ContentReferenceKey A unique reference key for the A+ Content document. A content reference key cannot form a permalink and might change in the future. A content reference key is not guaranteed to match any A+ content identifier.
 	ContentReferenceKey ContentReferenceKey `json:"contentReferenceKey"`
 
-	// ContentSubType The A+ Content document subtype. This represents a special-purpose type of an A+ Content document. Not every A+ Content document type will have a subtype, and subtypes may change at any time.
+	// ContentSubType The A+ Content document subtype. This represents a special-purpose type of an A+ Content document. Not every A+ Content document type has a subtype, and subtypes can change at any time.
 	ContentSubType *ContentSubType `json:"contentSubType,omitempty"`
 
 	// ContentType The A+ Content document type.
 	ContentType ContentType `json:"contentType"`
 
-	// Locale The IETF language tag. This only supports the primary language subtag with one secondary language subtag. The secondary language subtag is almost always a regional designation. This does not support additional subtags beyond the primary and secondary subtags.
+	// Locale The IETF language tag, which supports the primary language subtag and one secondary language subtag. The secondary language subtag is usually a regional designation. This doesn't support subtags other than the primary and secondary subtags.
 	// **Pattern:** ^[a-z]{2,}-[A-Z0-9]{2,}$
 	Locale LanguageTag `json:"locale"`
 
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId MarketplaceId `json:"marketplaceId"`
 }
 
@@ -495,7 +494,7 @@ type SearchContentDocumentsResponse struct {
 	// ContentMetadataRecords A list of A+ Content metadata records.
 	ContentMetadataRecords ContentMetadataRecordList `json:"contentMetadataRecords"`
 
-	// NextPageToken A page token that is returned when the results of the call exceed the page size. To get another page of results, call the operation again, passing in this value with the pageToken parameter.
+	// NextPageToken A token that you use to fetch a specific page when there are multiple pages of results.
 	NextPageToken *PageToken `json:"nextPageToken,omitempty"`
 
 	// Warnings A set of messages to the user, such as warnings or comments.
@@ -504,7 +503,7 @@ type SearchContentDocumentsResponse struct {
 
 // SearchContentPublishRecordsResponse defines model for SearchContentPublishRecordsResponse.
 type SearchContentPublishRecordsResponse struct {
-	// NextPageToken A page token that is returned when the results of the call exceed the page size. To get another page of results, call the operation again, passing in this value with the pageToken parameter.
+	// NextPageToken A token that you use to fetch a specific page when there are multiple pages of results.
 	NextPageToken *PageToken `json:"nextPageToken,omitempty"`
 
 	// PublishRecordList A list of A+ Content publishing records.
@@ -525,7 +524,7 @@ type StandardComparisonProductBlock struct {
 	// Asin The Amazon Standard Identification Number (ASIN).
 	Asin *Asin `json:"asin,omitempty"`
 
-	// Highlight Determines whether this block of content is visually highlighted.
+	// Highlight When true, indicates that this content block is visually highlighted.
 	Highlight *bool `json:"highlight,omitempty"`
 
 	// Image A reference to an image, hosted in the A+ Content media library.
@@ -589,9 +588,9 @@ type StandardHeaderImageTextModule struct {
 	Headline *TextComponent `json:"headline,omitempty"`
 }
 
-// StandardHeaderTextListBlock The A+ standard fixed-length list of text, with a related headline.
+// StandardHeaderTextListBlock The A+ standard fixed-length list of text and a related headline.
 type StandardHeaderTextListBlock struct {
-	// Block The A+ Content standard fixed length list of text, usually presented as bullet points.
+	// Block The A+ Content standard fixed-length list of text, usually presented as bullet points.
 	Block *StandardTextListBlock `json:"block,omitempty"`
 
 	// Headline Rich text content.
@@ -609,10 +608,10 @@ type StandardImageCaptionBlock struct {
 
 // StandardImageSidebarModule Two images, two paragraphs, and two bulleted lists. One image is smaller and displayed in the sidebar.
 type StandardImageSidebarModule struct {
-	// DescriptionListBlock The A+ Content standard fixed length list of text, usually presented as bullet points.
+	// DescriptionListBlock The A+ Content standard fixed-length list of text, usually presented as bullet points.
 	DescriptionListBlock *StandardTextListBlock `json:"descriptionListBlock,omitempty"`
 
-	// DescriptionTextBlock The A+ Content standard text box block, comprised of a paragraph with a headline.
+	// DescriptionTextBlock The A+ Content standard text box block, which contains a paragraph and a headline.
 	DescriptionTextBlock *StandardTextBlock `json:"descriptionTextBlock,omitempty"`
 
 	// Headline Rich text content.
@@ -624,13 +623,13 @@ type StandardImageSidebarModule struct {
 	// SidebarImageTextBlock The A+ Content standard image and text box block.
 	SidebarImageTextBlock *StandardImageTextBlock `json:"sidebarImageTextBlock,omitempty"`
 
-	// SidebarListBlock The A+ Content standard fixed length list of text, usually presented as bullet points.
+	// SidebarListBlock The A+ Content standard fixed-length list of text, usually presented as bullet points.
 	SidebarListBlock *StandardTextListBlock `json:"sidebarListBlock,omitempty"`
 }
 
 // StandardImageTextBlock The A+ Content standard image and text box block.
 type StandardImageTextBlock struct {
-	// Body A list of rich text content, usually presented in a text box.
+	// Body A list of rich text content that is typically presented in a text box.
 	Body *ParagraphComponent `json:"body,omitempty"`
 
 	// Headline Rich text content.
@@ -640,7 +639,7 @@ type StandardImageTextBlock struct {
 	Image *ImageComponent `json:"image,omitempty"`
 }
 
-// StandardImageTextCaptionBlock The A+ Content standard image and text block, with a related caption. The caption may not display on all devices.
+// StandardImageTextCaptionBlock The A+ Content standard image and text block, with a related caption. The caption might not display on all devices.
 type StandardImageTextCaptionBlock struct {
 	// Block The A+ Content standard image and text box block.
 	Block *StandardImageTextBlock `json:"block,omitempty"`
@@ -654,7 +653,7 @@ type StandardImageTextOverlayModule struct {
 	// Block The A+ Content standard image and text box block.
 	Block *StandardImageTextBlock `json:"block,omitempty"`
 
-	// OverlayColorType The relative color scheme of content.
+	// OverlayColorType The relative color scheme of your content.
 	OverlayColorType ColorType `json:"overlayColorType"`
 }
 
@@ -665,13 +664,13 @@ type StandardMultipleImageTextModule struct {
 
 // StandardProductDescriptionModule Standard product description text.
 type StandardProductDescriptionModule struct {
-	// Body A list of rich text content, usually presented in a text box.
+	// Body A list of rich text content that is typically presented in a text box.
 	Body ParagraphComponent `json:"body"`
 }
 
 // StandardSingleImageHighlightsModule A standard image with several paragraphs and a bulleted list.
 type StandardSingleImageHighlightsModule struct {
-	// BulletedListBlock The A+ standard fixed-length list of text, with a related headline.
+	// BulletedListBlock The A+ standard fixed-length list of text and a related headline.
 	BulletedListBlock *StandardHeaderTextListBlock `json:"bulletedListBlock,omitempty"`
 
 	// Headline Rich text content.
@@ -680,22 +679,22 @@ type StandardSingleImageHighlightsModule struct {
 	// Image A reference to an image, hosted in the A+ Content media library.
 	Image *ImageComponent `json:"image,omitempty"`
 
-	// TextBlock1 The A+ Content standard text box block, comprised of a paragraph with a headline.
+	// TextBlock1 The A+ Content standard text box block, which contains a paragraph and a headline.
 	TextBlock1 *StandardTextBlock `json:"textBlock1,omitempty"`
 
-	// TextBlock2 The A+ Content standard text box block, comprised of a paragraph with a headline.
+	// TextBlock2 The A+ Content standard text box block, which contains a paragraph and a headline.
 	TextBlock2 *StandardTextBlock `json:"textBlock2,omitempty"`
 
-	// TextBlock3 The A+ Content standard text box block, comprised of a paragraph with a headline.
+	// TextBlock3 The A+ Content standard text box block, which contains a paragraph and a headline.
 	TextBlock3 *StandardTextBlock `json:"textBlock3,omitempty"`
 }
 
-// StandardSingleImageSpecsDetailModule A standard image with paragraphs and a bulleted list, and extra space for technical details.
+// StandardSingleImageSpecsDetailModule A standard image with paragraphs, a bulleted list, and extra space for technical details.
 type StandardSingleImageSpecsDetailModule struct {
-	// DescriptionBlock1 The A+ Content standard text box block, comprised of a paragraph with a headline.
+	// DescriptionBlock1 The A+ Content standard text box block, which contains a paragraph and a headline.
 	DescriptionBlock1 *StandardTextBlock `json:"descriptionBlock1,omitempty"`
 
-	// DescriptionBlock2 The A+ Content standard text box block, comprised of a paragraph with a headline.
+	// DescriptionBlock2 The A+ Content standard text box block, which contains a paragraph and a headline.
 	DescriptionBlock2 *StandardTextBlock `json:"descriptionBlock2,omitempty"`
 
 	// DescriptionHeadline Rich text content.
@@ -710,10 +709,10 @@ type StandardSingleImageSpecsDetailModule struct {
 	// SpecificationHeadline Rich text content.
 	SpecificationHeadline *TextComponent `json:"specificationHeadline,omitempty"`
 
-	// SpecificationListBlock The A+ standard fixed-length list of text, with a related headline.
+	// SpecificationListBlock The A+ standard fixed-length list of text and a related headline.
 	SpecificationListBlock *StandardHeaderTextListBlock `json:"specificationListBlock,omitempty"`
 
-	// SpecificationTextBlock The A+ Content standard text box block, comprised of a paragraph with a headline.
+	// SpecificationTextBlock The A+ Content standard text box block, which contains a paragraph and a headline.
 	SpecificationTextBlock *StandardTextBlock `json:"specificationTextBlock,omitempty"`
 }
 
@@ -722,7 +721,7 @@ type StandardSingleSideImageModule struct {
 	// Block The A+ Content standard image and text box block.
 	Block *StandardImageTextBlock `json:"block,omitempty"`
 
-	// ImagePositionType The relative positioning of content.
+	// ImagePositionType The content's relative positioning.
 	ImagePositionType PositionType `json:"imagePositionType"`
 }
 
@@ -734,34 +733,34 @@ type StandardTechSpecsModule struct {
 	// SpecificationList The specification list.
 	SpecificationList []StandardTextPairBlock `json:"specificationList"`
 
-	// TableCount The number of tables to present. Features are evenly divided between the tables.
+	// TableCount The number of tables you want present. Features are evenly divided between the tables.
 	TableCount *int `json:"tableCount,omitempty"`
 }
 
-// StandardTextBlock The A+ Content standard text box block, comprised of a paragraph with a headline.
+// StandardTextBlock The A+ Content standard text box block, which contains a paragraph and a headline.
 type StandardTextBlock struct {
-	// Body A list of rich text content, usually presented in a text box.
+	// Body A list of rich text content that is typically presented in a text box.
 	Body *ParagraphComponent `json:"body,omitempty"`
 
 	// Headline Rich text content.
 	Headline *TextComponent `json:"headline,omitempty"`
 }
 
-// StandardTextListBlock The A+ Content standard fixed length list of text, usually presented as bullet points.
+// StandardTextListBlock The A+ Content standard fixed-length list of text, usually presented as bullet points.
 type StandardTextListBlock struct {
 	TextList []TextItem `json:"textList"`
 }
 
 // StandardTextModule A standard headline and body text.
 type StandardTextModule struct {
-	// Body A list of rich text content, usually presented in a text box.
+	// Body A list of rich text content that is typically presented in a text box.
 	Body ParagraphComponent `json:"body"`
 
 	// Headline Rich text content.
 	Headline *TextComponent `json:"headline,omitempty"`
 }
 
-// StandardTextPairBlock The A+ Content standard label and description block, comprised of a pair of text components.
+// StandardTextPairBlock The A+ Content standard label and description block, which contains a pair of text components.
 type StandardTextPairBlock struct {
 	// Description Rich text content.
 	Description *TextComponent `json:"description,omitempty"`
@@ -794,7 +793,7 @@ type TextComponent struct {
 	Value string `json:"value"`
 }
 
-// TextItem Rich positional text, usually presented as a collection of bullet points.
+// TextItem Rich positional text that is usually presented as a collection of bullet points.
 type TextItem struct {
 	// Position The rank or index of this text item within the collection. Different items cannot occupy the same position within a single collection.
 	Position int `json:"position"`
@@ -805,7 +804,7 @@ type TextItem struct {
 
 // ValidateContentDocumentAsinRelationsResponse defines model for ValidateContentDocumentAsinRelationsResponse.
 type ValidateContentDocumentAsinRelationsResponse struct {
-	// Errors A list of error responses returned when a request is unsuccessful.
+	// Errors A list of error responses that are returned when a request is unsuccessful.
 	Errors []Error `json:"errors"`
 
 	// Warnings A set of messages to the user, such as warnings or comments.
@@ -814,7 +813,7 @@ type ValidateContentDocumentAsinRelationsResponse struct {
 
 // ValidateContentDocumentAsinRelationsParams defines parameters for ValidateContentDocumentAsinRelations.
 type ValidateContentDocumentAsinRelationsParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 
 	// AsinSet The set of ASINs.
@@ -823,22 +822,22 @@ type ValidateContentDocumentAsinRelationsParams struct {
 
 // SearchContentDocumentsParams defines parameters for SearchContentDocuments.
 type SearchContentDocumentsParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 
-	// PageToken A page token from the nextPageToken response element returned by your previous call to this operation. nextPageToken is returned when the results of a call exceed the page size. To get the next page of results, call the operation and include pageToken as the only parameter. Specifying pageToken with any other parameter will cause the request to fail. When no nextPageToken value is returned there are no more pages to return. A pageToken value is not usable across different operations.
+	// PageToken A token that you use to fetch a specific page when there are multiple pages of results.
 	PageToken *string `form:"pageToken,omitempty" json:"pageToken,omitempty"`
 }
 
 // CreateContentDocumentParams defines parameters for CreateContentDocument.
 type CreateContentDocumentParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 }
 
 // GetContentDocumentParams defines parameters for GetContentDocument.
 type GetContentDocumentParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 
 	// IncludedDataSet The set of A+ Content data types to include in the response.
@@ -850,28 +849,28 @@ type GetContentDocumentParamsIncludedDataSet string
 
 // UpdateContentDocumentParams defines parameters for UpdateContentDocument.
 type UpdateContentDocumentParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 }
 
 // PostContentDocumentApprovalSubmissionParams defines parameters for PostContentDocumentApprovalSubmission.
 type PostContentDocumentApprovalSubmissionParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 }
 
 // ListContentDocumentAsinRelationsParams defines parameters for ListContentDocumentAsinRelations.
 type ListContentDocumentAsinRelationsParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 
-	// IncludedDataSet The set of A+ Content data types to include in the response. If you do not include this parameter, the operation returns the related ASINs without metadata.
+	// IncludedDataSet The set of A+ Content data types to include in the response. If you don't include this parameter, the operation returns the related ASINs without metadata.
 	IncludedDataSet *[]ListContentDocumentAsinRelationsParamsIncludedDataSet `form:"includedDataSet,omitempty" json:"includedDataSet,omitempty"`
 
 	// AsinSet The set of ASINs.
 	AsinSet *[]string `form:"asinSet,omitempty" json:"asinSet,omitempty"`
 
-	// PageToken A page token from the nextPageToken response element returned by your previous call to this operation. nextPageToken is returned when the results of a call exceed the page size. To get the next page of results, call the operation and include pageToken as the only parameter. Specifying pageToken with any other parameter will cause the request to fail. When no nextPageToken value is returned there are no more pages to return. A pageToken value is not usable across different operations.
+	// PageToken A token that you use to fetch a specific page when there are multiple pages of results.
 	PageToken *string `form:"pageToken,omitempty" json:"pageToken,omitempty"`
 }
 
@@ -880,25 +879,25 @@ type ListContentDocumentAsinRelationsParamsIncludedDataSet string
 
 // PostContentDocumentAsinRelationsParams defines parameters for PostContentDocumentAsinRelations.
 type PostContentDocumentAsinRelationsParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 }
 
 // PostContentDocumentSuspendSubmissionParams defines parameters for PostContentDocumentSuspendSubmission.
 type PostContentDocumentSuspendSubmissionParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 }
 
 // SearchContentPublishRecordsParams defines parameters for SearchContentPublishRecords.
 type SearchContentPublishRecordsParams struct {
-	// MarketplaceId The identifier for the marketplace where the A+ Content is published.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
 
-	// Asin The Amazon Standard Identification Number (ASIN).
+	// Asin The Amazon Standard Identification Number (ASIN) is the unique identifier of a product within a marketplace.
 	Asin string `form:"asin" json:"asin"`
 
-	// PageToken A page token from the nextPageToken response element returned by your previous call to this operation. nextPageToken is returned when the results of a call exceed the page size. To get the next page of results, call the operation and include pageToken as the only parameter. Specifying pageToken with any other parameter will cause the request to fail. When no nextPageToken value is returned there are no more pages to return. A pageToken value is not usable across different operations.
+	// PageToken A token that you use to fetch a specific page when there are multiple pages of results.
 	PageToken *string `form:"pageToken,omitempty" json:"pageToken,omitempty"`
 }
 
@@ -1332,7 +1331,7 @@ func (c *Client) SearchContentPublishRecords(ctx context.Context, params *Search
 // NewValidateContentDocumentAsinRelationsRequest calls the generic ValidateContentDocumentAsinRelations builder with application/json body
 func NewValidateContentDocumentAsinRelationsRequest(server string, params *ValidateContentDocumentAsinRelationsParams, body ValidateContentDocumentAsinRelationsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1467,7 +1466,7 @@ func NewSearchContentDocumentsRequest(server string, params *SearchContentDocume
 // NewCreateContentDocumentRequest calls the generic CreateContentDocument builder with application/json body
 func NewCreateContentDocumentRequest(server string, params *CreateContentDocumentParams, body CreateContentDocumentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1589,7 +1588,7 @@ func NewGetContentDocumentRequest(server string, contentReferenceKey string, par
 // NewUpdateContentDocumentRequest calls the generic UpdateContentDocument builder with application/json body
 func NewUpdateContentDocumentRequest(server string, contentReferenceKey string, params *UpdateContentDocumentParams, body UpdateContentDocumentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1806,7 +1805,7 @@ func NewListContentDocumentAsinRelationsRequest(server string, contentReferenceK
 // NewPostContentDocumentAsinRelationsRequest calls the generic PostContentDocumentAsinRelations builder with application/json body
 func NewPostContentDocumentAsinRelationsRequest(server string, contentReferenceKey string, params *PostContentDocumentAsinRelationsParams, body PostContentDocumentAsinRelationsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

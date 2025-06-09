@@ -15,15 +15,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
 // Defines values for IssueSeverity.
 const (
-	ERROR   IssueSeverity = "ERROR"
-	INFO    IssueSeverity = "INFO"
-	WARNING IssueSeverity = "WARNING"
+	IssueSeverityERROR   IssueSeverity = "ERROR"
+	IssueSeverityINFO    IssueSeverity = "INFO"
+	IssueSeverityWARNING IssueSeverity = "WARNING"
 )
 
 // Defines values for IssueExemptionStatus.
@@ -37,6 +36,12 @@ const (
 const (
 	B2B ItemOfferByMarketplaceOfferType = "B2B"
 	B2C ItemOfferByMarketplaceOfferType = "B2C"
+)
+
+// Defines values for ItemRelationshipType.
+const (
+	PACKAGEHIERARCHY ItemRelationshipType = "PACKAGE_HIERARCHY"
+	VARIATION        ItemRelationshipType = "VARIATION"
 )
 
 // Defines values for ItemSummaryByMarketplaceConditionType.
@@ -58,8 +63,8 @@ const (
 
 // Defines values for ItemSummaryByMarketplaceStatus.
 const (
-	BUYABLE      ItemSummaryByMarketplaceStatus = "BUYABLE"
-	DISCOVERABLE ItemSummaryByMarketplaceStatus = "DISCOVERABLE"
+	ItemSummaryByMarketplaceStatusBUYABLE      ItemSummaryByMarketplaceStatus = "BUYABLE"
+	ItemSummaryByMarketplaceStatusDISCOVERABLE ItemSummaryByMarketplaceStatus = "DISCOVERABLE"
 )
 
 // Defines values for ListingsItemPutRequestRequirements.
@@ -80,7 +85,64 @@ const (
 const (
 	Add     PatchOperationOp = "add"
 	Delete  PatchOperationOp = "delete"
+	Merge   PatchOperationOp = "merge"
 	Replace PatchOperationOp = "replace"
+)
+
+// Defines values for SearchListingsItemsParamsIncludedData.
+const (
+	SearchListingsItemsParamsIncludedDataAttributes              SearchListingsItemsParamsIncludedData = "attributes"
+	SearchListingsItemsParamsIncludedDataFulfillmentAvailability SearchListingsItemsParamsIncludedData = "fulfillmentAvailability"
+	SearchListingsItemsParamsIncludedDataIssues                  SearchListingsItemsParamsIncludedData = "issues"
+	SearchListingsItemsParamsIncludedDataOffers                  SearchListingsItemsParamsIncludedData = "offers"
+	SearchListingsItemsParamsIncludedDataProcurement             SearchListingsItemsParamsIncludedData = "procurement"
+	SearchListingsItemsParamsIncludedDataProductTypes            SearchListingsItemsParamsIncludedData = "productTypes"
+	SearchListingsItemsParamsIncludedDataRelationships           SearchListingsItemsParamsIncludedData = "relationships"
+	SearchListingsItemsParamsIncludedDataSummaries               SearchListingsItemsParamsIncludedData = "summaries"
+)
+
+// Defines values for SearchListingsItemsParamsIdentifiersType.
+const (
+	ASIN   SearchListingsItemsParamsIdentifiersType = "ASIN"
+	EAN    SearchListingsItemsParamsIdentifiersType = "EAN"
+	FNSKU  SearchListingsItemsParamsIdentifiersType = "FNSKU"
+	GTIN   SearchListingsItemsParamsIdentifiersType = "GTIN"
+	ISBN   SearchListingsItemsParamsIdentifiersType = "ISBN"
+	JAN    SearchListingsItemsParamsIdentifiersType = "JAN"
+	MINSAN SearchListingsItemsParamsIdentifiersType = "MINSAN"
+	SKU    SearchListingsItemsParamsIdentifiersType = "SKU"
+	UPC    SearchListingsItemsParamsIdentifiersType = "UPC"
+)
+
+// Defines values for SearchListingsItemsParamsWithIssueSeverity.
+const (
+	SearchListingsItemsParamsWithIssueSeverityERROR   SearchListingsItemsParamsWithIssueSeverity = "ERROR"
+	SearchListingsItemsParamsWithIssueSeverityWARNING SearchListingsItemsParamsWithIssueSeverity = "WARNING"
+)
+
+// Defines values for SearchListingsItemsParamsWithStatus.
+const (
+	SearchListingsItemsParamsWithStatusBUYABLE      SearchListingsItemsParamsWithStatus = "BUYABLE"
+	SearchListingsItemsParamsWithStatusDISCOVERABLE SearchListingsItemsParamsWithStatus = "DISCOVERABLE"
+)
+
+// Defines values for SearchListingsItemsParamsWithoutStatus.
+const (
+	BUYABLE      SearchListingsItemsParamsWithoutStatus = "BUYABLE"
+	DISCOVERABLE SearchListingsItemsParamsWithoutStatus = "DISCOVERABLE"
+)
+
+// Defines values for SearchListingsItemsParamsSortBy.
+const (
+	CreatedDate     SearchListingsItemsParamsSortBy = "createdDate"
+	LastUpdatedDate SearchListingsItemsParamsSortBy = "lastUpdatedDate"
+	Sku             SearchListingsItemsParamsSortBy = "sku"
+)
+
+// Defines values for SearchListingsItemsParamsSortOrder.
+const (
+	ASC  SearchListingsItemsParamsSortOrder = "ASC"
+	DESC SearchListingsItemsParamsSortOrder = "DESC"
 )
 
 // Defines values for GetListingsItemParamsIncludedData.
@@ -90,6 +152,8 @@ const (
 	GetListingsItemParamsIncludedDataIssues                  GetListingsItemParamsIncludedData = "issues"
 	GetListingsItemParamsIncludedDataOffers                  GetListingsItemParamsIncludedData = "offers"
 	GetListingsItemParamsIncludedDataProcurement             GetListingsItemParamsIncludedData = "procurement"
+	GetListingsItemParamsIncludedDataProductTypes            GetListingsItemParamsIncludedData = "productTypes"
+	GetListingsItemParamsIncludedDataRelationships           GetListingsItemParamsIncludedData = "relationships"
 	GetListingsItemParamsIncludedDataSummaries               GetListingsItemParamsIncludedData = "summaries"
 )
 
@@ -106,8 +170,8 @@ const (
 
 // Defines values for PutListingsItemParamsIncludedData.
 const (
-	Identifiers PutListingsItemParamsIncludedData = "identifiers"
-	Issues      PutListingsItemParamsIncludedData = "issues"
+	PutListingsItemParamsIncludedDataIdentifiers PutListingsItemParamsIncludedData = "identifiers"
+	PutListingsItemParamsIncludedDataIssues      PutListingsItemParamsIncludedData = "issues"
 )
 
 // Defines values for PutListingsItemParamsMode.
@@ -152,7 +216,7 @@ type ErrorList struct {
 
 // FulfillmentAvailability The fulfillment availability details for the listings item.
 type FulfillmentAvailability struct {
-	// FulfillmentChannelCode The code of the fulfillment network that will be used.
+	// FulfillmentChannelCode Designates which fulfillment network is used.
 	FulfillmentChannelCode string `json:"fulfillmentChannelCode"`
 
 	// Quantity The quantity of the item you are making available for sale.
@@ -166,23 +230,23 @@ type Issue struct {
 
 	// Categories List of issue categories.
 	//
-	// Possible vales:
+	// Possible values:
 	//
-	// * `INVALID_ATTRIBUTE` - Indicating an invalid attribute in the listing.
+	// * 'INVALID_ATTRIBUTE' - Indicating an invalid attribute in the listing.
 	//
-	// * `MISSING_ATTRIBUTE` - Highlighting a missing attribute in the listing.
+	// * 'MISSING_ATTRIBUTE' - Highlighting a missing attribute in the listing.
 	//
-	// * `INVALID_IMAGE` - Signifying an invalid image in the listing.
+	// * 'INVALID_IMAGE' - Signifying an invalid image in the listing.
 	//
-	// * `MISSING_IMAGE` - Noting the absence of an image in the listing.
+	// * 'MISSING_IMAGE' - Noting the absence of an image in the listing.
 	//
-	// * `INVALID_PRICE` - Pertaining to issues with the listing's price-related attributes.
+	// * 'INVALID_PRICE' - Pertaining to issues with the listing's price-related attributes.
 	//
-	// * `MISSING_PRICE` - Pointing out the absence of a price attribute in the listing.
+	// * 'MISSING_PRICE' - Pointing out the absence of a price attribute in the listing.
 	//
-	// * `DUPLICATE` - Identifying listings with potential duplicate problems, such as this ASIN potentially being a duplicate of another ASIN.
+	// * 'DUPLICATE' - Identifying listings with potential duplicate problems, such as this ASIN potentially being a duplicate of another ASIN.
 	//
-	// * `QUALIFICATION_REQUIRED` - Indicating that the listing requires qualification-related approval.
+	// * 'QUALIFICATION_REQUIRED' - Indicating that the listing requires qualification-related approval.
 	Categories []string `json:"categories"`
 
 	// Code An issue code that identifies the type of issue.
@@ -228,7 +292,7 @@ type IssueEnforcements struct {
 
 // IssueExemption Conveying the status of the listed enforcement actions and, if applicable, provides information about the exemption's expiry date.
 type IssueExemption struct {
-	// ExpiryDate This field represents the timestamp, following the ISO 8601 format, which specifies the date when temporary exemptions, if applicable, will expire, and Amazon will begin enforcing the listed actions.
+	// ExpiryDate Represents the timestamp, in ISO 8601 format, that specifies the date when the temporary exemptions expires, and Amazon begins enforcing the listed actions.
 	ExpiryDate *time.Time `json:"expiryDate,omitempty"`
 
 	// Status This field indicates the current exemption status for the listed enforcement actions. It can take values such as `EXEMPT`, signifying permanent exemption, `EXEMPT_UNTIL_EXPIRY_DATE` indicating temporary exemption until a specified date, or `NOT_EXEMPT` signifying no exemptions, and enforcement actions were already applied.
@@ -254,6 +318,12 @@ type Item struct {
 
 	// Procurement The vendor procurement information for the listings item.
 	Procurement *[]ItemProcurement `json:"procurement,omitempty"`
+
+	// ProductTypes Product types for a listing item, by marketplace.
+	ProductTypes *ItemProductTypes `json:"productTypes,omitempty"`
+
+	// Relationships Relationships for a listing item, by marketplace (for example, variations).
+	Relationships *ItemRelationships `json:"relationships,omitempty"`
 
 	// Sku A selling partner provided identifier for an Amazon listing.
 	Sku string `json:"sku"`
@@ -317,9 +387,62 @@ type ItemOfferByMarketplaceOfferType string
 type ItemOffers = []ItemOfferByMarketplace
 
 // ItemProcurement The vendor procurement information for the listings item.
-type ItemProcurement struct {
-	// CostPrice The currency type and amount.
-	CostPrice Money `json:"costPrice"`
+type ItemProcurement = []interface{}
+
+// ItemProductTypeByMarketplace Product types that are associated with the listing item for the specified marketplace.
+type ItemProductTypeByMarketplace struct {
+	// MarketplaceId Amazon marketplace identifier.
+	MarketplaceId string `json:"marketplaceId"`
+
+	// ProductType The name of the product type that is submitted by the Selling Partner.
+	ProductType string `json:"productType"`
+}
+
+// ItemProductTypes Product types for a listing item, by marketplace.
+type ItemProductTypes = []ItemProductTypeByMarketplace
+
+// ItemRelationship The relationship details for a listing item.
+type ItemRelationship struct {
+	// ChildSkus Identifiers (SKUs) of the related items that are children of this listing item.
+	ChildSkus *[]string `json:"childSkus,omitempty"`
+
+	// ParentSkus Identifiers (SKUs) of the related items that are parents of this listing item.
+	ParentSkus *[]string `json:"parentSkus,omitempty"`
+
+	// Type The type of relationship.
+	Type ItemRelationshipType `json:"type"`
+
+	// VariationTheme A variation theme that indicates the combination of listing item attributes that define the variation family.
+	VariationTheme *ItemVariationTheme `json:"variationTheme,omitempty"`
+}
+
+// ItemRelationshipType The type of relationship.
+type ItemRelationshipType string
+
+// ItemRelationships Relationships for a listing item, by marketplace (for example, variations).
+type ItemRelationships = []ItemRelationshipsByMarketplace
+
+// ItemRelationshipsByMarketplace Relationship details for the listing item in the specified marketplace.
+type ItemRelationshipsByMarketplace struct {
+	// MarketplaceId Amazon marketplace identifier.
+	MarketplaceId string `json:"marketplaceId"`
+
+	// Relationships Relationships for the listing item.
+	Relationships []ItemRelationship `json:"relationships"`
+}
+
+// ItemSearchResults Selling partner listings items and search related metadata.
+type ItemSearchResults struct {
+	// Items A list of listings items.
+	Items []Item `json:"items"`
+
+	// NumberOfResults The total number of selling partner listings items found for the search criteria (only results up to the page count limit is returned per request regardless of the number found).
+	//
+	// Note: The maximum number of items (SKUs) that can be returned and paged through is 1000.
+	NumberOfResults int `json:"numberOfResults"`
+
+	// Pagination When a request produces a response that exceeds the `pageSize`, pagination occurs. This means the response is divided into individual pages. To retrieve the next page or the previous page, you must pass the `nextToken` value or the `previousToken` value as the `pageToken` parameter in the next request. When you receive the last page, there is no `nextToken` key in the pagination object.
+	Pagination *Pagination `json:"pagination,omitempty"`
 }
 
 // ItemSummaries Summary details of a listings item.
@@ -328,7 +451,7 @@ type ItemSummaries = []ItemSummaryByMarketplace
 // ItemSummaryByMarketplace Summary details of a listings item for an Amazon marketplace.
 type ItemSummaryByMarketplace struct {
 	// Asin Amazon Standard Identification Number (ASIN) of the listings item.
-	Asin string `json:"asin"`
+	Asin *string `json:"asin,omitempty"`
 
 	// ConditionType Identifies the condition of the listings item.
 	ConditionType *ItemSummaryByMarketplaceConditionType `json:"conditionType,omitempty"`
@@ -340,7 +463,7 @@ type ItemSummaryByMarketplace struct {
 	FnSku *string `json:"fnSku,omitempty"`
 
 	// ItemName The name or title associated with an Amazon catalog item.
-	ItemName string `json:"itemName"`
+	ItemName *string `json:"itemName,omitempty"`
 
 	// LastUpdatedDate The date the listings item was last updated in ISO 8601 format.
 	LastUpdatedDate time.Time `json:"lastUpdatedDate"`
@@ -363,6 +486,15 @@ type ItemSummaryByMarketplaceConditionType string
 
 // ItemSummaryByMarketplaceStatus defines model for ItemSummaryByMarketplace.Status.
 type ItemSummaryByMarketplaceStatus string
+
+// ItemVariationTheme A variation theme that indicates the combination of listing item attributes that define the variation family.
+type ItemVariationTheme struct {
+	// Attributes The names of the listing item attributes that are associated with the variation theme.
+	Attributes []string `json:"attributes"`
+
+	// Theme The variation theme that indicates the combination of listing item attributes that define the variation family.
+	Theme string `json:"theme"`
+}
 
 // ListingsItemPatchRequest The request body schema for the `patchListingsItem` operation.
 type ListingsItemPatchRequest struct {
@@ -418,25 +550,123 @@ type Money struct {
 	CurrencyCode string `json:"currencyCode"`
 }
 
+// Pagination When a request produces a response that exceeds the `pageSize`, pagination occurs. This means the response is divided into individual pages. To retrieve the next page or the previous page, you must pass the `nextToken` value or the `previousToken` value as the `pageToken` parameter in the next request. When you receive the last page, there is no `nextToken` key in the pagination object.
+type Pagination struct {
+	// NextToken A token that can be used to fetch the next page.
+	NextToken *string `json:"nextToken,omitempty"`
+
+	// PreviousToken A token that can be used to fetch the previous page.
+	PreviousToken *string `json:"previousToken,omitempty"`
+}
+
 // PatchOperation Individual JSON Patch operation for an HTTP PATCH request.
 type PatchOperation struct {
-	// Op Type of JSON Patch operation. Supported JSON Patch operations include add, replace, and delete. Refer to [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902) for more information.
+	// Op Type of JSON Patch operation. Supported JSON Patch operations include `add`, `replace`, `merge` and `delete`. Refer to <https://tools.ietf.org/html/rfc6902>.
 	Op PatchOperationOp `json:"op"`
 
 	// Path JSON Pointer path of the element to patch. Refer to [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902) for more information.
 	Path string `json:"path"`
 
-	// Value JSON value to add, replace, or delete.
+	// Value JSON value to `add`, `replace`, `merge` or `delete`.
 	Value *[]map[string]interface{} `json:"value,omitempty"`
 }
 
-// PatchOperationOp Type of JSON Patch operation. Supported JSON Patch operations include add, replace, and delete. Refer to [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902) for more information.
+// PatchOperationOp Type of JSON Patch operation. Supported JSON Patch operations include `add`, `replace`, `merge` and `delete`. Refer to <https://tools.ietf.org/html/rfc6902>.
 type PatchOperationOp string
 
 // Points The number of Amazon Points offered with the purchase of an item, and their monetary value. Note that the `Points` element is only returned in Japan (JP).
 type Points struct {
 	PointsNumber int `json:"pointsNumber"`
 }
+
+// SearchListingsItemsParams defines parameters for SearchListingsItems.
+type SearchListingsItemsParams struct {
+	// MarketplaceIds A comma-delimited list of Amazon marketplace identifiers for the request.
+	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
+
+	// IssueLocale A locale that is used to localize issues. When not provided, the default language code of the first marketplace is used. Examples: "en_US", "fr_CA", "fr_FR". When a localization is not available in the specified locale, localized messages default to "en_US".
+	IssueLocale *string `form:"issueLocale,omitempty" json:"issueLocale,omitempty"`
+
+	// IncludedData A comma-delimited list of datasets that you want to include in the response. Default: `summaries`.
+	IncludedData *[]SearchListingsItemsParamsIncludedData `form:"includedData,omitempty" json:"includedData,omitempty"`
+
+	// Identifiers A comma-delimited list of product identifiers that you can use to search for listings items.
+	//
+	// **Note**:
+	// 1. This is required when you specify `identifiersType`.
+	// 2. You cannot use 'identifiers' if you specify `variationParentSku` or `packageHierarchySku`.
+	Identifiers *[]string `form:"identifiers,omitempty" json:"identifiers,omitempty"`
+
+	// IdentifiersType A type of product identifiers that you can use to search for listings items.
+	//
+	// **Note**:
+	// This is required when `identifiers` is provided.
+	IdentifiersType *SearchListingsItemsParamsIdentifiersType `form:"identifiersType,omitempty" json:"identifiersType,omitempty"`
+
+	// VariationParentSku Filters results to include listing items that are variation children of the specified SKU.
+	//
+	// **Note**: You cannot use `variationParentSku` if you include `identifiers` or `packageHierarchySku` in your request.
+	VariationParentSku *string `form:"variationParentSku,omitempty" json:"variationParentSku,omitempty"`
+
+	// PackageHierarchySku Filter results to include listing items that contain or are contained by the specified SKU.
+	//
+	// **Note**: You cannot use `packageHierarchySku` if you include `identifiers` or `variationParentSku` in your request.
+	PackageHierarchySku *string `form:"packageHierarchySku,omitempty" json:"packageHierarchySku,omitempty"`
+
+	// CreatedAfter A date-time that is used to filter listing items. The response includes listings items that were created at or after this time. Values are in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	CreatedAfter *time.Time `form:"createdAfter,omitempty" json:"createdAfter,omitempty"`
+
+	// CreatedBefore A date-time that is used to filter listing items. The response includes listings items that were created at or before this time. Values are in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	CreatedBefore *time.Time `form:"createdBefore,omitempty" json:"createdBefore,omitempty"`
+
+	// LastUpdatedAfter A date-time that is used to filter listing items. The response includes listings items that were last updated at or after this time. Values are in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	LastUpdatedAfter *time.Time `form:"lastUpdatedAfter,omitempty" json:"lastUpdatedAfter,omitempty"`
+
+	// LastUpdatedBefore A date-time that is used to filter listing items. The response includes listings items that were last updated at or before this time. Values are in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	LastUpdatedBefore *time.Time `form:"lastUpdatedBefore,omitempty" json:"lastUpdatedBefore,omitempty"`
+
+	// WithIssueSeverity Filter results to include only listing items that have issues that match one or more of the specified severity levels.
+	WithIssueSeverity *[]SearchListingsItemsParamsWithIssueSeverity `form:"withIssueSeverity,omitempty" json:"withIssueSeverity,omitempty"`
+
+	// WithStatus Filter results to include only listing items that have the specified status.
+	WithStatus *[]SearchListingsItemsParamsWithStatus `form:"withStatus,omitempty" json:"withStatus,omitempty"`
+
+	// WithoutStatus Filter results to include only listing items that don't contain the specified statuses.
+	WithoutStatus *[]SearchListingsItemsParamsWithoutStatus `form:"withoutStatus,omitempty" json:"withoutStatus,omitempty"`
+
+	// SortBy An attribute by which to sort the returned listing items.
+	SortBy *SearchListingsItemsParamsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+
+	// SortOrder The order in which to sort the result items.
+	SortOrder *SearchListingsItemsParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+
+	// PageSize The number of results that you want to include on each page.
+	PageSize *int `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// PageToken A token that you can use to fetch a specific page when there are multiple pages of results.
+	PageToken *string `form:"pageToken,omitempty" json:"pageToken,omitempty"`
+}
+
+// SearchListingsItemsParamsIncludedData defines parameters for SearchListingsItems.
+type SearchListingsItemsParamsIncludedData string
+
+// SearchListingsItemsParamsIdentifiersType defines parameters for SearchListingsItems.
+type SearchListingsItemsParamsIdentifiersType string
+
+// SearchListingsItemsParamsWithIssueSeverity defines parameters for SearchListingsItems.
+type SearchListingsItemsParamsWithIssueSeverity string
+
+// SearchListingsItemsParamsWithStatus defines parameters for SearchListingsItems.
+type SearchListingsItemsParamsWithStatus string
+
+// SearchListingsItemsParamsWithoutStatus defines parameters for SearchListingsItems.
+type SearchListingsItemsParamsWithoutStatus string
+
+// SearchListingsItemsParamsSortBy defines parameters for SearchListingsItems.
+type SearchListingsItemsParamsSortBy string
+
+// SearchListingsItemsParamsSortOrder defines parameters for SearchListingsItems.
+type SearchListingsItemsParamsSortOrder string
 
 // DeleteListingsItemParams defines parameters for DeleteListingsItem.
 type DeleteListingsItemParams struct {
@@ -606,6 +836,9 @@ func WithResponseEditorFn(fn ResponseEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// SearchListingsItems request
+	SearchListingsItems(ctx context.Context, sellerId string, params *SearchListingsItemsParams) (*http.Response, error)
+
 	// DeleteListingsItem request
 	DeleteListingsItem(ctx context.Context, sellerId string, sku string, params *DeleteListingsItemParams) (*http.Response, error)
 
@@ -621,6 +854,26 @@ type ClientInterface interface {
 	PutListingsItemWithBody(ctx context.Context, sellerId string, sku string, params *PutListingsItemParams, contentType string, body io.Reader) (*http.Response, error)
 
 	PutListingsItem(ctx context.Context, sellerId string, sku string, params *PutListingsItemParams, body PutListingsItemJSONRequestBody) (*http.Response, error)
+}
+
+func (c *Client) SearchListingsItems(ctx context.Context, sellerId string, params *SearchListingsItemsParams) (*http.Response, error) {
+	req, err := NewSearchListingsItemsRequest(c.Server, sellerId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
 }
 
 func (c *Client) DeleteListingsItem(ctx context.Context, sellerId string, sku string, params *DeleteListingsItemParams) (*http.Response, error) {
@@ -741,6 +994,330 @@ func (c *Client) PutListingsItem(ctx context.Context, sellerId string, sku strin
 		return nil, err
 	}
 	return rsp, nil
+}
+
+// NewSearchListingsItemsRequest generates requests for SearchListingsItems
+func NewSearchListingsItemsRequest(server string, sellerId string, params *SearchListingsItemsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "sellerId", runtime.ParamLocationPath, sellerId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/listings/2021-08-01/items/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "marketplaceIds", runtime.ParamLocationQuery, params.MarketplaceIds); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				values := make([]string, len(v))
+				copy(values, v)
+				queryValues.Add(k, strings.Join(values, ","))
+			}
+		}
+
+		if params.IssueLocale != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "issueLocale", runtime.ParamLocationQuery, *params.IssueLocale); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.IncludedData != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "includedData", runtime.ParamLocationQuery, *params.IncludedData); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.Identifiers != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "identifiers", runtime.ParamLocationQuery, *params.Identifiers); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.IdentifiersType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "identifiersType", runtime.ParamLocationQuery, *params.IdentifiersType); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.VariationParentSku != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "variationParentSku", runtime.ParamLocationQuery, *params.VariationParentSku); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.PackageHierarchySku != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "packageHierarchySku", runtime.ParamLocationQuery, *params.PackageHierarchySku); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.CreatedAfter != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "createdAfter", runtime.ParamLocationQuery, *params.CreatedAfter); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.CreatedBefore != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "createdBefore", runtime.ParamLocationQuery, *params.CreatedBefore); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.LastUpdatedAfter != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "lastUpdatedAfter", runtime.ParamLocationQuery, *params.LastUpdatedAfter); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.LastUpdatedBefore != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "lastUpdatedBefore", runtime.ParamLocationQuery, *params.LastUpdatedBefore); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.WithIssueSeverity != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "withIssueSeverity", runtime.ParamLocationQuery, *params.WithIssueSeverity); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.WithStatus != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "withStatus", runtime.ParamLocationQuery, *params.WithStatus); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.WithoutStatus != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "withoutStatus", runtime.ParamLocationQuery, *params.WithoutStatus); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.SortOrder != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortOrder", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "pageSize", runtime.ParamLocationQuery, *params.PageSize); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.PageToken != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "pageToken", runtime.ParamLocationQuery, *params.PageToken); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewDeleteListingsItemRequest generates requests for DeleteListingsItem
@@ -912,7 +1489,7 @@ func NewGetListingsItemRequest(server string, sellerId string, sku string, param
 // NewPatchListingsItemRequest calls the generic PatchListingsItem builder with application/json body
 func NewPatchListingsItemRequest(server string, sellerId string, sku string, params *PatchListingsItemParams, body PatchListingsItemJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1032,7 +1609,7 @@ func NewPatchListingsItemRequestWithBody(server string, sellerId string, sku str
 // NewPutListingsItemRequest calls the generic PutListingsItem builder with application/json body
 func NewPutListingsItemRequest(server string, sellerId string, sku string, params *PutListingsItemParams, body PutListingsItemJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1194,6 +1771,9 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// SearchListingsItemsWithResponse request
+	SearchListingsItemsWithResponse(ctx context.Context, sellerId string, params *SearchListingsItemsParams) (*SearchListingsItemsResp, error)
+
 	// DeleteListingsItemWithResponse request
 	DeleteListingsItemWithResponse(ctx context.Context, sellerId string, sku string, params *DeleteListingsItemParams) (*DeleteListingsItemResp, error)
 
@@ -1209,6 +1789,36 @@ type ClientWithResponsesInterface interface {
 	PutListingsItemWithBodyWithResponse(ctx context.Context, sellerId string, sku string, params *PutListingsItemParams, contentType string, body io.Reader) (*PutListingsItemResp, error)
 
 	PutListingsItemWithResponse(ctx context.Context, sellerId string, sku string, params *PutListingsItemParams, body PutListingsItemJSONRequestBody) (*PutListingsItemResp, error)
+}
+
+type SearchListingsItemsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ItemSearchResults
+	JSON400      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r SearchListingsItemsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SearchListingsItemsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type DeleteListingsItemResp struct {
@@ -1328,6 +1938,15 @@ func (r PutListingsItemResp) StatusCode() int {
 	return 0
 }
 
+// SearchListingsItemsWithResponse request returning *SearchListingsItemsResp
+func (c *ClientWithResponses) SearchListingsItemsWithResponse(ctx context.Context, sellerId string, params *SearchListingsItemsParams) (*SearchListingsItemsResp, error) {
+	rsp, err := c.SearchListingsItems(ctx, sellerId, params)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSearchListingsItemsResp(rsp)
+}
+
 // DeleteListingsItemWithResponse request returning *DeleteListingsItemResp
 func (c *ClientWithResponses) DeleteListingsItemWithResponse(ctx context.Context, sellerId string, sku string, params *DeleteListingsItemParams) (*DeleteListingsItemResp, error) {
 	rsp, err := c.DeleteListingsItem(ctx, sellerId, sku, params)
@@ -1378,6 +1997,88 @@ func (c *ClientWithResponses) PutListingsItemWithResponse(ctx context.Context, s
 		return nil, err
 	}
 	return ParsePutListingsItemResp(rsp)
+}
+
+// ParseSearchListingsItemsResp parses an HTTP response from a SearchListingsItemsWithResponse call
+func ParseSearchListingsItemsResp(rsp *http.Response) (*SearchListingsItemsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SearchListingsItemsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ItemSearchResults
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseDeleteListingsItemResp parses an HTTP response from a DeleteListingsItemWithResponse call

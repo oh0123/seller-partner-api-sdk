@@ -19,7 +19,7 @@ import (
 
 // AdhocDisbursementEvent An event related to an Adhoc Disbursement.
 type AdhocDisbursementEvent struct {
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// TransactionAmount A currency type and amount.
@@ -66,8 +66,11 @@ type AdjustmentEvent struct {
 	// * SellerRewards - An award credited to a seller's account for their participation in an offer in the Seller Rewards program. Applies only to the India marketplace.
 	AdjustmentType *string `json:"AdjustmentType,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
+
+	// StoreName The name of the store where the event occurred.
+	StoreName *string `json:"StoreName,omitempty"`
 }
 
 // AdjustmentEventList A list of adjustment event information for the seller's account.
@@ -95,6 +98,9 @@ type AdjustmentItem struct {
 
 	// TotalAmount A currency type and amount.
 	TotalAmount *Currency `json:"TotalAmount,omitempty"`
+
+	// TransactionNumber The transaction number that is related to the adjustment.
+	TransactionNumber *string `json:"TransactionNumber,omitempty"`
 }
 
 // AdjustmentItemList A list of information about items in an adjustment to the seller's account.
@@ -111,7 +117,7 @@ type AffordabilityExpenseEvent struct {
 	// MarketplaceId An encrypted, Amazon-defined marketplace identifier.
 	MarketplaceId *string `json:"MarketplaceId,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// TaxTypeCGST A currency type and amount.
@@ -139,7 +145,7 @@ type AffordabilityExpenseEvent struct {
 // AffordabilityExpenseEventList A list of expense information related to an affordability promotion.
 type AffordabilityExpenseEventList = []AffordabilityExpenseEvent
 
-// BigDecimal defines model for BigDecimal.
+// BigDecimal Fields with a schema type of BigDecimal are a signed decimal number (for example CurrencyAmount).
 type BigDecimal = float32
 
 // CapacityReservationBillingEvent An event related to a capacity reservation billing charge.
@@ -147,7 +153,7 @@ type CapacityReservationBillingEvent struct {
 	// Description A short description of the capacity reservation billing event.
 	Description *string `json:"Description,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// TransactionAmount A currency type and amount.
@@ -256,7 +262,7 @@ type ChargeRefundEvent struct {
 	// ChargeRefundTransactions A list of `ChargeRefund` transactions
 	ChargeRefundTransactions *ChargeRefundTransactions `json:"ChargeRefundTransactions,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// ReasonCode The reason given for a charge refund.
@@ -366,7 +372,7 @@ type CouponPaymentEvent struct {
 	// PaymentEventId A payment event identifier.
 	PaymentEventId *string `json:"PaymentEventId,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// SellerCouponDescription The description provided by the seller when they created the coupon.
@@ -381,13 +387,14 @@ type CouponPaymentEventList = []CouponPaymentEvent
 
 // Currency A currency type and amount.
 type Currency struct {
+	// CurrencyAmount Fields with a schema type of BigDecimal are a signed decimal number (for example CurrencyAmount).
 	CurrencyAmount *BigDecimal `json:"CurrencyAmount,omitempty"`
 
 	// CurrencyCode The three-digit currency code in ISO 4217 format.
 	CurrencyCode *string `json:"CurrencyCode,omitempty"`
 }
 
-// Date date-time format string
+// Date Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 type Date = string
 
 // DebtRecoveryEvent A debt payment or debt adjustment.
@@ -406,7 +413,7 @@ type DebtRecoveryEvent struct {
 	//
 	// * DebtPaymentFailure
 	//
-	// *DebtAdjustment
+	// * DebtAdjustment
 	DebtRecoveryType *string `json:"DebtRecoveryType,omitempty"`
 
 	// OverPaymentCredit A currency type and amount.
@@ -421,10 +428,10 @@ type DebtRecoveryEventList = []DebtRecoveryEvent
 
 // DebtRecoveryItem An item of a debt payment or debt adjustment.
 type DebtRecoveryItem struct {
-	// GroupBeginDate date-time format string
+	// GroupBeginDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	GroupBeginDate *Date `json:"GroupBeginDate,omitempty"`
 
-	// GroupEndDate date-time format string
+	// GroupEndDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	GroupEndDate *Date `json:"GroupEndDate,omitempty"`
 
 	// OriginalAmount A currency type and amount.
@@ -489,7 +496,7 @@ type FBALiquidationEvent struct {
 	// OriginalRemovalOrderId The identifier for the original removal order.
 	OriginalRemovalOrderId *string `json:"OriginalRemovalOrderId,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 }
 
@@ -511,7 +518,7 @@ type FailedAdhocDisbursementEvent struct {
 	// Example `CREDIT_CARD`
 	PaymentDisbursementType *string `json:"PaymentDisbursementType,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// Status The status of the failed `AdhocDisbursement`.
@@ -552,16 +559,16 @@ type FinancialEventGroup struct {
 	// ConvertedTotal A currency type and amount.
 	ConvertedTotal *Currency `json:"ConvertedTotal,omitempty"`
 
-	// FinancialEventGroupEnd date-time format string
+	// FinancialEventGroupEnd Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	FinancialEventGroupEnd *Date `json:"FinancialEventGroupEnd,omitempty"`
 
 	// FinancialEventGroupId A unique identifier for the financial event group.
 	FinancialEventGroupId *string `json:"FinancialEventGroupId,omitempty"`
 
-	// FinancialEventGroupStart date-time format string
+	// FinancialEventGroupStart Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	FinancialEventGroupStart *Date `json:"FinancialEventGroupStart,omitempty"`
 
-	// FundTransferDate date-time format string
+	// FundTransferDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	FundTransferDate *Date `json:"FundTransferDate,omitempty"`
 
 	// FundTransferStatus The status of the fund transfer.
@@ -699,7 +706,7 @@ type ImagingServicesFeeEvent struct {
 	// ImagingRequestBillingItemID The identifier for the imaging services request.
 	ImagingRequestBillingItemID *string `json:"ImagingRequestBillingItemID,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 }
 
@@ -773,7 +780,7 @@ type NetworkComminglingTransactionEvent struct {
 	// NetCoTransactionID The identifier for the network item swap.
 	NetCoTransactionID *string `json:"NetCoTransactionID,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// SwapReason The reason for the network item swap.
@@ -901,7 +908,7 @@ type PayWithAmazonEvent struct {
 	// StoreName The store name where the event occurred.
 	StoreName *string `json:"StoreName,omitempty"`
 
-	// TransactionPostedDate date-time format string
+	// TransactionPostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	TransactionPostedDate *Date `json:"TransactionPostedDate,omitempty"`
 }
 
@@ -916,7 +923,7 @@ type ProductAdsPaymentEvent struct {
 	// InvoiceId Identifier for the invoice that the transaction appears in.
 	InvoiceId *string `json:"invoiceId,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"postedDate,omitempty"`
 
 	// TaxValue A currency type and amount.
@@ -964,7 +971,7 @@ type RemovalShipmentAdjustmentEvent struct {
 	// OrderId The orderId for shipping inventory.
 	OrderId *string `json:"OrderId,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// RemovalShipmentItemAdjustmentList A comma-delimited list of Removal shipmentItemAdjustment details for FBA inventory.
@@ -989,11 +996,14 @@ type RemovalShipmentEvent struct {
 	// OrderId The identifier for the removal shipment order.
 	OrderId *string `json:"OrderId,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// RemovalShipmentItemList A list of information about removal shipment items.
 	RemovalShipmentItemList *RemovalShipmentItemList `json:"RemovalShipmentItemList,omitempty"`
+
+	// StoreName The name of the store where the event occurred.
+	StoreName *string `json:"StoreName,omitempty"`
 
 	// TransactionType The type of removal order.
 	//
@@ -1083,7 +1093,7 @@ type RentalTransactionEvent struct {
 	// MarketplaceName The name of the marketplace.
 	MarketplaceName *string `json:"MarketplaceName,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// RentalChargeList A list of charge information on the seller's account.
@@ -1135,7 +1145,7 @@ type RetrochargeEvent struct {
 	// MarketplaceName The name of the marketplace where the retrocharge event occurred.
 	MarketplaceName *string `json:"MarketplaceName,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// RetrochargeEventType The type of event.
@@ -1159,7 +1169,7 @@ type RetrochargeEventList = []RetrochargeEvent
 
 // SAFETReimbursementEvent A SAFE-T claim reimbursement on the seller's account.
 type SAFETReimbursementEvent struct {
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// ReasonCode Indicates why the seller was reimbursed.
@@ -1210,7 +1220,7 @@ type SellerDealPaymentEvent struct {
 	// FeeType The type of fee: RunLightningDealFee.
 	FeeType *string `json:"feeType,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"postedDate,omitempty"`
 
 	// TaxAmount A currency type and amount.
@@ -1301,7 +1311,7 @@ type SellerReviewEnrollmentPaymentEvent struct {
 	// ParentASIN The Amazon Standard Identification Number (ASIN) of the item that was enrolled in the Early Reviewer Program.
 	ParentASIN *string `json:"ParentASIN,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// TotalAmount A currency type and amount.
@@ -1333,6 +1343,9 @@ type ServiceFeeEvent struct {
 
 	// SellerSKU The seller SKU of the item. The seller SKU is qualified by the seller's seller ID, which is included with every call to the Selling Partner API.
 	SellerSKU *string `json:"SellerSKU,omitempty"`
+
+	// StoreName The name of the store where the event occurred.
+	StoreName *string `json:"StoreName,omitempty"`
 }
 
 // ServiceFeeEventList A list of information about service fee events.
@@ -1361,7 +1374,7 @@ type ShipmentEvent struct {
 	// OrderFeeList A list of fee component information.
 	OrderFeeList *FeeComponentList `json:"OrderFeeList,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// SellerOrderId A seller-defined identifier for an order.
@@ -1378,6 +1391,9 @@ type ShipmentEvent struct {
 
 	// ShipmentItemList A list of shipment items.
 	ShipmentItemList *ShipmentItemList `json:"ShipmentItemList,omitempty"`
+
+	// StoreName The name of the store where the event occurred.
+	StoreName *string `json:"StoreName,omitempty"`
 }
 
 // ShipmentEventList A list of shipment event information.
@@ -1460,7 +1476,7 @@ type SolutionProviderCreditEvent struct {
 	// TransactionAmount A currency type and amount.
 	TransactionAmount *Currency `json:"TransactionAmount,omitempty"`
 
-	// TransactionCreationDate date-time format string
+	// TransactionCreationDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	TransactionCreationDate *Date `json:"TransactionCreationDate,omitempty"`
 }
 
@@ -1469,7 +1485,7 @@ type SolutionProviderCreditEventList = []SolutionProviderCreditEvent
 
 // TDSReimbursementEvent An event related to a Tax-Deducted-at-Source (TDS) reimbursement.
 type TDSReimbursementEvent struct {
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// ReimbursedAmount A currency type and amount.
@@ -1505,7 +1521,7 @@ type TaxWithholdingEvent struct {
 	// BaseAmount A currency type and amount.
 	BaseAmount *Currency `json:"BaseAmount,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// TaxWithholdingPeriod Period which taxwithholding on seller's account is calculated.
@@ -1520,10 +1536,10 @@ type TaxWithholdingEventList = []TaxWithholdingEvent
 
 // TaxWithholdingPeriod Period which taxwithholding on seller's account is calculated.
 type TaxWithholdingPeriod struct {
-	// EndDate date-time format string
+	// EndDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	EndDate *Date `json:"EndDate,omitempty"`
 
-	// StartDate date-time format string
+	// StartDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	StartDate *Date `json:"StartDate,omitempty"`
 }
 
@@ -1538,7 +1554,7 @@ type TrialShipmentEvent struct {
 	// FinancialEventGroupId The identifier of the financial event group.
 	FinancialEventGroupId *string `json:"FinancialEventGroupId,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// SKU The seller SKU of the item. The seller SKU is qualified by the seller's seller ID, which is included with every call to the Selling Partner API.
@@ -1553,7 +1569,7 @@ type ValueAddedServiceChargeEvent struct {
 	// Description A short description of the service charge event.
 	Description *string `json:"Description,omitempty"`
 
-	// PostedDate date-time format string
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"PostedDate,omitempty"`
 
 	// TransactionAmount A currency type and amount.

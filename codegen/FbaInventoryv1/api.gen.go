@@ -4,6 +4,7 @@
 package fbainventoryv1
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -28,6 +29,42 @@ const (
 const (
 	Marketplace GetInventorySummariesParamsGranularityType = "Marketplace"
 )
+
+// AddInventoryRequest The object with the list of Inventory to be added
+type AddInventoryRequest struct {
+	// InventoryItems List of Inventory to be added
+	InventoryItems *InventoryItems `json:"inventoryItems,omitempty"`
+}
+
+// AddInventoryResponse The response schema for the AddInventory operation.
+type AddInventoryResponse struct {
+	// Errors A list of error responses returned when a request is unsuccessful.
+	Errors *ErrorList `json:"errors,omitempty"`
+}
+
+// CreateInventoryItemRequest An item to be created in the inventory.
+type CreateInventoryItemRequest struct {
+	// MarketplaceId The marketplaceId.
+	MarketplaceId string `json:"marketplaceId"`
+
+	// ProductName The name of the item.
+	ProductName string `json:"productName"`
+
+	// SellerSku The seller SKU of the item.
+	SellerSku string `json:"sellerSku"`
+}
+
+// CreateInventoryItemResponse The response schema for the CreateInventoryItem operation.
+type CreateInventoryItemResponse struct {
+	// Errors A list of error responses returned when a request is unsuccessful.
+	Errors *ErrorList `json:"errors,omitempty"`
+}
+
+// DeleteInventoryItemResponse The response schema for the DeleteInventoryItem operation.
+type DeleteInventoryItemResponse struct {
+	// Errors A list of error responses returned when a request is unsuccessful.
+	Errors *ErrorList `json:"errors,omitempty"`
+}
 
 // Error An error response returned when the request is unsuccessful.
 type Error struct {
@@ -98,6 +135,21 @@ type InventoryDetails struct {
 	UnfulfillableQuantity *UnfulfillableQuantity `json:"unfulfillableQuantity,omitempty"`
 }
 
+// InventoryItem An item in the list of inventory to be added.
+type InventoryItem struct {
+	// MarketplaceId The marketplaceId.
+	MarketplaceId string `json:"marketplaceId"`
+
+	// Quantity The quantity of item to add.
+	Quantity int `json:"quantity"`
+
+	// SellerSku The seller SKU of the item.
+	SellerSku string `json:"sellerSku"`
+}
+
+// InventoryItems List of Inventory to be added
+type InventoryItems = []InventoryItem
+
 // InventorySummaries A list of inventory summaries.
 type InventorySummaries = []InventorySummary
 
@@ -123,6 +175,9 @@ type InventorySummary struct {
 
 	// SellerSku The seller SKU of the item.
 	SellerSku *string `json:"sellerSku,omitempty"`
+
+	// Stores A list of seller-enrolled stores that apply to this seller SKU.
+	Stores *[]string `json:"stores,omitempty"`
 
 	// TotalQuantity The total number of units in an inbound shipment or in Amazon fulfillment centers.
 	TotalQuantity *int `json:"totalQuantity,omitempty"`
@@ -194,6 +249,18 @@ type UnfulfillableQuantity struct {
 	WarehouseDamagedQuantity *int `json:"warehouseDamagedQuantity,omitempty"`
 }
 
+// AddInventoryParams defines parameters for AddInventory.
+type AddInventoryParams struct {
+	// XAmznIdempotencyToken A unique token/requestId provided with each call to ensure idempotency.
+	XAmznIdempotencyToken string `json:"x-amzn-idempotency-token"`
+}
+
+// DeleteInventoryItemParams defines parameters for DeleteInventoryItem.
+type DeleteInventoryItemParams struct {
+	// MarketplaceId The marketplace ID for the marketplace for which the sellerSku is to be deleted.
+	MarketplaceId string `form:"marketplaceId" json:"marketplaceId"`
+}
+
 // GetInventorySummariesParams defines parameters for GetInventorySummaries.
 type GetInventorySummariesParams struct {
 	// Details true to return inventory summaries with additional summarized inventory details and quantities. Otherwise, returns inventory summaries only (default value).
@@ -223,6 +290,12 @@ type GetInventorySummariesParams struct {
 
 // GetInventorySummariesParamsGranularityType defines parameters for GetInventorySummaries.
 type GetInventorySummariesParamsGranularityType string
+
+// CreateInventoryItemJSONRequestBody defines body for CreateInventoryItem for application/json ContentType.
+type CreateInventoryItemJSONRequestBody = CreateInventoryItemRequest
+
+// AddInventoryJSONRequestBody defines body for AddInventory for application/json ContentType.
+type AddInventoryJSONRequestBody = AddInventoryRequest
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -320,8 +393,121 @@ func WithResponseEditorFn(fn ResponseEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// CreateInventoryItemWithBody request with any body
+	CreateInventoryItemWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error)
+
+	CreateInventoryItem(ctx context.Context, body CreateInventoryItemJSONRequestBody) (*http.Response, error)
+
+	// AddInventoryWithBody request with any body
+	AddInventoryWithBody(ctx context.Context, params *AddInventoryParams, contentType string, body io.Reader) (*http.Response, error)
+
+	AddInventory(ctx context.Context, params *AddInventoryParams, body AddInventoryJSONRequestBody) (*http.Response, error)
+
+	// DeleteInventoryItem request
+	DeleteInventoryItem(ctx context.Context, sellerSku string, params *DeleteInventoryItemParams) (*http.Response, error)
+
 	// GetInventorySummaries request
 	GetInventorySummaries(ctx context.Context, params *GetInventorySummariesParams) (*http.Response, error)
+}
+
+func (c *Client) CreateInventoryItemWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewCreateInventoryItemRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) CreateInventoryItem(ctx context.Context, body CreateInventoryItemJSONRequestBody) (*http.Response, error) {
+	req, err := NewCreateInventoryItemRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) AddInventoryWithBody(ctx context.Context, params *AddInventoryParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewAddInventoryRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) AddInventory(ctx context.Context, params *AddInventoryParams, body AddInventoryJSONRequestBody) (*http.Response, error) {
+	req, err := NewAddInventoryRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) DeleteInventoryItem(ctx context.Context, sellerSku string, params *DeleteInventoryItemParams) (*http.Response, error) {
+	req, err := NewDeleteInventoryItemRequest(c.Server, sellerSku, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
 }
 
 func (c *Client) GetInventorySummaries(ctx context.Context, params *GetInventorySummariesParams) (*http.Response, error) {
@@ -342,6 +528,151 @@ func (c *Client) GetInventorySummaries(ctx context.Context, params *GetInventory
 		return nil, err
 	}
 	return rsp, nil
+}
+
+// NewCreateInventoryItemRequest calls the generic CreateInventoryItem builder with application/json body
+func NewCreateInventoryItemRequest(server string, body CreateInventoryItemJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateInventoryItemRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateInventoryItemRequestWithBody generates requests for CreateInventoryItem with any type of body
+func NewCreateInventoryItemRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/fba/inventory/v1/items")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAddInventoryRequest calls the generic AddInventory builder with application/json body
+func NewAddInventoryRequest(server string, params *AddInventoryParams, body AddInventoryJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAddInventoryRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewAddInventoryRequestWithBody generates requests for AddInventory with any type of body
+func NewAddInventoryRequestWithBody(server string, params *AddInventoryParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/fba/inventory/v1/items/inventory")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		var headerParam0 string
+
+		headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-idempotency-token", runtime.ParamLocationHeader, params.XAmznIdempotencyToken)
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("x-amzn-idempotency-token", headerParam0)
+
+	}
+
+	return req, nil
+}
+
+// NewDeleteInventoryItemRequest generates requests for DeleteInventoryItem
+func NewDeleteInventoryItemRequest(server string, sellerSku string, params *DeleteInventoryItemParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "sellerSku", runtime.ParamLocationPath, sellerSku)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/fba/inventory/v1/items/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "marketplaceId", runtime.ParamLocationQuery, params.MarketplaceId); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				values := make([]string, len(v))
+				copy(values, v)
+				queryValues.Add(k, strings.Join(values, ","))
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewGetInventorySummariesRequest generates requests for GetInventorySummaries
@@ -538,8 +869,105 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// CreateInventoryItemWithBodyWithResponse request with any body
+	CreateInventoryItemWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*CreateInventoryItemResp, error)
+
+	CreateInventoryItemWithResponse(ctx context.Context, body CreateInventoryItemJSONRequestBody) (*CreateInventoryItemResp, error)
+
+	// AddInventoryWithBodyWithResponse request with any body
+	AddInventoryWithBodyWithResponse(ctx context.Context, params *AddInventoryParams, contentType string, body io.Reader) (*AddInventoryResp, error)
+
+	AddInventoryWithResponse(ctx context.Context, params *AddInventoryParams, body AddInventoryJSONRequestBody) (*AddInventoryResp, error)
+
+	// DeleteInventoryItemWithResponse request
+	DeleteInventoryItemWithResponse(ctx context.Context, sellerSku string, params *DeleteInventoryItemParams) (*DeleteInventoryItemResp, error)
+
 	// GetInventorySummariesWithResponse request
 	GetInventorySummariesWithResponse(ctx context.Context, params *GetInventorySummariesParams) (*GetInventorySummariesResp, error)
+}
+
+type CreateInventoryItemResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *CreateInventoryItemResponse
+	JSON400      *CreateInventoryItemResponse
+	JSON403      *CreateInventoryItemResponse
+	JSON404      *CreateInventoryItemResponse
+	JSON429      *CreateInventoryItemResponse
+	JSON500      *CreateInventoryItemResponse
+	JSON503      *CreateInventoryItemResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateInventoryItemResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateInventoryItemResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AddInventoryResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AddInventoryResponse
+	JSON400      *AddInventoryResponse
+	JSON403      *AddInventoryResponse
+	JSON404      *AddInventoryResponse
+	JSON429      *AddInventoryResponse
+	JSON500      *AddInventoryResponse
+	JSON503      *AddInventoryResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r AddInventoryResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AddInventoryResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteInventoryItemResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *DeleteInventoryItemResponse
+	JSON400      *DeleteInventoryItemResponse
+	JSON403      *DeleteInventoryItemResponse
+	JSON404      *DeleteInventoryItemResponse
+	JSON429      *DeleteInventoryItemResponse
+	JSON500      *DeleteInventoryItemResponse
+	JSON503      *DeleteInventoryItemResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteInventoryItemResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteInventoryItemResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type GetInventorySummariesResp struct {
@@ -570,6 +998,49 @@ func (r GetInventorySummariesResp) StatusCode() int {
 	return 0
 }
 
+// CreateInventoryItemWithBodyWithResponse request with arbitrary body returning *CreateInventoryItemResp
+func (c *ClientWithResponses) CreateInventoryItemWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*CreateInventoryItemResp, error) {
+	rsp, err := c.CreateInventoryItemWithBody(ctx, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateInventoryItemResp(rsp)
+}
+
+func (c *ClientWithResponses) CreateInventoryItemWithResponse(ctx context.Context, body CreateInventoryItemJSONRequestBody) (*CreateInventoryItemResp, error) {
+	rsp, err := c.CreateInventoryItem(ctx, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateInventoryItemResp(rsp)
+}
+
+// AddInventoryWithBodyWithResponse request with arbitrary body returning *AddInventoryResp
+func (c *ClientWithResponses) AddInventoryWithBodyWithResponse(ctx context.Context, params *AddInventoryParams, contentType string, body io.Reader) (*AddInventoryResp, error) {
+	rsp, err := c.AddInventoryWithBody(ctx, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddInventoryResp(rsp)
+}
+
+func (c *ClientWithResponses) AddInventoryWithResponse(ctx context.Context, params *AddInventoryParams, body AddInventoryJSONRequestBody) (*AddInventoryResp, error) {
+	rsp, err := c.AddInventory(ctx, params, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddInventoryResp(rsp)
+}
+
+// DeleteInventoryItemWithResponse request returning *DeleteInventoryItemResp
+func (c *ClientWithResponses) DeleteInventoryItemWithResponse(ctx context.Context, sellerSku string, params *DeleteInventoryItemParams) (*DeleteInventoryItemResp, error) {
+	rsp, err := c.DeleteInventoryItem(ctx, sellerSku, params)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteInventoryItemResp(rsp)
+}
+
 // GetInventorySummariesWithResponse request returning *GetInventorySummariesResp
 func (c *ClientWithResponses) GetInventorySummariesWithResponse(ctx context.Context, params *GetInventorySummariesParams) (*GetInventorySummariesResp, error) {
 	rsp, err := c.GetInventorySummaries(ctx, params)
@@ -577,6 +1048,210 @@ func (c *ClientWithResponses) GetInventorySummariesWithResponse(ctx context.Cont
 		return nil, err
 	}
 	return ParseGetInventorySummariesResp(rsp)
+}
+
+// ParseCreateInventoryItemResp parses an HTTP response from a CreateInventoryItemWithResponse call
+func ParseCreateInventoryItemResp(rsp *http.Response) (*CreateInventoryItemResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateInventoryItemResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CreateInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest CreateInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest CreateInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest CreateInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest CreateInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest CreateInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest CreateInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAddInventoryResp parses an HTTP response from a AddInventoryWithResponse call
+func ParseAddInventoryResp(rsp *http.Response) (*AddInventoryResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AddInventoryResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AddInventoryResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest AddInventoryResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest AddInventoryResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest AddInventoryResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest AddInventoryResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest AddInventoryResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest AddInventoryResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteInventoryItemResp parses an HTTP response from a DeleteInventoryItemWithResponse call
+func ParseDeleteInventoryItemResp(rsp *http.Response) (*DeleteInventoryItemResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteInventoryItemResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DeleteInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest DeleteInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest DeleteInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest DeleteInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest DeleteInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest DeleteInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest DeleteInventoryItemResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseGetInventorySummariesResp parses an HTTP response from a GetInventorySummariesWithResponse call

@@ -15,16 +15,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
-// Attachment Represents a file uploaded to a destination that was created by the [createUploadDestinationForResource](doc:uploads-api-reference#post-uploads2020-11-01uploaddestinationsresource) operation of the Selling Partner API for Uploads.
+// Attachment Represents a file that was uploaded to a destination that was created by the Uploads API [`createUploadDestinationForResource`](https://developer-docs.amazon.com/sp-api/docs/uploads-api-reference#post-uploads2020-11-01uploaddestinationsresource) operation.
 type Attachment struct {
 	// FileName The name of the file, including the extension. This is the file name that will appear in the message. This does not need to match the file name of the file that you uploaded.
 	FileName string `json:"fileName"`
 
-	// UploadDestinationId The identifier of the upload destination. Get this value by calling the [createUploadDestinationForResource](doc:uploads-api-reference#post-uploads2020-11-01uploaddestinationsresource) operation of the Uploads API.
+	// UploadDestinationId The identifier for the upload destination. To retrieve this value, call the Uploads API [`createUploadDestinationForResource`](https://developer-docs.amazon.com/sp-api/docs/uploads-api-reference#post-uploads2020-11-01uploaddestinationsresource) operation.
 	UploadDestinationId string `json:"uploadDestinationId"`
 }
 
@@ -91,16 +90,16 @@ type CreateConfirmServiceDetailsResponse struct {
 	Errors *ErrorList `json:"errors,omitempty"`
 }
 
-// CreateDigitalAccessKeyRequest The request schema for the createDigitalAccessKey operation.
+// CreateDigitalAccessKeyRequest The request schema for the `createDigitalAccessKey` operation.
 type CreateDigitalAccessKeyRequest struct {
-	// Attachments Attachments to include in the message to the buyer.
+	// Attachments Attachments that you want to include in the message to the buyer.
 	Attachments *[]Attachment `json:"attachments,omitempty"`
 
-	// Text The text to be sent to the buyer. Only links related to the digital access key are allowed. Do not include HTML or email addresses. The text must be written in the buyer's language of preference, which can be retrieved from the GetAttributes operation.
+	// Text The text that is sent to the buyer. Only links that are related to the digital access key are allowed. Do not include HTML or email addresses. The text must be written in the buyer's preferred language, which you can retrieve from the `GetAttributes` operation.
 	Text *string `json:"text,omitempty"`
 }
 
-// CreateDigitalAccessKeyResponse The response schema for the createDigitalAccessKey operation.
+// CreateDigitalAccessKeyResponse The response schema for the `createDigitalAccessKey` operation.
 type CreateDigitalAccessKeyResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
@@ -183,9 +182,13 @@ type GetAttributesResponse struct {
 
 // GetMessagingActionResponse Describes a messaging action that can be taken for an order. Provides a JSON Hypertext Application Language (HAL) link to the JSON schema document that describes the expected input.
 type GetMessagingActionResponse struct {
+	// Embedded The embedded response associated with the messaging action.
 	Embedded *struct {
+		// Schema The `GET` request schema response.
 		Schema *GetSchemaResponse `json:"schema,omitempty"`
 	} `json:"_embedded,omitempty"`
+
+	// Links The links response that is associated with the messaging action.
 	Links *struct {
 		// Schema A Link object.
 		Schema LinkObject `json:"schema"`
@@ -201,11 +204,14 @@ type GetMessagingActionResponse struct {
 	Payload *MessagingAction `json:"payload,omitempty"`
 }
 
-// GetMessagingActionsForOrderResponse The response schema for the getMessagingActionsForOrder operation.
+// GetMessagingActionsForOrderResponse The response schema for the `getMessagingActionsForOrder` operation.
 type GetMessagingActionsForOrderResponse struct {
+	// Embedded The messaging actions response that is associated with the specified `amazonOrderId`.
 	Embedded *struct {
 		Actions []GetMessagingActionResponse `json:"actions"`
 	} `json:"_embedded,omitempty"`
+
+	// Links The links response that is associated with the specified `amazonOrderId`.
 	Links *struct {
 		// Actions Eligible actions for the specified amazonOrderId.
 		Actions []LinkObject `json:"actions"`
@@ -218,8 +224,9 @@ type GetMessagingActionsForOrderResponse struct {
 	Errors *ErrorList `json:"errors,omitempty"`
 }
 
-// GetSchemaResponse defines model for GetSchemaResponse.
+// GetSchemaResponse The `GET` request schema response.
 type GetSchemaResponse struct {
+	// Links The links response that is associated with the object.
 	Links *struct {
 		// Self A Link object.
 		Self LinkObject `json:"self"`
@@ -232,7 +239,7 @@ type GetSchemaResponse struct {
 	Payload *Schema `json:"payload,omitempty"`
 }
 
-// InvoiceRequest The request schema for the sendInvoice operation.
+// InvoiceRequest The request schema for the `sendInvoice` operation.
 type InvoiceRequest struct {
 	// Attachments Attachments to include in the message to the buyer.
 	Attachments *[]Attachment `json:"attachments,omitempty"`
@@ -255,6 +262,7 @@ type LinkObject struct {
 
 // MessagingAction A simple object containing the name of the template.
 type MessagingAction struct {
+	// Name The name of the template.
 	Name string `json:"name"`
 }
 
@@ -263,79 +271,79 @@ type Schema map[string]interface{}
 
 // GetMessagingActionsForOrderParams defines parameters for GetMessagingActionsForOrder.
 type GetMessagingActionsForOrderParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // GetAttributesParams defines parameters for GetAttributes.
 type GetAttributesParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // CreateAmazonMotorsParams defines parameters for CreateAmazonMotors.
 type CreateAmazonMotorsParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // ConfirmCustomizationDetailsParams defines parameters for ConfirmCustomizationDetails.
 type ConfirmCustomizationDetailsParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // CreateConfirmDeliveryDetailsParams defines parameters for CreateConfirmDeliveryDetails.
 type CreateConfirmDeliveryDetailsParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // CreateConfirmOrderDetailsParams defines parameters for CreateConfirmOrderDetails.
 type CreateConfirmOrderDetailsParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // CreateConfirmServiceDetailsParams defines parameters for CreateConfirmServiceDetails.
 type CreateConfirmServiceDetailsParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // CreateDigitalAccessKeyParams defines parameters for CreateDigitalAccessKey.
 type CreateDigitalAccessKeyParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // SendInvoiceParams defines parameters for SendInvoice.
 type SendInvoiceParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // CreateLegalDisclosureParams defines parameters for CreateLegalDisclosure.
 type CreateLegalDisclosureParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // CreateNegativeFeedbackRemovalParams defines parameters for CreateNegativeFeedbackRemoval.
 type CreateNegativeFeedbackRemovalParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // CreateUnexpectedProblemParams defines parameters for CreateUnexpectedProblem.
 type CreateUnexpectedProblemParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
 // CreateWarrantyParams defines parameters for CreateWarranty.
 type CreateWarrantyParams struct {
-	// MarketplaceIds A marketplace identifier. This specifies the marketplace in which the order was placed. Only one marketplace can be specified.
+	// MarketplaceIds A marketplace identifier. This identifies the marketplace in which the order was placed. You can only specify one marketplace.
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 }
 
@@ -1092,7 +1100,7 @@ func NewGetAttributesRequest(server string, amazonOrderId string, params *GetAtt
 // NewCreateAmazonMotorsRequest calls the generic CreateAmazonMotors builder with application/json body
 func NewCreateAmazonMotorsRequest(server string, amazonOrderId string, params *CreateAmazonMotorsParams, body CreateAmazonMotorsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1157,7 +1165,7 @@ func NewCreateAmazonMotorsRequestWithBody(server string, amazonOrderId string, p
 // NewConfirmCustomizationDetailsRequest calls the generic ConfirmCustomizationDetails builder with application/json body
 func NewConfirmCustomizationDetailsRequest(server string, amazonOrderId string, params *ConfirmCustomizationDetailsParams, body ConfirmCustomizationDetailsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1222,7 +1230,7 @@ func NewConfirmCustomizationDetailsRequestWithBody(server string, amazonOrderId 
 // NewCreateConfirmDeliveryDetailsRequest calls the generic CreateConfirmDeliveryDetails builder with application/json body
 func NewCreateConfirmDeliveryDetailsRequest(server string, amazonOrderId string, params *CreateConfirmDeliveryDetailsParams, body CreateConfirmDeliveryDetailsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1287,7 +1295,7 @@ func NewCreateConfirmDeliveryDetailsRequestWithBody(server string, amazonOrderId
 // NewCreateConfirmOrderDetailsRequest calls the generic CreateConfirmOrderDetails builder with application/json body
 func NewCreateConfirmOrderDetailsRequest(server string, amazonOrderId string, params *CreateConfirmOrderDetailsParams, body CreateConfirmOrderDetailsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1352,7 +1360,7 @@ func NewCreateConfirmOrderDetailsRequestWithBody(server string, amazonOrderId st
 // NewCreateConfirmServiceDetailsRequest calls the generic CreateConfirmServiceDetails builder with application/json body
 func NewCreateConfirmServiceDetailsRequest(server string, amazonOrderId string, params *CreateConfirmServiceDetailsParams, body CreateConfirmServiceDetailsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1417,7 +1425,7 @@ func NewCreateConfirmServiceDetailsRequestWithBody(server string, amazonOrderId 
 // NewCreateDigitalAccessKeyRequest calls the generic CreateDigitalAccessKey builder with application/json body
 func NewCreateDigitalAccessKeyRequest(server string, amazonOrderId string, params *CreateDigitalAccessKeyParams, body CreateDigitalAccessKeyJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1482,7 +1490,7 @@ func NewCreateDigitalAccessKeyRequestWithBody(server string, amazonOrderId strin
 // NewSendInvoiceRequest calls the generic SendInvoice builder with application/json body
 func NewSendInvoiceRequest(server string, amazonOrderId string, params *SendInvoiceParams, body SendInvoiceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1547,7 +1555,7 @@ func NewSendInvoiceRequestWithBody(server string, amazonOrderId string, params *
 // NewCreateLegalDisclosureRequest calls the generic CreateLegalDisclosure builder with application/json body
 func NewCreateLegalDisclosureRequest(server string, amazonOrderId string, params *CreateLegalDisclosureParams, body CreateLegalDisclosureJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1664,7 +1672,7 @@ func NewCreateNegativeFeedbackRemovalRequest(server string, amazonOrderId string
 // NewCreateUnexpectedProblemRequest calls the generic CreateUnexpectedProblem builder with application/json body
 func NewCreateUnexpectedProblemRequest(server string, amazonOrderId string, params *CreateUnexpectedProblemParams, body CreateUnexpectedProblemJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1729,7 +1737,7 @@ func NewCreateUnexpectedProblemRequestWithBody(server string, amazonOrderId stri
 // NewCreateWarrantyRequest calls the generic CreateWarranty builder with application/json body
 func NewCreateWarrantyRequest(server string, amazonOrderId string, params *CreateWarrantyParams, body CreateWarrantyJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

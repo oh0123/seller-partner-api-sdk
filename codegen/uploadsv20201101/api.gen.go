@@ -54,13 +54,13 @@ type UploadDestination struct {
 
 // CreateUploadDestinationForResourceParams defines parameters for CreateUploadDestinationForResource.
 type CreateUploadDestinationForResourceParams struct {
-	// MarketplaceIds A list of marketplace identifiers. This specifies the marketplaces where the upload will be available. Only one marketplace can be specified.
+	// MarketplaceIds The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 
 	// ContentMD5 An MD5 hash of the content to be submitted to the upload destination. This value is used to determine if the data has been corrupted or tampered with during transit.
 	ContentMD5 string `form:"contentMD5" json:"contentMD5"`
 
-	// ContentType The content type of the file to be uploaded.
+	// ContentType The content type of the file you upload.
 	ContentType *string `form:"contentType,omitempty" json:"contentType,omitempty"`
 }
 

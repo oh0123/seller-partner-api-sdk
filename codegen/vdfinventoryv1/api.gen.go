@@ -14,7 +14,6 @@ import (
 	runt "runtime"
 	"strings"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -35,32 +34,32 @@ type ErrorList = []Error
 
 // InventoryUpdate Inventory details required to update some or all items for the requested warehouse.
 type InventoryUpdate struct {
-	// IsFullUpdate When `true`, this request contains a full feed. When `false`, this request contains a partial feed. When sending a full feed, you must send information about all items in the warehouse. Any items not in the full feed are updated as not available. When sending a partial feed, only include the items that need an inventory update. The status of other items will remain unchanged.
+	// IsFullUpdate When true, this request contains a full feed. Otherwise, this request contains a partial feed. When sending a full feed, you must send information about all items in the warehouse. Any items not in the full feed are updated as not available. When sending a partial feed, only include the items that need an update to inventory. The status of other items will remain unchanged.
 	IsFullUpdate bool `json:"isFullUpdate"`
 
 	// Items A list of inventory items with updated details, including quantity available.
 	Items []ItemDetails `json:"items"`
 
-	// SellingParty Name, address and tax details for a group.
+	// SellingParty Name, address and tax details of a party.
 	SellingParty PartyIdentification `json:"sellingParty"`
 }
 
 // ItemDetails Updated inventory details for an item.
 type ItemDetails struct {
-	// AvailableQuantity Details about item quantity.
+	// AvailableQuantity Details of item quantity.
 	AvailableQuantity ItemQuantity `json:"availableQuantity"`
 
-	// BuyerProductIdentifier The buyer-selected product identification for the item. Either `buyerProductIdentifier` or `vendorProductIdentifier` must be submitted.
+	// BuyerProductIdentifier The buyer selected product identification of the item. Either buyerProductIdentifier or vendorProductIdentifier should be submitted.
 	BuyerProductIdentifier *string `json:"buyerProductIdentifier,omitempty"`
 
-	// IsObsolete When `true`, the item is permanently unavailable.
+	// IsObsolete When true, the item is permanently unavailable.
 	IsObsolete *bool `json:"isObsolete,omitempty"`
 
-	// VendorProductIdentifier The vendor selected product identification for the item. Either `buyerProductIdentifier` or `vendorProductIdentifier` must be submitted.
+	// VendorProductIdentifier The vendor selected product identification of the item. Either buyerProductIdentifier or vendorProductIdentifier should be submitted.
 	VendorProductIdentifier *string `json:"vendorProductIdentifier,omitempty"`
 }
 
-// ItemQuantity Details about item quantity.
+// ItemQuantity Details of item quantity.
 type ItemQuantity struct {
 	// Amount Quantity of units available for a specific item.
 	Amount *int `json:"amount,omitempty"`
@@ -69,28 +68,28 @@ type ItemQuantity struct {
 	UnitOfMeasure string `json:"unitOfMeasure"`
 }
 
-// PartyIdentification Name, address and tax details for a group.
+// PartyIdentification Name, address and tax details of a party.
 type PartyIdentification struct {
 	// PartyId Assigned identification for the party.
 	PartyId string `json:"partyId"`
 }
 
-// SubmitInventoryUpdateRequest The request body for the `submitInventoryUpdate` operation.
+// SubmitInventoryUpdateRequest The request body for the submitInventoryUpdate operation.
 type SubmitInventoryUpdateRequest struct {
 	// Inventory Inventory details required to update some or all items for the requested warehouse.
 	Inventory *InventoryUpdate `json:"inventory,omitempty"`
 }
 
-// SubmitInventoryUpdateResponse The response schema for the `submitInventoryUpdate` operation.
+// SubmitInventoryUpdateResponse The response schema for the submitInventoryUpdate operation.
 type SubmitInventoryUpdateResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Payload A response that contains the transaction ID.
+	// Payload Response containing the transaction ID.
 	Payload *TransactionReference `json:"payload,omitempty"`
 }
 
-// TransactionReference A response that contains the transaction ID.
+// TransactionReference Response containing the transaction ID.
 type TransactionReference struct {
 	// TransactionId GUID to identify this transaction. This value can be used with the Transaction Status API to return the status of this transaction.
 	TransactionId *string `json:"transactionId,omitempty"`
@@ -244,7 +243,7 @@ func (c *Client) SubmitInventoryUpdate(ctx context.Context, warehouseId string, 
 // NewSubmitInventoryUpdateRequest calls the generic SubmitInventoryUpdate builder with application/json body
 func NewSubmitInventoryUpdateRequest(server string, warehouseId string, body SubmitInventoryUpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

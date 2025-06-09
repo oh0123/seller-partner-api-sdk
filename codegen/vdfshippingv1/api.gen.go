@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -158,7 +157,7 @@ type ContainerContainerType string
 
 // CustomerInvoice Represents a customer invoice associated with a purchase order.
 type CustomerInvoice struct {
-	// Content The `Base64encoded` customer invoice.
+	// Content The Base64encoded customer invoice.
 	Content string `json:"content"`
 
 	// PurchaseOrderNumber The purchase order number for this order.
@@ -167,7 +166,7 @@ type CustomerInvoice struct {
 
 // CustomerInvoiceList Represents a list of customer invoices, potentially paginated.
 type CustomerInvoiceList struct {
-	// CustomerInvoices Represents a customer invoice within the `CustomerInvoiceList`.
+	// CustomerInvoices Represents a customer invoice within the CustomerInvoiceList.
 	CustomerInvoices *[]CustomerInvoice `json:"customerInvoices,omitempty"`
 
 	// Pagination The pagination elements required to retrieve the remaining data.
@@ -210,7 +209,7 @@ type Error struct {
 // ErrorList A list of error responses returned when a request is unsuccessful.
 type ErrorList = []Error
 
-// GetCustomerInvoiceResponse The response schema for the `getCustomerInvoice` operation.
+// GetCustomerInvoiceResponse The response schema for the getCustomerInvoice operation.
 type GetCustomerInvoiceResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
@@ -219,7 +218,7 @@ type GetCustomerInvoiceResponse struct {
 	Payload *CustomerInvoice `json:"payload,omitempty"`
 }
 
-// GetCustomerInvoicesResponse The response schema for the `getCustomerInvoices` operation.
+// GetCustomerInvoicesResponse The response schema for the getCustomerInvoices operation.
 type GetCustomerInvoicesResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
@@ -228,7 +227,7 @@ type GetCustomerInvoicesResponse struct {
 	Payload *CustomerInvoiceList `json:"payload,omitempty"`
 }
 
-// GetPackingSlipListResponse Response payload with the list of packing slips.
+// GetPackingSlipListResponse Response payload with the list of Packing Slips.
 type GetPackingSlipListResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
@@ -246,7 +245,7 @@ type GetPackingSlipResponse struct {
 	Payload *PackingSlip `json:"payload,omitempty"`
 }
 
-// GetShippingLabelListResponse The response schema for the `getShippingLabels` operation.
+// GetShippingLabelListResponse The response schema for the getShippingLabels operation.
 type GetShippingLabelListResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
@@ -255,7 +254,7 @@ type GetShippingLabelListResponse struct {
 	Payload *ShippingLabelList `json:"payload,omitempty"`
 }
 
-// GetShippingLabelResponse The response schema for the `getShippingLabel` operation.
+// GetShippingLabelResponse The response schema for the getShippingLabel operation.
 type GetShippingLabelResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
@@ -266,7 +265,7 @@ type GetShippingLabelResponse struct {
 
 // Item Details of the item being shipped.
 type Item struct {
-	// BuyerProductIdentifier Buyer's Standard Identification Number (ASIN) of an item. Either `buyerProductIdentifier` or `vendorProductIdentifier` is required.
+	// BuyerProductIdentifier Buyer's Standard Identification Number (ASIN) of an item. Either buyerProductIdentifier or vendorProductIdentifier is required.
 	BuyerProductIdentifier *string `json:"buyerProductIdentifier,omitempty"`
 
 	// ItemSequenceNumber Item Sequence Number for the item. This must be the same value as sent in order for a given item.
@@ -296,7 +295,7 @@ type LabelData struct {
 	// PackageIdentifier Identifier for the package. The first package will be 001, the second 002, and so on. This number is used as a reference to refer to this package from the pallet level.
 	PackageIdentifier *string `json:"packageIdentifier,omitempty"`
 
-	// ShipMethod Ship method to be used for shipping the order. Amazon defines ship method codes indicating shipping carrier and shipment service level. Ship method codes are case and format sensitive. The same ship method code should returned on the shipment confirmation. Note that the ship method codes are vendor specific and will be provided to each vendor during the implementation.
+	// ShipMethod Ship method to be used for shipping the order. Amazon defines Ship Method Codes indicating shipping carrier and shipment service level. Ship Method Codes are case and format sensitive. The same ship method code should returned on the shipment confirmation. Note that the Ship Method Codes are vendor specific and will be provided to each vendor during the implementation.
 	ShipMethod *string `json:"shipMethod,omitempty"`
 
 	// ShipMethodName Shipping method name for internal reference.
@@ -308,7 +307,7 @@ type LabelData struct {
 
 // PackedItem Represents an item that has been packed into a container for shipping.
 type PackedItem struct {
-	// BuyerProductIdentifier Buyer's Standard Identification Number (ASIN) of an item. Either `buyerProductIdentifier` or `vendorProductIdentifier` is required.
+	// BuyerProductIdentifier Buyer's Standard Identification Number (ASIN) of an item. Either buyerProductIdentifier or vendorProductIdentifier is required.
 	BuyerProductIdentifier *string `json:"buyerProductIdentifier,omitempty"`
 
 	// ItemSequenceNumber Item Sequence Number for the item. This must be the same value as sent in the order for a given item.
@@ -347,7 +346,7 @@ type PackingSlipList struct {
 
 // Pagination The pagination elements required to retrieve the remaining data.
 type Pagination struct {
-	// NextToken A generated string used to pass information to your next request. If `NextToken` is returned, pass the value of `NextToken` to the next request. If `NextToken` is not returned, there are no more order items to return.
+	// NextToken A generated string used to pass information to your next request. If NextToken is returned, pass the value of NextToken to the next request. If NextToken is not returned, there are no more order items to return.
 	NextToken *string `json:"nextToken,omitempty"`
 }
 
@@ -467,41 +466,41 @@ type ShippingLabelRequest struct {
 
 // StatusUpdateDetails Details for the shipment status update given by the vendor for the specific package.
 type StatusUpdateDetails struct {
-	// ReasonCode Provides a reason code for the status for the package that will provide additional information about the transportation status. For more information, refer to the [Additional Fields Explanation](https://developer-docs.amazon.com/sp-api/docs/vendor-direct-fulfillment-shipping-api-use-case-guide#additional-fields-explanation).
+	// ReasonCode Provides a reason code for the status of the package that will provide additional information about the transportation status. For more information, refer to the [Additional Fields Explanation](https://developer-docs.amazon.com/sp-api/docs/vendor-direct-fulfillment-shipping-api-use-case-guide#additional-fields-explanation).
 	ReasonCode string `json:"reasonCode"`
 
 	// ShipmentSchedule Details for the scheduled delivery timeline for a shipment, including the estimated delivery date and time, as well as the start and end times of the appointment window for delivery.
 	ShipmentSchedule *struct {
-		// ApptWindowEndDateTime This field indicates the date and time at the end of the appointment window scheduled to deliver the shipment. This field is expected to be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format, with UTC time zone or UTC offset. For example, `2020-07-16T23:00:00Z` or `2020-07-16T23:00:00+01:00`.
+		// ApptWindowEndDateTime This field indicates the date and time at the end of the appointment window scheduled to deliver the shipment. This field is expected to be in ISO-8601 date/time format, with UTC time zone or UTC offset. For example, 2020-07-16T23:00:00Z or 2020-07-16T23:00:00+01:00.
 		ApptWindowEndDateTime *time.Time `json:"apptWindowEndDateTime,omitempty"`
 
-		// ApptWindowStartDateTime This field indicates the date and time at the start of the appointment window scheduled to deliver the shipment. This field is expected to be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format, with UTC time zone or UTC offset. For example, `2020-07-16T23:00:00Z` or `2020-07-16T23:00:00+01:00`.
+		// ApptWindowStartDateTime This field indicates the date and time at the start of the appointment window scheduled to deliver the shipment. This field is expected to be in ISO-8601 date/time format, with UTC time zone or UTC offset. For example, 2020-07-16T23:00:00Z or 2020-07-16T23:00:00+01:00.
 		ApptWindowStartDateTime *time.Time `json:"apptWindowStartDateTime,omitempty"`
 
-		// EstimatedDeliveryDateTime Date on which the shipment is expected to reach the customer delivery location. This field is expected to be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format, with UTC time zone or UTC offset. For example, `2020-07-16T23:00:00Z` or `2020-07-16T23:00:00+01:00`.
+		// EstimatedDeliveryDateTime Date on which the shipment is expected to reach the customer delivery location. This field is expected to be in ISO-8601 date/time format, with UTC time zone or UTC offset. For example, 2020-07-16T23:00:00Z or 2020-07-16T23:00:00+01:00.
 		EstimatedDeliveryDateTime *time.Time `json:"estimatedDeliveryDateTime,omitempty"`
 	} `json:"shipmentSchedule,omitempty"`
 
-	// StatusCode Indicates the shipment status code for the package that provides transportation information for Amazon tracking systems and ultimately for the final customer. For more information, refer to the [Additional Fields Explanation](https://developer-docs.amazon.com/sp-api/docs/vendor-direct-fulfillment-shipping-api-use-case-guide#additional-fields-explanation).
+	// StatusCode Indicates the shipment status code of the package that provides transportation information for Amazon tracking systems and ultimately for the final customer. For more information, refer to the [Additional Fields Explanation](https://developer-docs.amazon.com/sp-api/docs/vendor-direct-fulfillment-shipping-api-use-case-guide#additional-fields-explanation).
 	StatusCode string `json:"statusCode"`
 
-	// StatusDateTime The date and time when the shipment status was updated. This field is expected to be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format, with UTC time zone or UTC offset. For example, `2020-07-16T23:00:00Z` or `2020-07-16T23:00:00+01:00`.
+	// StatusDateTime The date and time when the shipment status was updated. This field is expected to be in ISO-8601 date/time format, with UTC time zone or UTC offset. For example, 2020-07-16T23:00:00Z or 2020-07-16T23:00:00+01:00.
 	StatusDateTime time.Time `json:"statusDateTime"`
 
 	// StatusLocationAddress Address of the party.
 	StatusLocationAddress Address `json:"statusLocationAddress"`
 
-	// TrackingNumber This is required to be provided for every package and should match with the `trackingNumber` sent for the shipment confirmation.
+	// TrackingNumber This is required to be provided for every package and should match with the trackingNumber sent for the shipment confirmation.
 	TrackingNumber string `json:"trackingNumber"`
 }
 
-// SubmitShipmentConfirmationsRequest The request schema for the `submitShipmentConfirmations` operation.
+// SubmitShipmentConfirmationsRequest The request schema for the submitShipmentConfirmations operation.
 type SubmitShipmentConfirmationsRequest struct {
-	// ShipmentConfirmations Array of `ShipmentConfirmation` objects, each representing confirmation details for a specific shipment.
+	// ShipmentConfirmations Array of ShipmentConfirmation objects, each representing confirmation details for a specific shipment.
 	ShipmentConfirmations *[]ShipmentConfirmation `json:"shipmentConfirmations,omitempty"`
 }
 
-// SubmitShipmentConfirmationsResponse The response schema for the `submitShipmentConfirmations` operation.
+// SubmitShipmentConfirmationsResponse The response schema for the submitShipmentConfirmations operation.
 type SubmitShipmentConfirmationsResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
@@ -510,13 +509,13 @@ type SubmitShipmentConfirmationsResponse struct {
 	Payload *TransactionReference `json:"payload,omitempty"`
 }
 
-// SubmitShipmentStatusUpdatesRequest Represents the request payload for submitting updates to the status of shipments, containing an array of one or more `ShipmentStatusUpdate` objects.
+// SubmitShipmentStatusUpdatesRequest Represents the request payload for submitting updates to the status of shipments, containing an array of one or more ShipmentStatusUpdate objects.
 type SubmitShipmentStatusUpdatesRequest struct {
-	// ShipmentStatusUpdates Contains a list of one or more `ShipmentStatusUpdate` objects, each representing an update to the status of a specific shipment.
+	// ShipmentStatusUpdates Contains a list of one or more ShipmentStatusUpdate objects, each representing an update to the status of a specific shipment.
 	ShipmentStatusUpdates *[]ShipmentStatusUpdate `json:"shipmentStatusUpdates,omitempty"`
 }
 
-// SubmitShipmentStatusUpdatesResponse The response schema for the `submitShipmentStatusUpdates` operation.
+// SubmitShipmentStatusUpdatesResponse The response schema for the submitShipmentStatusUpdates operation.
 type SubmitShipmentStatusUpdatesResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
@@ -525,13 +524,13 @@ type SubmitShipmentStatusUpdatesResponse struct {
 	Payload *TransactionReference `json:"payload,omitempty"`
 }
 
-// SubmitShippingLabelsRequest The request schema for the `submitShippingLabelRequest` operation.
+// SubmitShippingLabelsRequest The request schema for the submitShippingLabelRequest operation.
 type SubmitShippingLabelsRequest struct {
 	// ShippingLabelRequests An array of shipping label requests to be processed.
 	ShippingLabelRequests *[]ShippingLabelRequest `json:"shippingLabelRequests,omitempty"`
 }
 
-// SubmitShippingLabelsResponse The response schema for the `submitShippingLabelRequest` operation.
+// SubmitShippingLabelsResponse The response schema for the submitShippingLabelRequest operation.
 type SubmitShippingLabelsResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
@@ -578,16 +577,16 @@ type WeightUnitOfMeasure string
 
 // GetCustomerInvoicesParams defines parameters for GetCustomerInvoices.
 type GetCustomerInvoicesParams struct {
-	// ShipFromPartyId The vendor `warehouseId` for order fulfillment. If not specified, the result will contain orders for all warehouses.
+	// ShipFromPartyId The vendor warehouseId for order fulfillment. If not specified, the result will contain orders for all warehouses.
 	ShipFromPartyId *string `form:"shipFromPartyId,omitempty" json:"shipFromPartyId,omitempty"`
 
 	// Limit The limit to the number of records returned
 	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
 
-	// CreatedAfter Orders that became available after this date and time will be included in the result. Must be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format.
+	// CreatedAfter Orders that became available after this date and time will be included in the result. Must be in ISO-8601 date/time format.
 	CreatedAfter time.Time `form:"createdAfter" json:"createdAfter"`
 
-	// CreatedBefore Orders that became available before this date and time will be included in the result. Must be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format.
+	// CreatedBefore Orders that became available before this date and time will be included in the result. Must be in ISO-8601 date/time format.
 	CreatedBefore time.Time `form:"createdBefore" json:"createdBefore"`
 
 	// SortOrder Sort ASC or DESC by order creation date.
@@ -602,16 +601,16 @@ type GetCustomerInvoicesParamsSortOrder string
 
 // GetPackingSlipsParams defines parameters for GetPackingSlips.
 type GetPackingSlipsParams struct {
-	// ShipFromPartyId The vendor `warehouseId` for order fulfillment. If not specified the result will contain orders for all warehouses.
+	// ShipFromPartyId The vendor warehouseId for order fulfillment. If not specified the result will contain orders for all warehouses.
 	ShipFromPartyId *string `form:"shipFromPartyId,omitempty" json:"shipFromPartyId,omitempty"`
 
 	// Limit The limit to the number of records returned
 	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
 
-	// CreatedAfter Packing slips that became available after this date and time will be included in the result. Must be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format.
+	// CreatedAfter Packing slips that became available after this date and time will be included in the result. Must be in ISO-8601 date/time format.
 	CreatedAfter time.Time `form:"createdAfter" json:"createdAfter"`
 
-	// CreatedBefore Packing slips that became available before this date and time will be included in the result. Must be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format.
+	// CreatedBefore Packing slips that became available before this date and time will be included in the result. Must be in ISO-8601 date/time format.
 	CreatedBefore time.Time `form:"createdBefore" json:"createdBefore"`
 
 	// SortOrder Sort ASC or DESC by packing slip creation date.
@@ -626,16 +625,16 @@ type GetPackingSlipsParamsSortOrder string
 
 // GetShippingLabelsParams defines parameters for GetShippingLabels.
 type GetShippingLabelsParams struct {
-	// ShipFromPartyId The vendor `warehouseId` for order fulfillment. If not specified, the result will contain orders for all warehouses.
+	// ShipFromPartyId The vendor warehouseId for order fulfillment. If not specified, the result will contain orders for all warehouses.
 	ShipFromPartyId *string `form:"shipFromPartyId,omitempty" json:"shipFromPartyId,omitempty"`
 
 	// Limit The limit to the number of records returned.
 	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
 
-	// CreatedAfter Shipping labels that became available after this date and time will be included in the result. Must be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format.
+	// CreatedAfter Shipping labels that became available after this date and time will be included in the result. Must be in ISO-8601 date/time format.
 	CreatedAfter time.Time `form:"createdAfter" json:"createdAfter"`
 
-	// CreatedBefore Shipping labels that became available before this date and time will be included in the result. Must be in <a href='https://developer-docs.amazon.com/sp-api/docs/iso-8601'>ISO 8601</a> date/time format.
+	// CreatedBefore Shipping labels that became available before this date and time will be included in the result. Must be in ISO-8601 date/time format.
 	CreatedBefore time.Time `form:"createdBefore" json:"createdBefore"`
 
 	// SortOrder Sort ASC or DESC by order creation date.
@@ -1340,7 +1339,7 @@ func NewGetPackingSlipRequest(server string, purchaseOrderNumber string) (*http.
 // NewSubmitShipmentConfirmationsRequest calls the generic SubmitShipmentConfirmations builder with application/json body
 func NewSubmitShipmentConfirmationsRequest(server string, body SubmitShipmentConfirmationsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1380,7 +1379,7 @@ func NewSubmitShipmentConfirmationsRequestWithBody(server string, contentType st
 // NewSubmitShipmentStatusUpdatesRequest calls the generic SubmitShipmentStatusUpdates builder with application/json body
 func NewSubmitShipmentStatusUpdatesRequest(server string, body SubmitShipmentStatusUpdatesJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1541,7 +1540,7 @@ func NewGetShippingLabelsRequest(server string, params *GetShippingLabelsParams)
 // NewSubmitShippingLabelRequestRequest calls the generic SubmitShippingLabelRequest builder with application/json body
 func NewSubmitShippingLabelRequestRequest(server string, body SubmitShippingLabelRequestJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

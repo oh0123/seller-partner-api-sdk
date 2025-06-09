@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -239,21 +238,27 @@ type ErrorList = []Error
 // GetPurchaseOrderResponse The response schema for the getPurchaseOrder operation.
 type GetPurchaseOrderResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
-	Errors  *ErrorList `json:"errors,omitempty"`
-	Payload *Order     `json:"payload,omitempty"`
+	Errors *ErrorList `json:"errors,omitempty"`
+
+	// Payload Represents an order placed by Amazon, including the purchase order number, current state, and order details.
+	Payload *Order `json:"payload,omitempty"`
 }
 
 // GetPurchaseOrdersResponse The response schema for the getPurchaseOrders operation.
 type GetPurchaseOrdersResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
-	Errors  *ErrorList `json:"errors,omitempty"`
+	Errors *ErrorList `json:"errors,omitempty"`
+
+	// Payload A list of orders returned as response.
 	Payload *OrderList `json:"payload,omitempty"`
 }
 
 // GetPurchaseOrdersStatusResponse The response schema for the getPurchaseOrdersStatus operation.
 type GetPurchaseOrdersStatusResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
-	Errors  *ErrorList       `json:"errors,omitempty"`
+	Errors *ErrorList `json:"errors,omitempty"`
+
+	// Payload A list of order statuses.
 	Payload *OrderListStatus `json:"payload,omitempty"`
 }
 
@@ -314,7 +319,7 @@ type Money struct {
 // MoneyUnitOfMeasure The unit of measure for prices of items sold by weight. If this field is absent, the item is sold by eaches.
 type MoneyUnitOfMeasure string
 
-// Order defines model for Order.
+// Order Represents an order placed by Amazon, including the purchase order number, current state, and order details.
 type Order struct {
 	// OrderDetails Details of an order.
 	OrderDetails *OrderDetails `json:"orderDetails,omitempty"`
@@ -329,7 +334,7 @@ type Order struct {
 // OrderPurchaseOrderState This field will contain the current state of the purchase order.
 type OrderPurchaseOrderState string
 
-// OrderAcknowledgement defines model for OrderAcknowledgement.
+// OrderAcknowledgement Represents an acknowledgement for an order, including the purchase order number, selling party details, acknowledgement date, and a list of acknowledged items.
 type OrderAcknowledgement struct {
 	// AcknowledgementDate The date and time when the purchase order is acknowledged, in ISO-8601 date/time format.
 	AcknowledgementDate time.Time `json:"acknowledgementDate"`
@@ -338,8 +343,10 @@ type OrderAcknowledgement struct {
 	Items []OrderAcknowledgementItem `json:"items"`
 
 	// PurchaseOrderNumber The purchase order number. Formatting Notes: 8-character alpha-numeric code.
-	PurchaseOrderNumber string              `json:"purchaseOrderNumber"`
-	SellingParty        PartyIdentification `json:"sellingParty"`
+	PurchaseOrderNumber string `json:"purchaseOrderNumber"`
+
+	// SellingParty Name, address and tax details of a party.
+	SellingParty PartyIdentification `json:"sellingParty"`
 }
 
 // OrderAcknowledgementItem Details of the item being acknowledged.
@@ -371,7 +378,10 @@ type OrderAcknowledgementItem struct {
 
 // OrderDetails Details of an order.
 type OrderDetails struct {
+	// BillToParty Name, address and tax details of a party.
 	BillToParty *PartyIdentification `json:"billToParty,omitempty"`
+
+	// BuyingParty Name, address and tax details of a party.
 	BuyingParty *PartyIdentification `json:"buyingParty,omitempty"`
 
 	// DealCode If requested by the recipient, this field will contain a promotional/deal number. The discount code line is optional. It is used to obtain a price discount on items on the order.
@@ -400,8 +410,12 @@ type OrderDetails struct {
 
 	// PurchaseOrderType Type of purchase order.
 	PurchaseOrderType *OrderDetailsPurchaseOrderType `json:"purchaseOrderType,omitempty"`
-	SellingParty      *PartyIdentification           `json:"sellingParty,omitempty"`
-	ShipToParty       *PartyIdentification           `json:"shipToParty,omitempty"`
+
+	// SellingParty Name, address and tax details of a party.
+	SellingParty *PartyIdentification `json:"sellingParty,omitempty"`
+
+	// ShipToParty Name, address and tax details of a party.
+	ShipToParty *PartyIdentification `json:"shipToParty,omitempty"`
 
 	// ShipWindow Defines a date time interval according to ISO8601. Interval is separated by double hyphen (--).
 	ShipWindow *DateTimeInterval `json:"shipWindow,omitempty"`
@@ -413,7 +427,7 @@ type OrderDetailsPaymentMethod string
 // OrderDetailsPurchaseOrderType Type of purchase order.
 type OrderDetailsPurchaseOrderType string
 
-// OrderItem defines model for OrderItem.
+// OrderItem Represents an individual item in an order, including item details, quantities, pricing, and backorder information.
 type OrderItem struct {
 	// AmazonProductIdentifier Amazon Standard Identification Number (ASIN) of an item.
 	AmazonProductIdentifier *string `json:"amazonProductIdentifier,omitempty"`
@@ -437,7 +451,7 @@ type OrderItem struct {
 	VendorProductIdentifier *string `json:"vendorProductIdentifier,omitempty"`
 }
 
-// OrderItemAcknowledgement defines model for OrderItemAcknowledgement.
+// OrderItemAcknowledgement Represents the acknowledgement details for an individual order item, including the acknowledgement code, acknowledged quantity, scheduled ship and delivery dates, and rejection reason (if applicable).
 type OrderItemAcknowledgement struct {
 	// AcknowledgedQuantity Details of quantity ordered.
 	AcknowledgedQuantity ItemQuantity `json:"acknowledgedQuantity"`
@@ -461,7 +475,7 @@ type OrderItemAcknowledgementAcknowledgementCode string
 // OrderItemAcknowledgementRejectionReason Indicates the reason for rejection.
 type OrderItemAcknowledgementRejectionReason string
 
-// OrderItemStatus defines model for OrderItemStatus.
+// OrderItemStatus Represents the current status of an order item, including acknowledgement and receiving details.
 type OrderItemStatus struct {
 	// AcknowledgementStatus Acknowledgement status information.
 	AcknowledgementStatus *struct {
@@ -521,16 +535,22 @@ type OrderItemStatusAcknowledgementStatusConfirmationStatus string
 // OrderItemStatusReceivingStatusReceiveStatus Receive status of the line item.
 type OrderItemStatusReceivingStatusReceiveStatus string
 
-// OrderList defines model for OrderList.
+// OrderList A list of orders returned as response.
 type OrderList struct {
-	Orders     *[]Order    `json:"orders,omitempty"`
+	// Orders Represents an individual order within the OrderList.
+	Orders *[]Order `json:"orders,omitempty"`
+
+	// Pagination The pagination elements required to retrieve the remaining data.
 	Pagination *Pagination `json:"pagination,omitempty"`
 }
 
-// OrderListStatus defines model for OrderListStatus.
+// OrderListStatus A list of order statuses.
 type OrderListStatus struct {
+	// OrdersStatus Represents an order status within the OrderListStatus.
 	OrdersStatus *[]OrderStatus `json:"ordersStatus,omitempty"`
-	Pagination   *Pagination    `json:"pagination,omitempty"`
+
+	// Pagination The pagination elements required to retrieve the remaining data.
+	Pagination *Pagination `json:"pagination,omitempty"`
 }
 
 // OrderStatus Current status of a purchase order.
@@ -549,14 +569,18 @@ type OrderStatus struct {
 
 	// PurchaseOrderStatus The status of the buyer's purchase order for this order.
 	PurchaseOrderStatus OrderStatusPurchaseOrderStatus `json:"purchaseOrderStatus"`
-	SellingParty        PartyIdentification            `json:"sellingParty"`
-	ShipToParty         PartyIdentification            `json:"shipToParty"`
+
+	// SellingParty Name, address and tax details of a party.
+	SellingParty PartyIdentification `json:"sellingParty"`
+
+	// ShipToParty Name, address and tax details of a party.
+	ShipToParty PartyIdentification `json:"shipToParty"`
 }
 
 // OrderStatusPurchaseOrderStatus The status of the buyer's purchase order for this order.
 type OrderStatusPurchaseOrderStatus string
 
-// OrderedQuantityDetails Details of item quantity ordered
+// OrderedQuantityDetails Details of item quantity ordered.
 type OrderedQuantityDetails struct {
 	// CancelledQuantity Details of quantity ordered.
 	CancelledQuantity *ItemQuantity `json:"cancelledQuantity,omitempty"`
@@ -568,13 +592,13 @@ type OrderedQuantityDetails struct {
 	UpdatedDate *time.Time `json:"updatedDate,omitempty"`
 }
 
-// Pagination defines model for Pagination.
+// Pagination The pagination elements required to retrieve the remaining data.
 type Pagination struct {
 	// NextToken A generated string used to pass information to your next request. If NextToken is returned, pass the value of NextToken to the next request. If NextToken is not returned, there are no more purchase order items to return.
 	NextToken *string `json:"nextToken,omitempty"`
 }
 
-// PartyIdentification defines model for PartyIdentification.
+// PartyIdentification Name, address and tax details of a party.
 type PartyIdentification struct {
 	// Address Address of the party.
 	Address *Address `json:"address,omitempty"`
@@ -588,13 +612,16 @@ type PartyIdentification struct {
 
 // SubmitAcknowledgementRequest The request schema for the submitAcknowledgment operation.
 type SubmitAcknowledgementRequest struct {
+	// Acknowledgements An array of order acknowledgements to be submitted.
 	Acknowledgements *[]OrderAcknowledgement `json:"acknowledgements,omitempty"`
 }
 
 // SubmitAcknowledgementResponse The response schema for the submitAcknowledgement operation
 type SubmitAcknowledgementResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
-	Errors  *ErrorList     `json:"errors,omitempty"`
+	Errors *ErrorList `json:"errors,omitempty"`
+
+	// Payload Response containing the transaction ID.
 	Payload *TransactionId `json:"payload,omitempty"`
 }
 
@@ -610,7 +637,7 @@ type TaxRegistrationDetails struct {
 // TaxRegistrationDetailsTaxRegistrationType Tax registration type for the entity.
 type TaxRegistrationDetailsTaxRegistrationType string
 
-// TransactionId defines model for TransactionId.
+// TransactionId Response containing the transaction ID.
 type TransactionId struct {
 	// TransactionId GUID assigned by Amazon to identify this transaction. This value can be used with the Transaction Status API to return the status of this transaction.
 	TransactionId *string `json:"transactionId,omitempty"`
@@ -935,7 +962,7 @@ func (c *Client) GetPurchaseOrdersStatus(ctx context.Context, params *GetPurchas
 // NewSubmitAcknowledgementRequest calls the generic SubmitAcknowledgement builder with application/json body
 func NewSubmitAcknowledgementRequest(server string, body SubmitAcknowledgementJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

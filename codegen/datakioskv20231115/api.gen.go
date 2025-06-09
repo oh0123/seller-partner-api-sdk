@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -540,7 +539,7 @@ func NewGetQueriesRequest(server string, params *GetQueriesParams) (*http.Reques
 // NewCreateQueryRequest calls the generic CreateQuery builder with application/json body
 func NewCreateQueryRequest(server string, body CreateQueryJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

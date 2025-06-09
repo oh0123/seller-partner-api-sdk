@@ -13,8 +13,6 @@ import (
 	"net/url"
 	runt "runtime"
 	"strings"
-
-	"github.com/bytedance/sonic"
 )
 
 // Defines values for RestrictedResourceMethod.
@@ -232,7 +230,7 @@ func (c *Client) CreateRestrictedDataToken(ctx context.Context, body CreateRestr
 // NewCreateRestrictedDataTokenRequest calls the generic CreateRestrictedDataToken builder with application/json body
 func NewCreateRestrictedDataTokenRequest(server string, body CreateRestrictedDataTokenJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

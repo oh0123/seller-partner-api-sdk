@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -37,6 +36,21 @@ const (
 	AccessPointTypeOMNILOCKER   AccessPointType = "OMNI_LOCKER"
 )
 
+// Defines values for AccountStatus.
+const (
+	ACTIVE    AccountStatus = "ACTIVE"
+	INACTIVE  AccountStatus = "INACTIVE"
+	PENDING   AccountStatus = "PENDING"
+	SUSPENDED AccountStatus = "SUSPENDED"
+)
+
+// Defines values for AccountType.
+const (
+	AMAZONACCOUNT             AccountType = "AMAZON_ACCOUNT"
+	SHIPPERACCOUNT            AccountType = "SHIPPER_ACCOUNT"
+	SHIPPERACCOUNTWITHINVOICE AccountType = "SHIPPER_ACCOUNT_WITH_INVOICE"
+)
+
 // Defines values for ChannelType.
 const (
 	AMAZON   ChannelType = "AMAZON"
@@ -47,6 +61,15 @@ const (
 const (
 	DISCOUNT ChargeComponentChargeType = "DISCOUNT"
 	TAX      ChargeComponentChargeType = "TAX"
+)
+
+// Defines values for ClaimReason.
+const (
+	CODABUSE              ClaimReason = "COD_ABUSE"
+	DAMAGEDINTRANSIT      ClaimReason = "DAMAGED_IN_TRANSIT"
+	DELIVEREDNOTRECEIVED  ClaimReason = "DELIVERED_NOT_RECEIVED"
+	ITEMMISSINGSWITCHEROO ClaimReason = "ITEM_MISSING_SWITCHEROO"
+	LOSTINTRANSIT         ClaimReason = "LOST_IN_TRANSIT"
 )
 
 // Defines values for ClientReferenceDetailClientReferenceType.
@@ -81,33 +104,36 @@ const (
 
 // Defines values for DetailCodes.
 const (
-	DetailCodesAddressNotFound             DetailCodes = "AddressNotFound"
-	DetailCodesBusinessClosed              DetailCodes = "BusinessClosed"
-	DetailCodesCancelledByRecipient        DetailCodes = "CancelledByRecipient"
-	DetailCodesCustomerUnavailable         DetailCodes = "CustomerUnavailable"
-	DetailCodesDamaged                     DetailCodes = "Damaged"
-	DetailCodesDeliveredToBehindWheelieBin DetailCodes = "DeliveredToBehindWheelieBin"
-	DetailCodesDeliveredToGarage           DetailCodes = "DeliveredToGarage"
-	DetailCodesDeliveredToGarden           DetailCodes = "DeliveredToGarden"
-	DetailCodesDeliveredToGreenhouse       DetailCodes = "DeliveredToGreenhouse"
-	DetailCodesDeliveredToMailRoom         DetailCodes = "DeliveredToMailRoom"
-	DetailCodesDeliveredToMailSlot         DetailCodes = "DeliveredToMailSlot"
-	DetailCodesDeliveredToNeighbor         DetailCodes = "DeliveredToNeighbor"
-	DetailCodesDeliveredToPorch            DetailCodes = "DeliveredToPorch"
-	DetailCodesDeliveredToRearDoor         DetailCodes = "DeliveredToRearDoor"
-	DetailCodesDeliveredToReceptionist     DetailCodes = "DeliveredToReceptionist"
-	DetailCodesDeliveredToShed             DetailCodes = "DeliveredToShed"
-	DetailCodesDeliveryAttempted           DetailCodes = "DeliveryAttempted"
-	DetailCodesHazmatShipment              DetailCodes = "HazmatShipment"
-	DetailCodesIncorrectItems              DetailCodes = "IncorrectItems"
-	DetailCodesNotRequired                 DetailCodes = "NotRequired"
-	DetailCodesOtpNotAvailable             DetailCodes = "OtpNotAvailable"
-	DetailCodesPaymentNotReady             DetailCodes = "PaymentNotReady"
-	DetailCodesRejected                    DetailCodes = "Rejected"
-	DetailCodesSigned                      DetailCodes = "Signed"
-	DetailCodesUnableToAccess              DetailCodes = "UnableToAccess"
-	DetailCodesUnableToContactRecipient    DetailCodes = "UnableToContactRecipient"
-	DetailCodesUndeliverable               DetailCodes = "Undeliverable"
+	DetailCodesAddressNotFound                     DetailCodes = "AddressNotFound"
+	DetailCodesArrivedAtLocalFacility              DetailCodes = "ArrivedAtLocalFacility"
+	DetailCodesBusinessClosed                      DetailCodes = "BusinessClosed"
+	DetailCodesCancelledByRecipient                DetailCodes = "CancelledByRecipient"
+	DetailCodesCustomerUnavailable                 DetailCodes = "CustomerUnavailable"
+	DetailCodesDamaged                             DetailCodes = "Damaged"
+	DetailCodesDeliveredToBehindWheelieBin         DetailCodes = "DeliveredToBehindWheelieBin"
+	DetailCodesDeliveredToGarage                   DetailCodes = "DeliveredToGarage"
+	DetailCodesDeliveredToGarden                   DetailCodes = "DeliveredToGarden"
+	DetailCodesDeliveredToGreenhouse               DetailCodes = "DeliveredToGreenhouse"
+	DetailCodesDeliveredToMailRoom                 DetailCodes = "DeliveredToMailRoom"
+	DetailCodesDeliveredToMailSlot                 DetailCodes = "DeliveredToMailSlot"
+	DetailCodesDeliveredToNeighbor                 DetailCodes = "DeliveredToNeighbor"
+	DetailCodesDeliveredToPorch                    DetailCodes = "DeliveredToPorch"
+	DetailCodesDeliveredToRearDoor                 DetailCodes = "DeliveredToRearDoor"
+	DetailCodesDeliveredToReceptionist             DetailCodes = "DeliveredToReceptionist"
+	DetailCodesDeliveredToShed                     DetailCodes = "DeliveredToShed"
+	DetailCodesDeliveredWithOTP                    DetailCodes = "DeliveredWithOTP"
+	DetailCodesDeliveryAttempted                   DetailCodes = "DeliveryAttempted"
+	DetailCodesHazmatShipment                      DetailCodes = "HazmatShipment"
+	DetailCodesIncorrectItems                      DetailCodes = "IncorrectItems"
+	DetailCodesNotRequired                         DetailCodes = "NotRequired"
+	DetailCodesOtpNotAvailable                     DetailCodes = "OtpNotAvailable"
+	DetailCodesPaymentNotReady                     DetailCodes = "PaymentNotReady"
+	DetailCodesRejected                            DetailCodes = "Rejected"
+	DetailCodesRejectedByRecipientWithVerification DetailCodes = "RejectedByRecipientWithVerification"
+	DetailCodesSigned                              DetailCodes = "Signed"
+	DetailCodesUnableToAccess                      DetailCodes = "UnableToAccess"
+	DetailCodesUnableToContactRecipient            DetailCodes = "UnableToContactRecipient"
+	DetailCodesUndeliverable                       DetailCodes = "Undeliverable"
 )
 
 // Defines values for DimensionsUnit.
@@ -139,19 +165,26 @@ const (
 
 // Defines values for EventCode.
 const (
-	EventCodeArrivedAtCarrierFacility EventCode = "ArrivedAtCarrierFacility"
-	EventCodeAvailableForPickup       EventCode = "AvailableForPickup"
-	EventCodeDelivered                EventCode = "Delivered"
-	EventCodeDeliveryAttempted        EventCode = "DeliveryAttempted"
-	EventCodeDeparted                 EventCode = "Departed"
-	EventCodeLost                     EventCode = "Lost"
-	EventCodeOutForDelivery           EventCode = "OutForDelivery"
-	EventCodePickupCancelled          EventCode = "PickupCancelled"
-	EventCodePickupDone               EventCode = "PickupDone"
-	EventCodeReadyForReceive          EventCode = "ReadyForReceive"
-	EventCodeRejected                 EventCode = "Rejected"
-	EventCodeReturnInitiated          EventCode = "ReturnInitiated"
-	EventCodeUndeliverable            EventCode = "Undeliverable"
+	EventCodeArrivedAtCarrierFacility                  EventCode = "ArrivedAtCarrierFacility"
+	EventCodeAvailableForPickup                        EventCode = "AvailableForPickup"
+	EventCodeDelivered                                 EventCode = "Delivered"
+	EventCodeDeliveryAttempted                         EventCode = "DeliveryAttempted"
+	EventCodeDeparted                                  EventCode = "Departed"
+	EventCodeLost                                      EventCode = "Lost"
+	EventCodeOutForDelivery                            EventCode = "OutForDelivery"
+	EventCodePickupCancelled                           EventCode = "PickupCancelled"
+	EventCodePickupDone                                EventCode = "PickupDone"
+	EventCodeReadyForReceive                           EventCode = "ReadyForReceive"
+	EventCodeRecipientRequestedAlternateDeliveryTiming EventCode = "RecipientRequestedAlternateDeliveryTiming"
+	EventCodeRejected                                  EventCode = "Rejected"
+	EventCodeReturnInitiated                           EventCode = "ReturnInitiated"
+	EventCodeUndeliverable                             EventCode = "Undeliverable"
+)
+
+// Defines values for GenerationStatus.
+const (
+	Completed  GenerationStatus = "Completed"
+	InProgress GenerationStatus = "InProgress"
 )
 
 // Defines values for IneligibilityReasonCode.
@@ -166,6 +199,19 @@ const (
 	UNSUPPORTEDVAS                IneligibilityReasonCode = "UNSUPPORTED_VAS"
 	VASCOMBINATIONRESTRICTION     IneligibilityReasonCode = "VAS_COMBINATION_RESTRICTION"
 	WEIGHTRESTRICTIONS            IneligibilityReasonCode = "WEIGHT_RESTRICTIONS"
+)
+
+// Defines values for InputType.
+const (
+	PASSWORD InputType = "PASSWORD"
+	TEXTBOX  InputType = "TEXTBOX"
+)
+
+// Defines values for LabelAttribute.
+const (
+	COLLECTONDELIVERYAMOUNT  LabelAttribute = "COLLECT_ON_DELIVERY_AMOUNT"
+	PACKAGECLIENTREFERENCEID LabelAttribute = "PACKAGE_CLIENT_REFERENCE_ID"
+	SELLERDISPLAYNAME        LabelAttribute = "SELLER_DISPLAY_NAME"
 )
 
 // Defines values for LiquidVolumeUnit.
@@ -203,14 +249,19 @@ const (
 	DECLAREDVALUE               RateItemID = "DECLARED_VALUE"
 	DELIVERYAREASURCHARGE       RateItemID = "DELIVERY_AREA_SURCHARGE"
 	DELIVERYCONFIRMATION        RateItemID = "DELIVERY_CONFIRMATION"
+	DEMANDSURCHARGE             RateItemID = "DEMAND_SURCHARGE"
 	FUELSURCHARGE               RateItemID = "FUEL_SURCHARGE"
 	HIDDENPOSTAGE               RateItemID = "HIDDEN_POSTAGE"
+	HIGHCUBESURCHARGE           RateItemID = "HIGH_CUBE_SURCHARGE"
+	HIGHLENGTHSURCHARGE         RateItemID = "HIGH_LENGTH_SURCHARGE"
+	HIGHWIDTHSURCHARGE          RateItemID = "HIGH_WIDTH_SURCHARGE"
 	IMPLIEDLIABILITY            RateItemID = "IMPLIED_LIABILITY"
 	IMPORTDUTYCHARGE            RateItemID = "IMPORT_DUTY_CHARGE"
 	INSPECTIONCHARGE            RateItemID = "INSPECTION_CHARGE"
 	INSURANCE                   RateItemID = "INSURANCE"
 	INTEGRATORSPONSOREDDISCOUNT RateItemID = "INTEGRATOR_SPONSORED_DISCOUNT"
 	NOCONFIRMATION              RateItemID = "NO_CONFIRMATION"
+	NONSTANDARDFEE              RateItemID = "NONSTANDARD_FEE"
 	NOSATURDAYDELIVERY          RateItemID = "NO_SATURDAY_DELIVERY"
 	OVERSIZESURCHARGE           RateItemID = "OVERSIZE_SURCHARGE"
 	REBATE                      RateItemID = "REBATE"
@@ -229,6 +280,12 @@ const (
 	INCLUDED  RateItemType = "INCLUDED"
 	MANDATORY RateItemType = "MANDATORY"
 	OPTIONAL  RateItemType = "OPTIONAL"
+)
+
+// Defines values for SettlementType.
+const (
+	CERTIFICATEOFFACT SettlementType = "CERTIFICATE_OF_FACT"
+	REFUND            SettlementType = "REFUND"
 )
 
 // Defines values for ShipmentType.
@@ -290,6 +347,118 @@ const (
 	GetAccessPointsParamsXAmznShippingBusinessIdAmazonShippingUS  GetAccessPointsParamsXAmznShippingBusinessId = "AmazonShipping_US"
 )
 
+// Defines values for GetCarrierAccountFormInputsParamsXAmznShippingBusinessId.
+const (
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingEG  GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingES  GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingFR  GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingIN  GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingIT  GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingJP  GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingSA  GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingUAE GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingUK  GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	GetCarrierAccountFormInputsParamsXAmznShippingBusinessIdAmazonShippingUS  GetCarrierAccountFormInputsParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
+// Defines values for GetCarrierAccountsParamsXAmznShippingBusinessId.
+const (
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingEG  GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingES  GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingFR  GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingIN  GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingIT  GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingJP  GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingSA  GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingUAE GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingUK  GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	GetCarrierAccountsParamsXAmznShippingBusinessIdAmazonShippingUS  GetCarrierAccountsParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
+// Defines values for LinkCarrierAccountParamsXAmznShippingBusinessId.
+const (
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingEG  LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingES  LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingFR  LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingIN  LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingIT  LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingJP  LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingSA  LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingUAE LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingUK  LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	LinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingUS  LinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
+// Defines values for UnlinkCarrierAccountParamsXAmznShippingBusinessId.
+const (
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingEG  UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingES  UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingFR  UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingIN  UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingIT  UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingJP  UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingSA  UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingUAE UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingUK  UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	UnlinkCarrierAccountParamsXAmznShippingBusinessIdAmazonShippingUS  UnlinkCarrierAccountParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
+// Defines values for CreateClaimParamsXAmznShippingBusinessId.
+const (
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingEG  CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingES  CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingFR  CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingIN  CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingIT  CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingJP  CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingSA  CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingUAE CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingUK  CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	CreateClaimParamsXAmznShippingBusinessIdAmazonShippingUS  CreateClaimParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
+// Defines values for GenerateCollectionFormParamsXAmznShippingBusinessId.
+const (
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingEG  GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingES  GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingFR  GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingIN  GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingIT  GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingJP  GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingSA  GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingUAE GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingUK  GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	GenerateCollectionFormParamsXAmznShippingBusinessIdAmazonShippingUS  GenerateCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
+// Defines values for GetCollectionFormHistoryParamsXAmznShippingBusinessId.
+const (
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingEG  GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingES  GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingFR  GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingIN  GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingIT  GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingJP  GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingSA  GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingUAE GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingUK  GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	GetCollectionFormHistoryParamsXAmznShippingBusinessIdAmazonShippingUS  GetCollectionFormHistoryParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
+// Defines values for GetCollectionFormParamsXAmznShippingBusinessId.
+const (
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingEG  GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingES  GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingFR  GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingIN  GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingIT  GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingJP  GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingSA  GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingUAE GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingUK  GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	GetCollectionFormParamsXAmznShippingBusinessIdAmazonShippingUS  GetCollectionFormParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
 // Defines values for SubmitNdrFeedbackParamsXAmznShippingBusinessId.
 const (
 	SubmitNdrFeedbackParamsXAmznShippingBusinessIdAmazonShippingEG  SubmitNdrFeedbackParamsXAmznShippingBusinessId = "AmazonShipping_EG"
@@ -330,6 +499,34 @@ const (
 	PurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingUAE PurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
 	PurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingUK  PurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_UK"
 	PurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingUS  PurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
+// Defines values for GetAdditionalInputsParamsXAmznShippingBusinessId.
+const (
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingEG  GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingES  GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingFR  GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingIN  GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingIT  GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingJP  GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingSA  GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingUAE GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingUK  GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	GetAdditionalInputsParamsXAmznShippingBusinessIdAmazonShippingUS  GetAdditionalInputsParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
+// Defines values for DirectPurchaseShipmentParamsXAmznShippingBusinessId.
+const (
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingEG  DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingES  DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingFR  DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingIN  DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingIT  DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingJP  DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingSA  DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingUAE DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingUK  DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	DirectPurchaseShipmentParamsXAmznShippingBusinessIdAmazonShippingUS  DirectPurchaseShipmentParamsXAmznShippingBusinessId = "AmazonShipping_US"
 )
 
 // Defines values for GetRatesParamsXAmznShippingBusinessId.
@@ -388,6 +585,20 @@ const (
 	GetTrackingParamsXAmznShippingBusinessIdAmazonShippingUS  GetTrackingParamsXAmznShippingBusinessId = "AmazonShipping_US"
 )
 
+// Defines values for GetUnmanifestedShipmentsParamsXAmznShippingBusinessId.
+const (
+	AmazonShippingEG  GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_EG"
+	AmazonShippingES  GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_ES"
+	AmazonShippingFR  GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_FR"
+	AmazonShippingIN  GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_IN"
+	AmazonShippingIT  GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_IT"
+	AmazonShippingJP  GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_JP"
+	AmazonShippingSA  GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_SA"
+	AmazonShippingUAE GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_UAE"
+	AmazonShippingUK  GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_UK"
+	AmazonShippingUS  GetUnmanifestedShipmentsParamsXAmznShippingBusinessId = "AmazonShipping_US"
+)
+
 // AccessPoint Access point details
 type AccessPoint struct {
 	// AccessPointId Unique identifier for the access point
@@ -397,8 +608,12 @@ type AccessPoint struct {
 	AccessibilityAttributes *AccessibilityAttributes `json:"accessibilityAttributes,omitempty"`
 
 	// Address The address.
-	Address                 *Address                   `json:"address,omitempty"`
-	AssistanceType          *AccessPointAssistanceType `json:"assistanceType,omitempty"`
+	Address *Address `json:"address,omitempty"`
+
+	// AssistanceType Assistance type enum for Access point i.e. STAFF_ASSISTED or SELF_ASSISTED
+	AssistanceType *AccessPointAssistanceType `json:"assistanceType,omitempty"`
+
+	// ExceptionOperatingHours Exception operating hours for Access Point
 	ExceptionOperatingHours *[]ExceptionOperatingHours `json:"exceptionOperatingHours,omitempty"`
 
 	// Name Name of entity (store/hub etc) where this access point is located
@@ -417,10 +632,10 @@ type AccessPoint struct {
 	Type *AccessPointType `json:"type,omitempty"`
 }
 
-// AccessPointAssistanceType defines model for AccessPoint.AssistanceType.
+// AccessPointAssistanceType Assistance type enum for Access point i.e. STAFF_ASSISTED or SELF_ASSISTED
 type AccessPointAssistanceType string
 
-// AccessPointDetails defines model for AccessPointDetails.
+// AccessPointDetails AccessPointDetails object
 type AccessPointDetails struct {
 	// AccessPointId Unique identifier for the access point
 	AccessPointId *AccessPointId `json:"accessPointId,omitempty"`
@@ -446,6 +661,27 @@ type AccessibilityAttributes struct {
 	// DriveTime The approximate (static) drive time from input postal code's centroid.
 	DriveTime *int `json:"driveTime,omitempty"`
 }
+
+// AccountId Identifier for the seller's carrier account.
+type AccountId = string
+
+// AccountStatus Account Status.
+type AccountStatus string
+
+// AccountType Shipper Account Type.
+type AccountType string
+
+// ActiveAccount Active Account Details
+type ActiveAccount struct {
+	// AccountId Identifier for the seller's carrier account.
+	AccountId *AccountId `json:"accountId,omitempty"`
+
+	// CarrierId The carrier identifier for the offering, provided by the carrier.
+	CarrierId *CarrierId `json:"carrierId,omitempty"`
+}
+
+// ActiveAccounts A list of ActiveAccount
+type ActiveAccounts = []ActiveAccount
 
 // AdditionalAddressNotes Address notes to re-attempt delivery with.
 type AdditionalAddressNotes = string
@@ -522,7 +758,7 @@ type AvailableValueAddedServiceGroup struct {
 // AvailableValueAddedServiceGroupList A list of value-added services available for a shipping service offering.
 type AvailableValueAddedServiceGroupList = []AvailableValueAddedServiceGroup
 
-// Benefits Representing the included/excluded benefits that we offer for each ShippingOffering/Rate. Benefits being services provided by Amazon when sellers purchase shipping through Amazon.
+// Benefits Benefits that are included and excluded for each shipping offer. Benefits represents services provided by Amazon (eg. CLAIMS_PROTECTED, etc.) when sellers purchase shipping through Amazon. Benefit details will be made available for any shipment placed on or after January 1st 2024 00:00 UTC.
 type Benefits struct {
 	// ExcludedBenefits A list of excluded benefit. Refer to the ExcludeBenefit object for further documentation
 	ExcludedBenefits ExcludedBenefits `json:"excludedBenefits"`
@@ -548,6 +784,66 @@ type Carrier struct {
 	// Name The carrier name for the offering.
 	Name CarrierName `json:"name"`
 }
+
+// CarrierAccount Carrier Account details used to fetch rates.
+type CarrierAccount struct {
+	// CarrierAccountId Identifier for the seller's carrier account.
+	CarrierAccountId AccountId `json:"carrierAccountId"`
+
+	// CarrierId The carrier identifier for the offering, provided by the carrier.
+	CarrierId CarrierId `json:"carrierId"`
+}
+
+// CarrierAccountAttribute Attribute Properties required by carrier
+type CarrierAccountAttribute struct {
+	// AttributeName Attribute Name .
+	AttributeName *string `json:"attributeName,omitempty"`
+
+	// PropertyGroup Property Group.
+	PropertyGroup *string `json:"propertyGroup,omitempty"`
+
+	// Value Value .
+	Value *string `json:"value,omitempty"`
+}
+
+// CarrierAccountAttributes A list of all attributes required by the carrier in order to successfully link the merchant's account
+type CarrierAccountAttributes = []CarrierAccountAttribute
+
+// CarrierAccountInput Info About CarrierAccountInput
+type CarrierAccountInput struct {
+	// DescriptionLocalizationKey descriptionLocalizationKey value .
+	DescriptionLocalizationKey *string `json:"descriptionLocalizationKey,omitempty"`
+
+	// GroupName groupName value .
+	GroupName *string `json:"groupName,omitempty"`
+
+	// InputType Type of Input.
+	InputType *InputType `json:"inputType,omitempty"`
+
+	// IsConfidential is value is Confidential .
+	IsConfidential *bool `json:"isConfidential,omitempty"`
+
+	// IsHidden is value is hidden .
+	IsHidden *bool `json:"isHidden,omitempty"`
+
+	// IsMandatory mandatory or not  value .
+	IsMandatory *bool `json:"isMandatory,omitempty"`
+
+	// Name name value .
+	Name *string `json:"name,omitempty"`
+
+	// ValidationMetadata A list of ValidationMetadata
+	ValidationMetadata *ValidationMetadataList `json:"validationMetadata,omitempty"`
+}
+
+// CarrierAccountInputsList A list of CarrierAccountInput
+type CarrierAccountInputsList = []CarrierAccountInput
+
+// CarrierAccountType CarrierAccountType  associated with account.
+type CarrierAccountType = string
+
+// CarrierAccounts A list of CarrierAccounts
+type CarrierAccounts = []CarrierAccount
 
 // CarrierId The carrier identifier for the offering, provided by the carrier.
 type CarrierId = string
@@ -588,6 +884,15 @@ type ChargeList = []ChargeComponent
 // City The city or town where the person, business or institution is located.
 type City = string
 
+// ClaimId The claim identifier originally returned by the createClaim operation.
+type ClaimId = string
+
+// ClaimProofURLs A list of proof URLs for a claim. Basic URL validation will happen for each URLs present in the list
+type ClaimProofURLs = []string
+
+// ClaimReason The reason for which shipper is filing the claim for a particular shipment.
+type ClaimReason string
+
 // ClientReferenceDetail Client Reference Details
 type ClientReferenceDetail struct {
 	// ClientReferenceId The Client Reference Id.
@@ -609,11 +914,71 @@ type CollectOnDelivery struct {
 	Amount Currency `json:"amount"`
 }
 
+// CollectionFormId Collection Form Id for Reprint .
+type CollectionFormId = string
+
+// CollectionFormsHistoryRecord Active Account Details
+type CollectionFormsHistoryRecord struct {
+	// CarrierName The carrier name for the offering.
+	CarrierName *CarrierName `json:"carrierName,omitempty"`
+
+	// CollectionFormId Collection Form Id for Reprint .
+	CollectionFormId *CollectionFormId `json:"collectionFormId,omitempty"`
+
+	// CreationDate Creation Time for this account.
+	CreationDate *string `json:"creationDate,omitempty"`
+
+	// GenerationStatus Generation Status.
+	GenerationStatus *GenerationStatus `json:"generationStatus,omitempty"`
+
+	// ShipFromAddress The address.
+	ShipFromAddress *Address `json:"shipFromAddress,omitempty"`
+}
+
+// CollectionFormsHistoryRecordList A list of CollectionFormsHistoryRecord
+type CollectionFormsHistoryRecordList = []CollectionFormsHistoryRecord
+
+// CollectionsFormDocument Collection Form Document Details
+type CollectionsFormDocument struct {
+	// Base64EncodedContent Base64 document Value of Collection.
+	Base64EncodedContent *string `json:"base64EncodedContent,omitempty"`
+
+	// DocumentFormat Collection Document format is PDF.
+	DocumentFormat *string `json:"documentFormat,omitempty"`
+}
+
 // Contents A Base64 encoded string of the file contents.
 type Contents = string
 
 // CountryCode The two digit country code. Follows ISO 3166-1 alpha-2 format.
 type CountryCode = string
+
+// CreateClaimRequest The request schema for the CreateClaim operation
+type CreateClaimRequest struct {
+	// ClaimReason The reason for which shipper is filing the claim for a particular shipment.
+	ClaimReason ClaimReason `json:"claimReason"`
+
+	// DeclaredValue The monetary value in the currency indicated, in ISO 4217 standard format.
+	DeclaredValue *Currency `json:"declaredValue,omitempty"`
+
+	// IsReplacementPackageSent Applicable for only On Amazon shipments to identify if replacement was sent
+	IsReplacementPackageSent *bool `json:"isReplacementPackageSent,omitempty"`
+
+	// Proofs A list of proof URLs for a claim. Basic URL validation will happen for each URLs present in the list
+	Proofs *ClaimProofURLs `json:"proofs,omitempty"`
+
+	// SettlementType Type of settlement the shipper wants to receive for a particular shipment.
+	SettlementType SettlementType `json:"settlementType"`
+
+	// TrackingId The carrier generated identifier for a package in a purchased shipment.
+	TrackingId TrackingId `json:"trackingId"`
+}
+
+// CreateClaimResponse The response schema for the createClaim operation.
+type CreateClaimResponse struct {
+	// ClaimId The claim identifier originally returned by the createClaim operation.
+	ClaimId *ClaimId `json:"claimId,omitempty"`
+}
 
 // Currency The monetary value in the currency indicated, in ISO 4217 standard format.
 type Currency struct {
@@ -687,6 +1052,42 @@ type DirectFulfillmentItemIdentifiers struct {
 	PieceNumber *string `json:"pieceNumber,omitempty"`
 }
 
+// DirectPurchaseRequest The request schema for the directPurchaseShipment operation. When the channel type is Amazon, the shipTo address is not required and will be ignored.
+type DirectPurchaseRequest struct {
+	// ChannelDetails Shipment source channel related information.
+	ChannelDetails ChannelDetails `json:"channelDetails"`
+
+	// LabelSpecifications The document specifications requested. For calls to the purchaseShipment operation, the shipment purchase fails if the specified document specifications are not among those returned in the response to the getRates operation.
+	LabelSpecifications *RequestedDocumentSpecification `json:"labelSpecifications,omitempty"`
+
+	// Packages A list of packages to be shipped through a shipping service offering.
+	Packages *PackageList `json:"packages,omitempty"`
+
+	// ReturnTo The address.
+	ReturnTo *Address `json:"returnTo,omitempty"`
+
+	// ShipFrom The address.
+	ShipFrom *Address `json:"shipFrom,omitempty"`
+
+	// ShipTo The address.
+	ShipTo *Address `json:"shipTo,omitempty"`
+}
+
+// DirectPurchaseResponse The response schema for the directPurchaseShipment operation.
+type DirectPurchaseResponse struct {
+	// Payload The payload for the directPurchaseShipment operation.
+	Payload *DirectPurchaseResult `json:"payload,omitempty"`
+}
+
+// DirectPurchaseResult The payload for the directPurchaseShipment operation.
+type DirectPurchaseResult struct {
+	// PackageDocumentDetailList A list of post-purchase details about a package that will be shipped using a shipping service.
+	PackageDocumentDetailList *PackageDocumentDetailList `json:"packageDocumentDetailList,omitempty"`
+
+	// ShipmentId The unique shipment identifier provided by a shipping service.
+	ShipmentId ShipmentId `json:"shipmentId"`
+}
+
 // DocumentFormat The file format of the document.
 type DocumentFormat string
 
@@ -725,6 +1126,7 @@ type Error struct {
 
 // ErrorList A list of error responses returned when a request is unsuccessful.
 type ErrorList struct {
+	// Errors Array of Errors
 	Errors []Error `json:"errors"`
 }
 
@@ -755,14 +1157,41 @@ type ExceptionOperatingHours struct {
 	OperatingHours *OperatingHours `json:"operatingHours,omitempty"`
 }
 
-// ExcludedBenefit Object representing an excluded benefit that is excluded for an ShippingOffering/Rate.
+// ExcludedBenefit Object representing a benefit that is excluded for a shipping offer or rate.
 type ExcludedBenefit struct {
-	Benefit    string `json:"benefit"`
-	ReasonCode string `json:"reasonCode"`
+	// Benefit benefit
+	Benefit string `json:"benefit"`
+
+	// ReasonCodes List of reasons (eg. LATE_DELIVERY_RISK, etc.) indicating why a benefit is excluded for a shipping offer.
+	ReasonCodes *ExcludedBenefitReasonCodes `json:"reasonCodes,omitempty"`
 }
+
+// ExcludedBenefitReasonCodes List of reasons (eg. LATE_DELIVERY_RISK, etc.) indicating why a benefit is excluded for a shipping offer.
+type ExcludedBenefitReasonCodes = []string
 
 // ExcludedBenefits A list of excluded benefit. Refer to the ExcludeBenefit object for further documentation
 type ExcludedBenefits = []ExcludedBenefit
+
+// GenerateCollectionFormRequest The request schema Call to generate the collection form.
+type GenerateCollectionFormRequest struct {
+	// CarrierId The carrier identifier for the offering, provided by the carrier.
+	CarrierId CarrierId `json:"carrierId"`
+
+	// ClientReferenceDetails Object to pass additional information about the MCI Integrator shipperType: List of ClientReferenceDetail
+	ClientReferenceDetails *ClientReferenceDetails `json:"clientReferenceDetails,omitempty"`
+
+	// ShipFromAddress The address.
+	ShipFromAddress *Address `json:"shipFromAddress,omitempty"`
+}
+
+// GenerateCollectionFormResponse The Response  for the GenerateCollectionFormResponse operation.
+type GenerateCollectionFormResponse struct {
+	// CollectionsFormDocument Collection Form Document Details
+	CollectionsFormDocument *CollectionsFormDocument `json:"collectionsFormDocument,omitempty"`
+}
+
+// GenerationStatus Generation Status.
+type GenerationStatus string
 
 // Geocode Defines the latitude and longitude of the access point.
 type Geocode struct {
@@ -785,14 +1214,79 @@ type GetAccessPointsResult struct {
 	AccessPointsMap AccessPointsMap `json:"accessPointsMap"`
 }
 
+// GetAdditionalInputsResponse The response schema for the getAdditionalInputs operation.
+type GetAdditionalInputsResponse struct {
+	// Payload The JSON schema to use to provide additional inputs when required to purchase a shipping offering.
+	Payload *GetAdditionalInputsResult `json:"payload,omitempty"`
+}
+
+// GetAdditionalInputsResult The JSON schema to use to provide additional inputs when required to purchase a shipping offering.
+type GetAdditionalInputsResult map[string]interface{}
+
+// GetCarrierAccountFormInputsResponse The Response  for the GetCarrierAccountFormInputsResponse operation.
+type GetCarrierAccountFormInputsResponse struct {
+	// LinkableCarriersList A list of LinkableCarrier
+	LinkableCarriersList *LinkableCarriersList `json:"linkableCarriersList,omitempty"`
+}
+
+// GetCarrierAccountsRequest The request schema for the GetCarrierAccounts operation.
+type GetCarrierAccountsRequest struct {
+	// ClientReferenceDetails Object to pass additional information about the MCI Integrator shipperType: List of ClientReferenceDetail
+	ClientReferenceDetails *ClientReferenceDetails `json:"clientReferenceDetails,omitempty"`
+}
+
+// GetCarrierAccountsResponse The Response  for the GetCarrierAccountsResponse operation.
+type GetCarrierAccountsResponse struct {
+	// ActiveAccounts A list of ActiveAccount
+	ActiveAccounts ActiveAccounts `json:"activeAccounts"`
+}
+
+// GetCollectionFormHistoryRequest The request schema to get query collections form history API .
+type GetCollectionFormHistoryRequest struct {
+	// CarrierId The carrier identifier for the offering, provided by the carrier.
+	CarrierId *CarrierId `json:"carrierId,omitempty"`
+
+	// ClientReferenceDetails Object to pass additional information about the MCI Integrator shipperType: List of ClientReferenceDetail
+	ClientReferenceDetails *ClientReferenceDetails `json:"clientReferenceDetails,omitempty"`
+
+	// DateRange Date Range for query the results.
+	DateRange *DateRange `json:"dateRange,omitempty"`
+
+	// MaxResults max Number of Results for query .
+	MaxResults *int `json:"maxResults,omitempty"`
+
+	// ShipFromAddress The address.
+	ShipFromAddress *Address `json:"shipFromAddress,omitempty"`
+}
+
+// GetCollectionFormHistoryResponse The Response  for the GetCollectionFormHistoryResponse operation.
+type GetCollectionFormHistoryResponse struct {
+	// CollectionFormsHistoryRecordList A list of CollectionFormsHistoryRecord
+	CollectionFormsHistoryRecordList *CollectionFormsHistoryRecordList `json:"collectionFormsHistoryRecordList,omitempty"`
+
+	// LastRefreshedDate Last Refereshed Date of collection
+	LastRefreshedDate *string `json:"lastRefreshedDate,omitempty"`
+}
+
+// GetCollectionFormResponse The Response  for the GetCollectionFormResponse operation.
+type GetCollectionFormResponse struct {
+	// CollectionsFormDocument Collection Form Document Details
+	CollectionsFormDocument *CollectionsFormDocument `json:"collectionsFormDocument,omitempty"`
+}
+
 // GetRatesRequest The request schema for the getRates operation. When the channelType is Amazon, the shipTo address is not required and will be ignored.
 type GetRatesRequest struct {
+	// CarrierAccounts A list of CarrierAccounts
+	CarrierAccounts *CarrierAccounts `json:"carrierAccounts,omitempty"`
+
 	// ChannelDetails Shipment source channel related information.
 	ChannelDetails ChannelDetails `json:"channelDetails"`
 
 	// ClientReferenceDetails Object to pass additional information about the MCI Integrator shipperType: List of ClientReferenceDetail
-	ClientReferenceDetails        *ClientReferenceDetails `json:"clientReferenceDetails,omitempty"`
-	DestinationAccessPointDetails *AccessPointDetails     `json:"destinationAccessPointDetails,omitempty"`
+	ClientReferenceDetails *ClientReferenceDetails `json:"clientReferenceDetails,omitempty"`
+
+	// DestinationAccessPointDetails AccessPointDetails object
+	DestinationAccessPointDetails *AccessPointDetails `json:"destinationAccessPointDetails,omitempty"`
 
 	// Packages A list of packages to be shipped through a shipping service offering.
 	Packages PackageList `json:"packages"`
@@ -848,6 +1342,9 @@ type GetShipmentDocumentsResponse struct {
 
 // GetShipmentDocumentsResult The payload for the getShipmentDocuments operation.
 type GetShipmentDocumentsResult struct {
+	// Benefits Benefits that are included and excluded for each shipping offer. Benefits represents services provided by Amazon (eg. CLAIMS_PROTECTED, etc.) when sellers purchase shipping through Amazon. Benefit details will be made available for any shipment placed on or after January 1st 2024 00:00 UTC.
+	Benefits *Benefits `json:"benefits,omitempty"`
+
 	// PackageDocumentDetail The post-purchase details of a package that will be shipped using a shipping service.
 	PackageDocumentDetail PackageDocumentDetail `json:"packageDocumentDetail"`
 
@@ -877,6 +1374,24 @@ type GetTrackingResult struct {
 
 	// TrackingId The carrier generated identifier for a package in a purchased shipment.
 	TrackingId TrackingId `json:"trackingId"`
+}
+
+// GetUnmanifestedShipmentsRequest The request schema for the GetUnmanifestedShipmentsRequest operation.
+type GetUnmanifestedShipmentsRequest struct {
+	// ClientReferenceDetails Object to pass additional information about the MCI Integrator shipperType: List of ClientReferenceDetail
+	ClientReferenceDetails *ClientReferenceDetails `json:"clientReferenceDetails,omitempty"`
+}
+
+// GetUnmanifestedShipmentsResponse The Response  for the GetUnmanifestedShipmentsResponse operation.
+type GetUnmanifestedShipmentsResponse struct {
+	// UnmanifestedCarrierInformationList A list of UnmanifestedCarrierInformation
+	UnmanifestedCarrierInformationList *UnmanifestedCarrierInformationList `json:"unmanifestedCarrierInformationList,omitempty"`
+}
+
+// GoodsOwner The seller owning the goods before handing them over to the carrier
+type GoodsOwner struct {
+	// MerchantId merchant Id of provided merchant
+	MerchantId MerchantId `json:"merchantId"`
 }
 
 // IncludedBenefits A list of included benefits.
@@ -914,6 +1429,9 @@ type IneligibleRate struct {
 
 // IneligibleRateList A list of ineligible shipping service offerings.
 type IneligibleRateList = []IneligibleRate
+
+// InputType Type of Input.
+type InputType string
 
 // InvoiceDetails The invoice details for charges associated with the goods in the package. Only applies to certain regions.
 type InvoiceDetails struct {
@@ -966,6 +1484,57 @@ type Item struct {
 // ItemList A list of items.
 type ItemList = []Item
 
+// LabelAttribute Enumerates the attributes supported to be printed on a shipping label. The values for these attributes are retrieved from GetRates/OneClickShipment request
+type LabelAttribute string
+
+// LinkCarrierAccountRequest The request schema for verify and add the merchant's account with a certain carrier.
+type LinkCarrierAccountRequest struct {
+	// CarrierAccountAttributes A list of all attributes required by the carrier in order to successfully link the merchant's account
+	CarrierAccountAttributes CarrierAccountAttributes `json:"carrierAccountAttributes"`
+
+	// CarrierAccountType CarrierAccountType  associated with account.
+	CarrierAccountType CarrierAccountType `json:"carrierAccountType"`
+
+	// ClientReferenceDetails Object to pass additional information about the MCI Integrator shipperType: List of ClientReferenceDetail
+	ClientReferenceDetails *ClientReferenceDetails `json:"clientReferenceDetails,omitempty"`
+
+	// EncryptedCarrierAccountAttributes A list of all attributes required by the carrier in order to successfully link the merchant's account
+	EncryptedCarrierAccountAttributes *CarrierAccountAttributes `json:"encryptedCarrierAccountAttributes,omitempty"`
+}
+
+// LinkCarrierAccountResponse The Response  for the LinkCarrierAccount operation.
+type LinkCarrierAccountResponse struct {
+	// AccountId Identifier for the seller's carrier account.
+	AccountId *AccountId `json:"accountId,omitempty"`
+
+	// RegistrationStatus Account Status.
+	RegistrationStatus *AccountStatus `json:"registrationStatus,omitempty"`
+}
+
+// LinkableAccountType Info About Linkable Account Type
+type LinkableAccountType struct {
+	// AccountType Shipper Account Type.
+	AccountType *AccountType `json:"accountType,omitempty"`
+
+	// CarrierAccountInputs A list of CarrierAccountInput
+	CarrierAccountInputs *CarrierAccountInputsList `json:"carrierAccountInputs,omitempty"`
+}
+
+// LinkableAccountTypeList A list of LinkableAccountType
+type LinkableAccountTypeList = []LinkableAccountType
+
+// LinkableCarrier Info About Linkable Carrier
+type LinkableCarrier struct {
+	// CarrierId The carrier identifier for the offering, provided by the carrier.
+	CarrierId *CarrierId `json:"carrierId,omitempty"`
+
+	// LinkableAccountTypes A list of LinkableAccountType
+	LinkableAccountTypes *LinkableAccountTypeList `json:"linkableAccountTypes,omitempty"`
+}
+
+// LinkableCarriersList A list of LinkableCarrier
+type LinkableCarriersList = []LinkableCarrier
+
 // LiquidVolume Liquid Volume.
 type LiquidVolume struct {
 	// Unit The unit of measurement.
@@ -993,6 +1562,9 @@ type Location struct {
 	StateOrRegion *StateOrRegion `json:"stateOrRegion,omitempty"`
 }
 
+// MerchantId merchant Id of provided merchant
+type MerchantId = string
+
 // NdrAction The type of NDR action shipper wants to take for a particular shipment.
 type NdrAction string
 
@@ -1011,8 +1583,13 @@ type NeedFileJoining = bool
 // OneClickShipmentRequest The request schema for the OneClickShipment operation. When the channelType is not Amazon, shipTo is required and when channelType is Amazon shipTo is ignored.
 type OneClickShipmentRequest struct {
 	// ChannelDetails Shipment source channel related information.
-	ChannelDetails                ChannelDetails      `json:"channelDetails"`
+	ChannelDetails ChannelDetails `json:"channelDetails"`
+
+	// DestinationAccessPointDetails AccessPointDetails object
 	DestinationAccessPointDetails *AccessPointDetails `json:"destinationAccessPointDetails,omitempty"`
+
+	// GoodsOwner The seller owning the goods before handing them over to the carrier
+	GoodsOwner *GoodsOwner `json:"goodsOwner,omitempty"`
 
 	// LabelSpecifications The document specifications requested. For calls to the purchaseShipment operation, the shipment purchase fails if the specified document specifications are not among those returned in the response to the getRates operation.
 	LabelSpecifications RequestedDocumentSpecification `json:"labelSpecifications"`
@@ -1087,7 +1664,9 @@ type OneClickShipmentValueAddedServiceDetails = []OneClickShipmentValueAddedServ
 // OperatingHours The hours in which the access point shall remain operational
 type OperatingHours struct {
 	// ClosingTime Denotes time of the day, used for defining opening or closing time of access points
-	ClosingTime    *TimeOfDay   `json:"closingTime,omitempty"`
+	ClosingTime *TimeOfDay `json:"closingTime,omitempty"`
+
+	// MidDayClosures midDayClosures operating hours array
 	MidDayClosures *[]TimeOfDay `json:"midDayClosures,omitempty"`
 
 	// OpeningTime Denotes time of the day, used for defining opening or closing time of access points
@@ -1221,6 +1800,9 @@ type PurchaseShipmentResponse struct {
 
 // PurchaseShipmentResult The payload for the purchaseShipment operation.
 type PurchaseShipmentResult struct {
+	// Benefits Benefits that are included and excluded for each shipping offer. Benefits represents services provided by Amazon (eg. CLAIMS_PROTECTED, etc.) when sellers purchase shipping through Amazon. Benefit details will be made available for any shipment placed on or after January 1st 2024 00:00 UTC.
+	Benefits *Benefits `json:"benefits,omitempty"`
+
 	// PackageDocumentDetails A list of post-purchase details about a package that will be shipped using a shipping service.
 	PackageDocumentDetails PackageDocumentDetailList `json:"packageDocumentDetails"`
 
@@ -1236,7 +1818,7 @@ type Rate struct {
 	// AvailableValueAddedServiceGroups A list of value-added services available for a shipping service offering.
 	AvailableValueAddedServiceGroups *AvailableValueAddedServiceGroupList `json:"availableValueAddedServiceGroups,omitempty"`
 
-	// Benefits Representing the included/excluded benefits that we offer for each ShippingOffering/Rate. Benefits being services provided by Amazon when sellers purchase shipping through Amazon.
+	// Benefits Benefits that are included and excluded for each shipping offer. Benefits represents services provided by Amazon (eg. CLAIMS_PROTECTED, etc.) when sellers purchase shipping through Amazon. Benefit details will be made available for any shipment placed on or after January 1st 2024 00:00 UTC.
 	Benefits *Benefits `json:"benefits,omitempty"`
 
 	// BilledWeight The weight in the units indicated.
@@ -1306,6 +1888,9 @@ type RateItemType string
 // RateList A list of eligible shipping service offerings.
 type RateList = []Rate
 
+// RequestAttributes Specify the type of attributes to be added on a label.
+type RequestAttributes = []LabelAttribute
+
 // RequestToken A unique token generated to identify a getRates operation.
 type RequestToken = string
 
@@ -1326,8 +1911,17 @@ type RequestedDocumentSpecification struct {
 	// RequestedDocumentTypes A list of the document types requested.
 	RequestedDocumentTypes []DocumentType `json:"requestedDocumentTypes"`
 
+	// RequestedLabelCustomization Object contains customised data requested by a shipper to be printed on a shipping label.
+	RequestedLabelCustomization *RequestedLabelCustomization `json:"requestedLabelCustomization,omitempty"`
+
 	// Size The size dimensions of the label.
 	Size DocumentSize `json:"size"`
+}
+
+// RequestedLabelCustomization Object contains customised data requested by a shipper to be printed on a shipping label.
+type RequestedLabelCustomization struct {
+	// RequestAttributes Specify the type of attributes to be added on a label.
+	RequestAttributes *RequestAttributes `json:"requestAttributes,omitempty"`
 }
 
 // RequestedValueAddedService A value-added service to be applied to a shipping service purchase.
@@ -1362,6 +1956,9 @@ type ServiceSelection struct {
 	// ServiceId A list of ServiceId.
 	ServiceId ServiceIds `json:"serviceId"`
 }
+
+// SettlementType Type of settlement the shipper wants to receive for a particular shipment.
+type SettlementType string
 
 // ShipmentId The unique shipment identifier provided by a shipping service.
 type ShipmentId = string
@@ -1434,8 +2031,13 @@ type TaxType string
 
 // TimeOfDay Denotes time of the day, used for defining opening or closing time of access points
 type TimeOfDay struct {
-	HourOfDay      *int `json:"hourOfDay,omitempty"`
-	MinuteOfHour   *int `json:"minuteOfHour,omitempty"`
+	// HourOfDay Denotes hour of the day, used for defining opening or closing time of access points
+	HourOfDay *int `json:"hourOfDay,omitempty"`
+
+	// MinuteOfHour Denotes minute of the hour, used for defining opening or closing time of access points
+	MinuteOfHour *int `json:"minuteOfHour,omitempty"`
+
+	// SecondOfMinute Denotes second of the minute, used for defining opening or closing time of access points
 	SecondOfMinute *int `json:"secondOfMinute,omitempty"`
 }
 
@@ -1469,6 +2071,63 @@ type TrackingSummary struct {
 	TrackingDetailCodes *TrackingDetailCodes `json:"trackingDetailCodes,omitempty"`
 }
 
+// UnlinkCarrierAccountRequest The request schema for remove the Carrier Account associated with the provided merchant.
+type UnlinkCarrierAccountRequest struct {
+	// AccountId Identifier for the seller's carrier account.
+	AccountId *AccountId `json:"accountId,omitempty"`
+
+	// ClientReferenceDetails Object to pass additional information about the MCI Integrator shipperType: List of ClientReferenceDetail
+	ClientReferenceDetails *ClientReferenceDetails `json:"clientReferenceDetails,omitempty"`
+}
+
+// UnlinkCarrierAccountResponse The Response  for the UnlinkCarrierAccountResponse operation.
+type UnlinkCarrierAccountResponse struct {
+	// IsUnlinked Is Carrier unlinked from Merchant
+	IsUnlinked *bool `json:"isUnlinked,omitempty"`
+}
+
+// UnmanifestedCarrierInformation UnmanifestedCarrierInformation like carrierId CarrierName and Location
+type UnmanifestedCarrierInformation struct {
+	// CarrierId The carrier identifier for the offering, provided by the carrier.
+	CarrierId *CarrierId `json:"carrierId,omitempty"`
+
+	// CarrierName The carrier name for the offering.
+	CarrierName *CarrierName `json:"carrierName,omitempty"`
+
+	// UnmanifestedShipmentLocationList A list of UnmanifestedShipmentLocation
+	UnmanifestedShipmentLocationList *UnmanifestedShipmentLocationList `json:"unmanifestedShipmentLocationList,omitempty"`
+}
+
+// UnmanifestedCarrierInformationList A list of UnmanifestedCarrierInformation
+type UnmanifestedCarrierInformationList = []UnmanifestedCarrierInformation
+
+// UnmanifestedShipmentLocation UnmanifestedShipmentLocation info
+type UnmanifestedShipmentLocation struct {
+	// Address The address.
+	Address *Address `json:"address,omitempty"`
+
+	// LastManifestDate Its Last Manifest Date.
+	LastManifestDate *string `json:"lastManifestDate,omitempty"`
+}
+
+// UnmanifestedShipmentLocationList A list of UnmanifestedShipmentLocation
+type UnmanifestedShipmentLocationList = []UnmanifestedShipmentLocation
+
+// ValidationMetadata ValidationMetadata Details
+type ValidationMetadata struct {
+	// ErrorMessage errorMessage for the error.
+	ErrorMessage *string `json:"errorMessage,omitempty"`
+
+	// ValidationStrategy validationStrategy for the error.
+	ValidationStrategy *string `json:"validationStrategy,omitempty"`
+
+	// Value Value.
+	Value *string `json:"value,omitempty"`
+}
+
+// ValidationMetadataList A list of ValidationMetadata
+type ValidationMetadataList = []ValidationMetadata
+
 // ValueAddedService A value-added service available for purchase with a shipment service offering.
 type ValueAddedService struct {
 	// Cost The monetary value in the currency indicated, in ISO 4217 standard format.
@@ -1501,9 +2160,14 @@ type WeightUnit string
 
 // GetAccessPointsParams defines parameters for GetAccessPoints.
 type GetAccessPointsParams struct {
+	// AccessPointTypes Access point types
 	AccessPointTypes []GetAccessPointsParamsAccessPointTypes `form:"accessPointTypes" json:"accessPointTypes"`
-	CountryCode      string                                  `form:"countryCode" json:"countryCode"`
-	PostalCode       string                                  `form:"postalCode" json:"postalCode"`
+
+	// CountryCode Country code for access point
+	CountryCode string `form:"countryCode" json:"countryCode"`
+
+	// PostalCode postal code for access point
+	PostalCode string `form:"postalCode" json:"postalCode"`
 
 	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
 	XAmznShippingBusinessId *GetAccessPointsParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
@@ -1514,6 +2178,81 @@ type GetAccessPointsParamsAccessPointTypes string
 
 // GetAccessPointsParamsXAmznShippingBusinessId defines parameters for GetAccessPoints.
 type GetAccessPointsParamsXAmznShippingBusinessId string
+
+// GetCarrierAccountFormInputsParams defines parameters for GetCarrierAccountFormInputs.
+type GetCarrierAccountFormInputsParams struct {
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *GetCarrierAccountFormInputsParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// GetCarrierAccountFormInputsParamsXAmznShippingBusinessId defines parameters for GetCarrierAccountFormInputs.
+type GetCarrierAccountFormInputsParamsXAmznShippingBusinessId string
+
+// GetCarrierAccountsParams defines parameters for GetCarrierAccounts.
+type GetCarrierAccountsParams struct {
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *GetCarrierAccountsParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// GetCarrierAccountsParamsXAmznShippingBusinessId defines parameters for GetCarrierAccounts.
+type GetCarrierAccountsParamsXAmznShippingBusinessId string
+
+// LinkCarrierAccountParams defines parameters for LinkCarrierAccount.
+type LinkCarrierAccountParams struct {
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *LinkCarrierAccountParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// LinkCarrierAccountParamsXAmznShippingBusinessId defines parameters for LinkCarrierAccount.
+type LinkCarrierAccountParamsXAmznShippingBusinessId string
+
+// UnlinkCarrierAccountParams defines parameters for UnlinkCarrierAccount.
+type UnlinkCarrierAccountParams struct {
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *UnlinkCarrierAccountParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// UnlinkCarrierAccountParamsXAmznShippingBusinessId defines parameters for UnlinkCarrierAccount.
+type UnlinkCarrierAccountParamsXAmznShippingBusinessId string
+
+// CreateClaimParams defines parameters for CreateClaim.
+type CreateClaimParams struct {
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *CreateClaimParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// CreateClaimParamsXAmznShippingBusinessId defines parameters for CreateClaim.
+type CreateClaimParamsXAmznShippingBusinessId string
+
+// GenerateCollectionFormParams defines parameters for GenerateCollectionForm.
+type GenerateCollectionFormParams struct {
+	// XAmznIdempotencyKey A unique value which the server uses to recognize subsequent retries of the same request.
+	XAmznIdempotencyKey *string `json:"x-amzn-IdempotencyKey,omitempty"`
+
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *GenerateCollectionFormParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// GenerateCollectionFormParamsXAmznShippingBusinessId defines parameters for GenerateCollectionForm.
+type GenerateCollectionFormParamsXAmznShippingBusinessId string
+
+// GetCollectionFormHistoryParams defines parameters for GetCollectionFormHistory.
+type GetCollectionFormHistoryParams struct {
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *GetCollectionFormHistoryParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// GetCollectionFormHistoryParamsXAmznShippingBusinessId defines parameters for GetCollectionFormHistory.
+type GetCollectionFormHistoryParamsXAmznShippingBusinessId string
+
+// GetCollectionFormParams defines parameters for GetCollectionForm.
+type GetCollectionFormParams struct {
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *GetCollectionFormParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// GetCollectionFormParamsXAmznShippingBusinessId defines parameters for GetCollectionForm.
+type GetCollectionFormParamsXAmznShippingBusinessId string
 
 // SubmitNdrFeedbackParams defines parameters for SubmitNdrFeedback.
 type SubmitNdrFeedbackParams struct {
@@ -1544,6 +2283,38 @@ type PurchaseShipmentParams struct {
 
 // PurchaseShipmentParamsXAmznShippingBusinessId defines parameters for PurchaseShipment.
 type PurchaseShipmentParamsXAmznShippingBusinessId string
+
+// GetAdditionalInputsParams defines parameters for GetAdditionalInputs.
+type GetAdditionalInputsParams struct {
+	// RequestToken The request token returned in the response to the getRates operation.
+	RequestToken string `form:"requestToken" json:"requestToken"`
+
+	// RateId The rate identifier for the shipping offering (rate) returned in the response to the getRates operation.
+	RateId string `form:"rateId" json:"rateId"`
+
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *GetAdditionalInputsParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// GetAdditionalInputsParamsXAmznShippingBusinessId defines parameters for GetAdditionalInputs.
+type GetAdditionalInputsParamsXAmznShippingBusinessId string
+
+// DirectPurchaseShipmentParams defines parameters for DirectPurchaseShipment.
+type DirectPurchaseShipmentParams struct {
+	// XAmznIdempotencyKey A unique value which the server uses to recognize subsequent retries of the same request.
+	XAmznIdempotencyKey *string `json:"x-amzn-IdempotencyKey,omitempty"`
+
+	// Locale The IETF Language Tag. Note that this only supports the primary language subtag with one secondary language subtag (i.e. en-US, fr-CA).
+	// The secondary language subtag is almost always a regional designation.
+	// This does not support additional subtags beyond the primary and secondary language subtags.
+	Locale *string `json:"locale,omitempty"`
+
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *DirectPurchaseShipmentParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// DirectPurchaseShipmentParamsXAmznShippingBusinessId defines parameters for DirectPurchaseShipment.
+type DirectPurchaseShipmentParamsXAmznShippingBusinessId string
 
 // GetRatesParams defines parameters for GetRates.
 type GetRatesParams struct {
@@ -1596,6 +2367,33 @@ type GetTrackingParams struct {
 // GetTrackingParamsXAmznShippingBusinessId defines parameters for GetTracking.
 type GetTrackingParamsXAmznShippingBusinessId string
 
+// GetUnmanifestedShipmentsParams defines parameters for GetUnmanifestedShipments.
+type GetUnmanifestedShipmentsParams struct {
+	// XAmznShippingBusinessId Amazon shipping business to assume for this request. The default is AmazonShipping_UK.
+	XAmznShippingBusinessId *GetUnmanifestedShipmentsParamsXAmznShippingBusinessId `json:"x-amzn-shipping-business-id,omitempty"`
+}
+
+// GetUnmanifestedShipmentsParamsXAmznShippingBusinessId defines parameters for GetUnmanifestedShipments.
+type GetUnmanifestedShipmentsParamsXAmznShippingBusinessId string
+
+// GetCarrierAccountsJSONRequestBody defines body for GetCarrierAccounts for application/json ContentType.
+type GetCarrierAccountsJSONRequestBody = GetCarrierAccountsRequest
+
+// LinkCarrierAccountJSONRequestBody defines body for LinkCarrierAccount for application/json ContentType.
+type LinkCarrierAccountJSONRequestBody = LinkCarrierAccountRequest
+
+// UnlinkCarrierAccountJSONRequestBody defines body for UnlinkCarrierAccount for application/json ContentType.
+type UnlinkCarrierAccountJSONRequestBody = UnlinkCarrierAccountRequest
+
+// CreateClaimJSONRequestBody defines body for CreateClaim for application/json ContentType.
+type CreateClaimJSONRequestBody = CreateClaimRequest
+
+// GenerateCollectionFormJSONRequestBody defines body for GenerateCollectionForm for application/json ContentType.
+type GenerateCollectionFormJSONRequestBody = GenerateCollectionFormRequest
+
+// GetCollectionFormHistoryJSONRequestBody defines body for GetCollectionFormHistory for application/json ContentType.
+type GetCollectionFormHistoryJSONRequestBody = GetCollectionFormHistoryRequest
+
 // SubmitNdrFeedbackJSONRequestBody defines body for SubmitNdrFeedback for application/json ContentType.
 type SubmitNdrFeedbackJSONRequestBody = SubmitNdrFeedbackRequest
 
@@ -1605,8 +2403,14 @@ type OneClickShipmentJSONRequestBody = OneClickShipmentRequest
 // PurchaseShipmentJSONRequestBody defines body for PurchaseShipment for application/json ContentType.
 type PurchaseShipmentJSONRequestBody = PurchaseShipmentRequest
 
+// DirectPurchaseShipmentJSONRequestBody defines body for DirectPurchaseShipment for application/json ContentType.
+type DirectPurchaseShipmentJSONRequestBody = DirectPurchaseRequest
+
 // GetRatesJSONRequestBody defines body for GetRates for application/json ContentType.
 type GetRatesJSONRequestBody = GetRatesRequest
+
+// GetUnmanifestedShipmentsJSONRequestBody defines body for GetUnmanifestedShipments for application/json ContentType.
+type GetUnmanifestedShipmentsJSONRequestBody = GetUnmanifestedShipmentsRequest
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -1707,6 +2511,42 @@ type ClientInterface interface {
 	// GetAccessPoints request
 	GetAccessPoints(ctx context.Context, params *GetAccessPointsParams) (*http.Response, error)
 
+	// GetCarrierAccountFormInputs request
+	GetCarrierAccountFormInputs(ctx context.Context, params *GetCarrierAccountFormInputsParams) (*http.Response, error)
+
+	// GetCarrierAccountsWithBody request with any body
+	GetCarrierAccountsWithBody(ctx context.Context, params *GetCarrierAccountsParams, contentType string, body io.Reader) (*http.Response, error)
+
+	GetCarrierAccounts(ctx context.Context, params *GetCarrierAccountsParams, body GetCarrierAccountsJSONRequestBody) (*http.Response, error)
+
+	// LinkCarrierAccountWithBody request with any body
+	LinkCarrierAccountWithBody(ctx context.Context, carrierId string, params *LinkCarrierAccountParams, contentType string, body io.Reader) (*http.Response, error)
+
+	LinkCarrierAccount(ctx context.Context, carrierId string, params *LinkCarrierAccountParams, body LinkCarrierAccountJSONRequestBody) (*http.Response, error)
+
+	// UnlinkCarrierAccountWithBody request with any body
+	UnlinkCarrierAccountWithBody(ctx context.Context, carrierId string, params *UnlinkCarrierAccountParams, contentType string, body io.Reader) (*http.Response, error)
+
+	UnlinkCarrierAccount(ctx context.Context, carrierId string, params *UnlinkCarrierAccountParams, body UnlinkCarrierAccountJSONRequestBody) (*http.Response, error)
+
+	// CreateClaimWithBody request with any body
+	CreateClaimWithBody(ctx context.Context, params *CreateClaimParams, contentType string, body io.Reader) (*http.Response, error)
+
+	CreateClaim(ctx context.Context, params *CreateClaimParams, body CreateClaimJSONRequestBody) (*http.Response, error)
+
+	// GenerateCollectionFormWithBody request with any body
+	GenerateCollectionFormWithBody(ctx context.Context, params *GenerateCollectionFormParams, contentType string, body io.Reader) (*http.Response, error)
+
+	GenerateCollectionForm(ctx context.Context, params *GenerateCollectionFormParams, body GenerateCollectionFormJSONRequestBody) (*http.Response, error)
+
+	// GetCollectionFormHistoryWithBody request with any body
+	GetCollectionFormHistoryWithBody(ctx context.Context, params *GetCollectionFormHistoryParams, contentType string, body io.Reader) (*http.Response, error)
+
+	GetCollectionFormHistory(ctx context.Context, params *GetCollectionFormHistoryParams, body GetCollectionFormHistoryJSONRequestBody) (*http.Response, error)
+
+	// GetCollectionForm request
+	GetCollectionForm(ctx context.Context, collectionFormId string, params *GetCollectionFormParams) (*http.Response, error)
+
 	// SubmitNdrFeedbackWithBody request with any body
 	SubmitNdrFeedbackWithBody(ctx context.Context, params *SubmitNdrFeedbackParams, contentType string, body io.Reader) (*http.Response, error)
 
@@ -1722,6 +2562,14 @@ type ClientInterface interface {
 
 	PurchaseShipment(ctx context.Context, params *PurchaseShipmentParams, body PurchaseShipmentJSONRequestBody) (*http.Response, error)
 
+	// GetAdditionalInputs request
+	GetAdditionalInputs(ctx context.Context, params *GetAdditionalInputsParams) (*http.Response, error)
+
+	// DirectPurchaseShipmentWithBody request with any body
+	DirectPurchaseShipmentWithBody(ctx context.Context, params *DirectPurchaseShipmentParams, contentType string, body io.Reader) (*http.Response, error)
+
+	DirectPurchaseShipment(ctx context.Context, params *DirectPurchaseShipmentParams, body DirectPurchaseShipmentJSONRequestBody) (*http.Response, error)
+
 	// GetRatesWithBody request with any body
 	GetRatesWithBody(ctx context.Context, params *GetRatesParams, contentType string, body io.Reader) (*http.Response, error)
 
@@ -1735,10 +2583,295 @@ type ClientInterface interface {
 
 	// GetTracking request
 	GetTracking(ctx context.Context, params *GetTrackingParams) (*http.Response, error)
+
+	// GetUnmanifestedShipmentsWithBody request with any body
+	GetUnmanifestedShipmentsWithBody(ctx context.Context, params *GetUnmanifestedShipmentsParams, contentType string, body io.Reader) (*http.Response, error)
+
+	GetUnmanifestedShipments(ctx context.Context, params *GetUnmanifestedShipmentsParams, body GetUnmanifestedShipmentsJSONRequestBody) (*http.Response, error)
 }
 
 func (c *Client) GetAccessPoints(ctx context.Context, params *GetAccessPointsParams) (*http.Response, error) {
 	req, err := NewGetAccessPointsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GetCarrierAccountFormInputs(ctx context.Context, params *GetCarrierAccountFormInputsParams) (*http.Response, error) {
+	req, err := NewGetCarrierAccountFormInputsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GetCarrierAccountsWithBody(ctx context.Context, params *GetCarrierAccountsParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewGetCarrierAccountsRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GetCarrierAccounts(ctx context.Context, params *GetCarrierAccountsParams, body GetCarrierAccountsJSONRequestBody) (*http.Response, error) {
+	req, err := NewGetCarrierAccountsRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) LinkCarrierAccountWithBody(ctx context.Context, carrierId string, params *LinkCarrierAccountParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewLinkCarrierAccountRequestWithBody(c.Server, carrierId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) LinkCarrierAccount(ctx context.Context, carrierId string, params *LinkCarrierAccountParams, body LinkCarrierAccountJSONRequestBody) (*http.Response, error) {
+	req, err := NewLinkCarrierAccountRequest(c.Server, carrierId, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) UnlinkCarrierAccountWithBody(ctx context.Context, carrierId string, params *UnlinkCarrierAccountParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewUnlinkCarrierAccountRequestWithBody(c.Server, carrierId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) UnlinkCarrierAccount(ctx context.Context, carrierId string, params *UnlinkCarrierAccountParams, body UnlinkCarrierAccountJSONRequestBody) (*http.Response, error) {
+	req, err := NewUnlinkCarrierAccountRequest(c.Server, carrierId, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) CreateClaimWithBody(ctx context.Context, params *CreateClaimParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewCreateClaimRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) CreateClaim(ctx context.Context, params *CreateClaimParams, body CreateClaimJSONRequestBody) (*http.Response, error) {
+	req, err := NewCreateClaimRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GenerateCollectionFormWithBody(ctx context.Context, params *GenerateCollectionFormParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewGenerateCollectionFormRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GenerateCollectionForm(ctx context.Context, params *GenerateCollectionFormParams, body GenerateCollectionFormJSONRequestBody) (*http.Response, error) {
+	req, err := NewGenerateCollectionFormRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GetCollectionFormHistoryWithBody(ctx context.Context, params *GetCollectionFormHistoryParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewGetCollectionFormHistoryRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GetCollectionFormHistory(ctx context.Context, params *GetCollectionFormHistoryParams, body GetCollectionFormHistoryJSONRequestBody) (*http.Response, error) {
+	req, err := NewGetCollectionFormHistoryRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GetCollectionForm(ctx context.Context, collectionFormId string, params *GetCollectionFormParams) (*http.Response, error) {
+	req, err := NewGetCollectionFormRequest(c.Server, collectionFormId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1877,6 +3010,66 @@ func (c *Client) PurchaseShipment(ctx context.Context, params *PurchaseShipmentP
 	return rsp, nil
 }
 
+func (c *Client) GetAdditionalInputs(ctx context.Context, params *GetAdditionalInputsParams) (*http.Response, error) {
+	req, err := NewGetAdditionalInputsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) DirectPurchaseShipmentWithBody(ctx context.Context, params *DirectPurchaseShipmentParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewDirectPurchaseShipmentRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) DirectPurchaseShipment(ctx context.Context, params *DirectPurchaseShipmentParams, body DirectPurchaseShipmentJSONRequestBody) (*http.Response, error) {
+	req, err := NewDirectPurchaseShipmentRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
 func (c *Client) GetRatesWithBody(ctx context.Context, params *GetRatesParams, contentType string, body io.Reader) (*http.Response, error) {
 	req, err := NewGetRatesRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
@@ -1959,6 +3152,46 @@ func (c *Client) GetShipmentDocuments(ctx context.Context, shipmentId string, pa
 
 func (c *Client) GetTracking(ctx context.Context, params *GetTrackingParams) (*http.Response, error) {
 	req, err := NewGetTrackingRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GetUnmanifestedShipmentsWithBody(ctx context.Context, params *GetUnmanifestedShipmentsParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewGetUnmanifestedShipmentsRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (c *Client) GetUnmanifestedShipments(ctx context.Context, params *GetUnmanifestedShipmentsParams, body GetUnmanifestedShipmentsJSONRequestBody) (*http.Response, error) {
+	req, err := NewGetUnmanifestedShipmentsRequest(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2061,10 +3294,456 @@ func NewGetAccessPointsRequest(server string, params *GetAccessPointsParams) (*h
 	return req, nil
 }
 
+// NewGetCarrierAccountFormInputsRequest generates requests for GetCarrierAccountFormInputs
+func NewGetCarrierAccountFormInputsRequest(server string, params *GetCarrierAccountFormInputsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/carrierAccountFormInputs")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewGetCarrierAccountsRequest calls the generic GetCarrierAccounts builder with application/json body
+func NewGetCarrierAccountsRequest(server string, params *GetCarrierAccountsParams, body GetCarrierAccountsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewGetCarrierAccountsRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewGetCarrierAccountsRequestWithBody generates requests for GetCarrierAccounts with any type of body
+func NewGetCarrierAccountsRequestWithBody(server string, params *GetCarrierAccountsParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/carrierAccounts")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewLinkCarrierAccountRequest calls the generic LinkCarrierAccount builder with application/json body
+func NewLinkCarrierAccountRequest(server string, carrierId string, params *LinkCarrierAccountParams, body LinkCarrierAccountJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewLinkCarrierAccountRequestWithBody(server, carrierId, params, "application/json", bodyReader)
+}
+
+// NewLinkCarrierAccountRequestWithBody generates requests for LinkCarrierAccount with any type of body
+func NewLinkCarrierAccountRequestWithBody(server string, carrierId string, params *LinkCarrierAccountParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "carrierId", runtime.ParamLocationPath, carrierId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/carrierAccounts/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewUnlinkCarrierAccountRequest calls the generic UnlinkCarrierAccount builder with application/json body
+func NewUnlinkCarrierAccountRequest(server string, carrierId string, params *UnlinkCarrierAccountParams, body UnlinkCarrierAccountJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUnlinkCarrierAccountRequestWithBody(server, carrierId, params, "application/json", bodyReader)
+}
+
+// NewUnlinkCarrierAccountRequestWithBody generates requests for UnlinkCarrierAccount with any type of body
+func NewUnlinkCarrierAccountRequestWithBody(server string, carrierId string, params *UnlinkCarrierAccountParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "carrierId", runtime.ParamLocationPath, carrierId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/carrierAccounts/%s/unlink", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewCreateClaimRequest calls the generic CreateClaim builder with application/json body
+func NewCreateClaimRequest(server string, params *CreateClaimParams, body CreateClaimJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateClaimRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewCreateClaimRequestWithBody generates requests for CreateClaim with any type of body
+func NewCreateClaimRequestWithBody(server string, params *CreateClaimParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/claims")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewGenerateCollectionFormRequest calls the generic GenerateCollectionForm builder with application/json body
+func NewGenerateCollectionFormRequest(server string, params *GenerateCollectionFormParams, body GenerateCollectionFormJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewGenerateCollectionFormRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewGenerateCollectionFormRequestWithBody generates requests for GenerateCollectionForm with any type of body
+func NewGenerateCollectionFormRequestWithBody(server string, params *GenerateCollectionFormParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/collectionForms")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XAmznIdempotencyKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-IdempotencyKey", runtime.ParamLocationHeader, *params.XAmznIdempotencyKey)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-IdempotencyKey", headerParam0)
+		}
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam1 string
+
+			headerParam1, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam1)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewGetCollectionFormHistoryRequest calls the generic GetCollectionFormHistory builder with application/json body
+func NewGetCollectionFormHistoryRequest(server string, params *GetCollectionFormHistoryParams, body GetCollectionFormHistoryJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewGetCollectionFormHistoryRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewGetCollectionFormHistoryRequestWithBody generates requests for GetCollectionFormHistory with any type of body
+func NewGetCollectionFormHistoryRequestWithBody(server string, params *GetCollectionFormHistoryParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/collectionForms/history")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewGetCollectionFormRequest generates requests for GetCollectionForm
+func NewGetCollectionFormRequest(server string, collectionFormId string, params *GetCollectionFormParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "collectionFormId", runtime.ParamLocationPath, collectionFormId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/collectionForms/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
 // NewSubmitNdrFeedbackRequest calls the generic SubmitNdrFeedback builder with application/json body
 func NewSubmitNdrFeedbackRequest(server string, params *SubmitNdrFeedbackParams, body SubmitNdrFeedbackJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2119,7 +3798,7 @@ func NewSubmitNdrFeedbackRequestWithBody(server string, params *SubmitNdrFeedbac
 // NewOneClickShipmentRequest calls the generic OneClickShipment builder with application/json body
 func NewOneClickShipmentRequest(server string, params *OneClickShipmentParams, body OneClickShipmentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2174,7 +3853,7 @@ func NewOneClickShipmentRequestWithBody(server string, params *OneClickShipmentP
 // NewPurchaseShipmentRequest calls the generic PurchaseShipment builder with application/json body
 func NewPurchaseShipmentRequest(server string, params *PurchaseShipmentParams, body PurchaseShipmentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2237,10 +3916,159 @@ func NewPurchaseShipmentRequestWithBody(server string, params *PurchaseShipmentP
 	return req, nil
 }
 
+// NewGetAdditionalInputsRequest generates requests for GetAdditionalInputs
+func NewGetAdditionalInputsRequest(server string, params *GetAdditionalInputsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/shipments/additionalInputs/schema")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "requestToken", runtime.ParamLocationQuery, params.RequestToken); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				values := make([]string, len(v))
+				copy(values, v)
+				queryValues.Add(k, strings.Join(values, ","))
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "rateId", runtime.ParamLocationQuery, params.RateId); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				values := make([]string, len(v))
+				copy(values, v)
+				queryValues.Add(k, strings.Join(values, ","))
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewDirectPurchaseShipmentRequest calls the generic DirectPurchaseShipment builder with application/json body
+func NewDirectPurchaseShipmentRequest(server string, params *DirectPurchaseShipmentParams, body DirectPurchaseShipmentJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDirectPurchaseShipmentRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewDirectPurchaseShipmentRequestWithBody generates requests for DirectPurchaseShipment with any type of body
+func NewDirectPurchaseShipmentRequestWithBody(server string, params *DirectPurchaseShipmentParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/shipments/directPurchase")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XAmznIdempotencyKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-IdempotencyKey", runtime.ParamLocationHeader, *params.XAmznIdempotencyKey)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-IdempotencyKey", headerParam0)
+		}
+
+		if params.Locale != nil {
+			var headerParam1 string
+
+			headerParam1, err = runtime.StyleParamWithLocation("simple", false, "locale", runtime.ParamLocationHeader, *params.Locale)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("locale", headerParam1)
+		}
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam2 string
+
+			headerParam2, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam2)
+		}
+
+	}
+
+	return req, nil
+}
+
 // NewGetRatesRequest calls the generic GetRates builder with application/json body
 func NewGetRatesRequest(server string, params *GetRatesParams, body GetRatesJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2512,6 +4340,61 @@ func NewGetTrackingRequest(server string, params *GetTrackingParams) (*http.Requ
 	return req, nil
 }
 
+// NewGetUnmanifestedShipmentsRequest calls the generic GetUnmanifestedShipments builder with application/json body
+func NewGetUnmanifestedShipmentsRequest(server string, params *GetUnmanifestedShipmentsParams, body GetUnmanifestedShipmentsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewGetUnmanifestedShipmentsRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewGetUnmanifestedShipmentsRequestWithBody generates requests for GetUnmanifestedShipments with any type of body
+func NewGetUnmanifestedShipmentsRequestWithBody(server string, params *GetUnmanifestedShipmentsParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/shipping/v2/unmanifestedShipments")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XAmznShippingBusinessId != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "x-amzn-shipping-business-id", runtime.ParamLocationHeader, *params.XAmznShippingBusinessId)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-amzn-shipping-business-id", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
 func (c *Client) applyReqEditors(ctx context.Context, req *http.Request) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -2560,6 +4443,42 @@ type ClientWithResponsesInterface interface {
 	// GetAccessPointsWithResponse request
 	GetAccessPointsWithResponse(ctx context.Context, params *GetAccessPointsParams) (*GetAccessPointsResp, error)
 
+	// GetCarrierAccountFormInputsWithResponse request
+	GetCarrierAccountFormInputsWithResponse(ctx context.Context, params *GetCarrierAccountFormInputsParams) (*GetCarrierAccountFormInputsResp, error)
+
+	// GetCarrierAccountsWithBodyWithResponse request with any body
+	GetCarrierAccountsWithBodyWithResponse(ctx context.Context, params *GetCarrierAccountsParams, contentType string, body io.Reader) (*GetCarrierAccountsResp, error)
+
+	GetCarrierAccountsWithResponse(ctx context.Context, params *GetCarrierAccountsParams, body GetCarrierAccountsJSONRequestBody) (*GetCarrierAccountsResp, error)
+
+	// LinkCarrierAccountWithBodyWithResponse request with any body
+	LinkCarrierAccountWithBodyWithResponse(ctx context.Context, carrierId string, params *LinkCarrierAccountParams, contentType string, body io.Reader) (*LinkCarrierAccountResp, error)
+
+	LinkCarrierAccountWithResponse(ctx context.Context, carrierId string, params *LinkCarrierAccountParams, body LinkCarrierAccountJSONRequestBody) (*LinkCarrierAccountResp, error)
+
+	// UnlinkCarrierAccountWithBodyWithResponse request with any body
+	UnlinkCarrierAccountWithBodyWithResponse(ctx context.Context, carrierId string, params *UnlinkCarrierAccountParams, contentType string, body io.Reader) (*UnlinkCarrierAccountResp, error)
+
+	UnlinkCarrierAccountWithResponse(ctx context.Context, carrierId string, params *UnlinkCarrierAccountParams, body UnlinkCarrierAccountJSONRequestBody) (*UnlinkCarrierAccountResp, error)
+
+	// CreateClaimWithBodyWithResponse request with any body
+	CreateClaimWithBodyWithResponse(ctx context.Context, params *CreateClaimParams, contentType string, body io.Reader) (*CreateClaimResp, error)
+
+	CreateClaimWithResponse(ctx context.Context, params *CreateClaimParams, body CreateClaimJSONRequestBody) (*CreateClaimResp, error)
+
+	// GenerateCollectionFormWithBodyWithResponse request with any body
+	GenerateCollectionFormWithBodyWithResponse(ctx context.Context, params *GenerateCollectionFormParams, contentType string, body io.Reader) (*GenerateCollectionFormResp, error)
+
+	GenerateCollectionFormWithResponse(ctx context.Context, params *GenerateCollectionFormParams, body GenerateCollectionFormJSONRequestBody) (*GenerateCollectionFormResp, error)
+
+	// GetCollectionFormHistoryWithBodyWithResponse request with any body
+	GetCollectionFormHistoryWithBodyWithResponse(ctx context.Context, params *GetCollectionFormHistoryParams, contentType string, body io.Reader) (*GetCollectionFormHistoryResp, error)
+
+	GetCollectionFormHistoryWithResponse(ctx context.Context, params *GetCollectionFormHistoryParams, body GetCollectionFormHistoryJSONRequestBody) (*GetCollectionFormHistoryResp, error)
+
+	// GetCollectionFormWithResponse request
+	GetCollectionFormWithResponse(ctx context.Context, collectionFormId string, params *GetCollectionFormParams) (*GetCollectionFormResp, error)
+
 	// SubmitNdrFeedbackWithBodyWithResponse request with any body
 	SubmitNdrFeedbackWithBodyWithResponse(ctx context.Context, params *SubmitNdrFeedbackParams, contentType string, body io.Reader) (*SubmitNdrFeedbackResp, error)
 
@@ -2575,6 +4494,14 @@ type ClientWithResponsesInterface interface {
 
 	PurchaseShipmentWithResponse(ctx context.Context, params *PurchaseShipmentParams, body PurchaseShipmentJSONRequestBody) (*PurchaseShipmentResp, error)
 
+	// GetAdditionalInputsWithResponse request
+	GetAdditionalInputsWithResponse(ctx context.Context, params *GetAdditionalInputsParams) (*GetAdditionalInputsResp, error)
+
+	// DirectPurchaseShipmentWithBodyWithResponse request with any body
+	DirectPurchaseShipmentWithBodyWithResponse(ctx context.Context, params *DirectPurchaseShipmentParams, contentType string, body io.Reader) (*DirectPurchaseShipmentResp, error)
+
+	DirectPurchaseShipmentWithResponse(ctx context.Context, params *DirectPurchaseShipmentParams, body DirectPurchaseShipmentJSONRequestBody) (*DirectPurchaseShipmentResp, error)
+
 	// GetRatesWithBodyWithResponse request with any body
 	GetRatesWithBodyWithResponse(ctx context.Context, params *GetRatesParams, contentType string, body io.Reader) (*GetRatesResp, error)
 
@@ -2588,6 +4515,11 @@ type ClientWithResponsesInterface interface {
 
 	// GetTrackingWithResponse request
 	GetTrackingWithResponse(ctx context.Context, params *GetTrackingParams) (*GetTrackingResp, error)
+
+	// GetUnmanifestedShipmentsWithBodyWithResponse request with any body
+	GetUnmanifestedShipmentsWithBodyWithResponse(ctx context.Context, params *GetUnmanifestedShipmentsParams, contentType string, body io.Reader) (*GetUnmanifestedShipmentsResp, error)
+
+	GetUnmanifestedShipmentsWithResponse(ctx context.Context, params *GetUnmanifestedShipmentsParams, body GetUnmanifestedShipmentsJSONRequestBody) (*GetUnmanifestedShipmentsResp, error)
 }
 
 type GetAccessPointsResp struct {
@@ -2615,6 +4547,254 @@ func (r GetAccessPointsResp) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetAccessPointsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetCarrierAccountFormInputsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetCarrierAccountFormInputsResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r GetCarrierAccountFormInputsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetCarrierAccountFormInputsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetCarrierAccountsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetCarrierAccountsResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r GetCarrierAccountsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetCarrierAccountsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type LinkCarrierAccountResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *LinkCarrierAccountResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r LinkCarrierAccountResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r LinkCarrierAccountResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UnlinkCarrierAccountResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *UnlinkCarrierAccountResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r UnlinkCarrierAccountResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UnlinkCarrierAccountResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateClaimResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *CreateClaimResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateClaimResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateClaimResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GenerateCollectionFormResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GenerateCollectionFormResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r GenerateCollectionFormResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GenerateCollectionFormResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetCollectionFormHistoryResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetCollectionFormHistoryResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r GetCollectionFormHistoryResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetCollectionFormHistoryResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetCollectionFormResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetCollectionFormResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r GetCollectionFormResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetCollectionFormResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2707,6 +4887,68 @@ func (r PurchaseShipmentResp) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r PurchaseShipmentResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetAdditionalInputsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetAdditionalInputsResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r GetAdditionalInputsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetAdditionalInputsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DirectPurchaseShipmentResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *DirectPurchaseResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r DirectPurchaseShipmentResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DirectPurchaseShipmentResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2837,6 +5079,37 @@ func (r GetTrackingResp) StatusCode() int {
 	return 0
 }
 
+type GetUnmanifestedShipmentsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetUnmanifestedShipmentsResponse
+	JSON400      *ErrorList
+	JSON401      *ErrorList
+	JSON403      *ErrorList
+	JSON404      *ErrorList
+	JSON413      *ErrorList
+	JSON415      *ErrorList
+	JSON429      *ErrorList
+	JSON500      *ErrorList
+	JSON503      *ErrorList
+}
+
+// Status returns HTTPResponse.Status
+func (r GetUnmanifestedShipmentsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetUnmanifestedShipmentsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // GetAccessPointsWithResponse request returning *GetAccessPointsResp
 func (c *ClientWithResponses) GetAccessPointsWithResponse(ctx context.Context, params *GetAccessPointsParams) (*GetAccessPointsResp, error) {
 	rsp, err := c.GetAccessPoints(ctx, params)
@@ -2844,6 +5117,126 @@ func (c *ClientWithResponses) GetAccessPointsWithResponse(ctx context.Context, p
 		return nil, err
 	}
 	return ParseGetAccessPointsResp(rsp)
+}
+
+// GetCarrierAccountFormInputsWithResponse request returning *GetCarrierAccountFormInputsResp
+func (c *ClientWithResponses) GetCarrierAccountFormInputsWithResponse(ctx context.Context, params *GetCarrierAccountFormInputsParams) (*GetCarrierAccountFormInputsResp, error) {
+	rsp, err := c.GetCarrierAccountFormInputs(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetCarrierAccountFormInputsResp(rsp)
+}
+
+// GetCarrierAccountsWithBodyWithResponse request with arbitrary body returning *GetCarrierAccountsResp
+func (c *ClientWithResponses) GetCarrierAccountsWithBodyWithResponse(ctx context.Context, params *GetCarrierAccountsParams, contentType string, body io.Reader) (*GetCarrierAccountsResp, error) {
+	rsp, err := c.GetCarrierAccountsWithBody(ctx, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetCarrierAccountsResp(rsp)
+}
+
+func (c *ClientWithResponses) GetCarrierAccountsWithResponse(ctx context.Context, params *GetCarrierAccountsParams, body GetCarrierAccountsJSONRequestBody) (*GetCarrierAccountsResp, error) {
+	rsp, err := c.GetCarrierAccounts(ctx, params, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetCarrierAccountsResp(rsp)
+}
+
+// LinkCarrierAccountWithBodyWithResponse request with arbitrary body returning *LinkCarrierAccountResp
+func (c *ClientWithResponses) LinkCarrierAccountWithBodyWithResponse(ctx context.Context, carrierId string, params *LinkCarrierAccountParams, contentType string, body io.Reader) (*LinkCarrierAccountResp, error) {
+	rsp, err := c.LinkCarrierAccountWithBody(ctx, carrierId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseLinkCarrierAccountResp(rsp)
+}
+
+func (c *ClientWithResponses) LinkCarrierAccountWithResponse(ctx context.Context, carrierId string, params *LinkCarrierAccountParams, body LinkCarrierAccountJSONRequestBody) (*LinkCarrierAccountResp, error) {
+	rsp, err := c.LinkCarrierAccount(ctx, carrierId, params, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseLinkCarrierAccountResp(rsp)
+}
+
+// UnlinkCarrierAccountWithBodyWithResponse request with arbitrary body returning *UnlinkCarrierAccountResp
+func (c *ClientWithResponses) UnlinkCarrierAccountWithBodyWithResponse(ctx context.Context, carrierId string, params *UnlinkCarrierAccountParams, contentType string, body io.Reader) (*UnlinkCarrierAccountResp, error) {
+	rsp, err := c.UnlinkCarrierAccountWithBody(ctx, carrierId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUnlinkCarrierAccountResp(rsp)
+}
+
+func (c *ClientWithResponses) UnlinkCarrierAccountWithResponse(ctx context.Context, carrierId string, params *UnlinkCarrierAccountParams, body UnlinkCarrierAccountJSONRequestBody) (*UnlinkCarrierAccountResp, error) {
+	rsp, err := c.UnlinkCarrierAccount(ctx, carrierId, params, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUnlinkCarrierAccountResp(rsp)
+}
+
+// CreateClaimWithBodyWithResponse request with arbitrary body returning *CreateClaimResp
+func (c *ClientWithResponses) CreateClaimWithBodyWithResponse(ctx context.Context, params *CreateClaimParams, contentType string, body io.Reader) (*CreateClaimResp, error) {
+	rsp, err := c.CreateClaimWithBody(ctx, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateClaimResp(rsp)
+}
+
+func (c *ClientWithResponses) CreateClaimWithResponse(ctx context.Context, params *CreateClaimParams, body CreateClaimJSONRequestBody) (*CreateClaimResp, error) {
+	rsp, err := c.CreateClaim(ctx, params, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateClaimResp(rsp)
+}
+
+// GenerateCollectionFormWithBodyWithResponse request with arbitrary body returning *GenerateCollectionFormResp
+func (c *ClientWithResponses) GenerateCollectionFormWithBodyWithResponse(ctx context.Context, params *GenerateCollectionFormParams, contentType string, body io.Reader) (*GenerateCollectionFormResp, error) {
+	rsp, err := c.GenerateCollectionFormWithBody(ctx, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGenerateCollectionFormResp(rsp)
+}
+
+func (c *ClientWithResponses) GenerateCollectionFormWithResponse(ctx context.Context, params *GenerateCollectionFormParams, body GenerateCollectionFormJSONRequestBody) (*GenerateCollectionFormResp, error) {
+	rsp, err := c.GenerateCollectionForm(ctx, params, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGenerateCollectionFormResp(rsp)
+}
+
+// GetCollectionFormHistoryWithBodyWithResponse request with arbitrary body returning *GetCollectionFormHistoryResp
+func (c *ClientWithResponses) GetCollectionFormHistoryWithBodyWithResponse(ctx context.Context, params *GetCollectionFormHistoryParams, contentType string, body io.Reader) (*GetCollectionFormHistoryResp, error) {
+	rsp, err := c.GetCollectionFormHistoryWithBody(ctx, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetCollectionFormHistoryResp(rsp)
+}
+
+func (c *ClientWithResponses) GetCollectionFormHistoryWithResponse(ctx context.Context, params *GetCollectionFormHistoryParams, body GetCollectionFormHistoryJSONRequestBody) (*GetCollectionFormHistoryResp, error) {
+	rsp, err := c.GetCollectionFormHistory(ctx, params, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetCollectionFormHistoryResp(rsp)
+}
+
+// GetCollectionFormWithResponse request returning *GetCollectionFormResp
+func (c *ClientWithResponses) GetCollectionFormWithResponse(ctx context.Context, collectionFormId string, params *GetCollectionFormParams) (*GetCollectionFormResp, error) {
+	rsp, err := c.GetCollectionForm(ctx, collectionFormId, params)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetCollectionFormResp(rsp)
 }
 
 // SubmitNdrFeedbackWithBodyWithResponse request with arbitrary body returning *SubmitNdrFeedbackResp
@@ -2897,6 +5290,32 @@ func (c *ClientWithResponses) PurchaseShipmentWithResponse(ctx context.Context, 
 	return ParsePurchaseShipmentResp(rsp)
 }
 
+// GetAdditionalInputsWithResponse request returning *GetAdditionalInputsResp
+func (c *ClientWithResponses) GetAdditionalInputsWithResponse(ctx context.Context, params *GetAdditionalInputsParams) (*GetAdditionalInputsResp, error) {
+	rsp, err := c.GetAdditionalInputs(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetAdditionalInputsResp(rsp)
+}
+
+// DirectPurchaseShipmentWithBodyWithResponse request with arbitrary body returning *DirectPurchaseShipmentResp
+func (c *ClientWithResponses) DirectPurchaseShipmentWithBodyWithResponse(ctx context.Context, params *DirectPurchaseShipmentParams, contentType string, body io.Reader) (*DirectPurchaseShipmentResp, error) {
+	rsp, err := c.DirectPurchaseShipmentWithBody(ctx, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDirectPurchaseShipmentResp(rsp)
+}
+
+func (c *ClientWithResponses) DirectPurchaseShipmentWithResponse(ctx context.Context, params *DirectPurchaseShipmentParams, body DirectPurchaseShipmentJSONRequestBody) (*DirectPurchaseShipmentResp, error) {
+	rsp, err := c.DirectPurchaseShipment(ctx, params, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDirectPurchaseShipmentResp(rsp)
+}
+
 // GetRatesWithBodyWithResponse request with arbitrary body returning *GetRatesResp
 func (c *ClientWithResponses) GetRatesWithBodyWithResponse(ctx context.Context, params *GetRatesParams, contentType string, body io.Reader) (*GetRatesResp, error) {
 	rsp, err := c.GetRatesWithBody(ctx, params, contentType, body)
@@ -2941,6 +5360,23 @@ func (c *ClientWithResponses) GetTrackingWithResponse(ctx context.Context, param
 	return ParseGetTrackingResp(rsp)
 }
 
+// GetUnmanifestedShipmentsWithBodyWithResponse request with arbitrary body returning *GetUnmanifestedShipmentsResp
+func (c *ClientWithResponses) GetUnmanifestedShipmentsWithBodyWithResponse(ctx context.Context, params *GetUnmanifestedShipmentsParams, contentType string, body io.Reader) (*GetUnmanifestedShipmentsResp, error) {
+	rsp, err := c.GetUnmanifestedShipmentsWithBody(ctx, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetUnmanifestedShipmentsResp(rsp)
+}
+
+func (c *ClientWithResponses) GetUnmanifestedShipmentsWithResponse(ctx context.Context, params *GetUnmanifestedShipmentsParams, body GetUnmanifestedShipmentsJSONRequestBody) (*GetUnmanifestedShipmentsResp, error) {
+	rsp, err := c.GetUnmanifestedShipments(ctx, params, body)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetUnmanifestedShipmentsResp(rsp)
+}
+
 // ParseGetAccessPointsResp parses an HTTP response from a GetAccessPointsWithResponse call
 func ParseGetAccessPointsResp(rsp *http.Response) (*GetAccessPointsResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2957,6 +5393,718 @@ func ParseGetAccessPointsResp(rsp *http.Response) (*GetAccessPointsResp, error) 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest GetAccessPointsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetCarrierAccountFormInputsResp parses an HTTP response from a GetCarrierAccountFormInputsWithResponse call
+func ParseGetCarrierAccountFormInputsResp(rsp *http.Response) (*GetCarrierAccountFormInputsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetCarrierAccountFormInputsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetCarrierAccountFormInputsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetCarrierAccountsResp parses an HTTP response from a GetCarrierAccountsWithResponse call
+func ParseGetCarrierAccountsResp(rsp *http.Response) (*GetCarrierAccountsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetCarrierAccountsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetCarrierAccountsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseLinkCarrierAccountResp parses an HTTP response from a LinkCarrierAccountWithResponse call
+func ParseLinkCarrierAccountResp(rsp *http.Response) (*LinkCarrierAccountResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &LinkCarrierAccountResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest LinkCarrierAccountResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUnlinkCarrierAccountResp parses an HTTP response from a UnlinkCarrierAccountWithResponse call
+func ParseUnlinkCarrierAccountResp(rsp *http.Response) (*UnlinkCarrierAccountResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UnlinkCarrierAccountResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UnlinkCarrierAccountResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateClaimResp parses an HTTP response from a CreateClaimWithResponse call
+func ParseCreateClaimResp(rsp *http.Response) (*CreateClaimResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateClaimResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateClaimResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGenerateCollectionFormResp parses an HTTP response from a GenerateCollectionFormWithResponse call
+func ParseGenerateCollectionFormResp(rsp *http.Response) (*GenerateCollectionFormResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GenerateCollectionFormResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GenerateCollectionFormResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetCollectionFormHistoryResp parses an HTTP response from a GetCollectionFormHistoryWithResponse call
+func ParseGetCollectionFormHistoryResp(rsp *http.Response) (*GetCollectionFormHistoryResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetCollectionFormHistoryResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetCollectionFormHistoryResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetCollectionFormResp parses an HTTP response from a GetCollectionFormWithResponse call
+func ParseGetCollectionFormResp(rsp *http.Response) (*GetCollectionFormResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetCollectionFormResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetCollectionFormResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3217,6 +6365,184 @@ func ParsePurchaseShipmentResp(rsp *http.Response) (*PurchaseShipmentResp, error
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest PurchaseShipmentResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetAdditionalInputsResp parses an HTTP response from a GetAdditionalInputsWithResponse call
+func ParseGetAdditionalInputsResp(rsp *http.Response) (*GetAdditionalInputsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetAdditionalInputsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetAdditionalInputsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDirectPurchaseShipmentResp parses an HTTP response from a DirectPurchaseShipmentWithResponse call
+func ParseDirectPurchaseShipmentResp(rsp *http.Response) (*DirectPurchaseShipmentResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DirectPurchaseShipmentResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DirectPurchaseResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3573,6 +6899,95 @@ func ParseGetTrackingResp(rsp *http.Response) (*GetTrackingResp, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest GetTrackingResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ErrorList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetUnmanifestedShipmentsResp parses an HTTP response from a GetUnmanifestedShipmentsWithResponse call
+func ParseGetUnmanifestedShipmentsResp(rsp *http.Response) (*GetUnmanifestedShipmentsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetUnmanifestedShipmentsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetUnmanifestedShipmentsResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

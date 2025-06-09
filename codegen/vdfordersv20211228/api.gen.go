@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -360,7 +359,8 @@ type SubmitAcknowledgementRequest struct {
 	OrderAcknowledgements *[]OrderAcknowledgementItem `json:"orderAcknowledgements,omitempty"`
 }
 
-// TaxDetails The tax details related to the order.
+// TaxDetails The tax details for the order.
+// _Note:_ Amazon calculates tax on the list price (Amazon retail price).
 type TaxDetails struct {
 	// TaxAmount An amount of money, including units in the form of currency.
 	TaxAmount Money `json:"taxAmount"`
@@ -644,7 +644,7 @@ func (c *Client) GetOrder(ctx context.Context, purchaseOrderNumber string) (*htt
 // NewSubmitAcknowledgementRequest calls the generic SubmitAcknowledgement builder with application/json body
 func NewSubmitAcknowledgementRequest(server string, body SubmitAcknowledgementJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

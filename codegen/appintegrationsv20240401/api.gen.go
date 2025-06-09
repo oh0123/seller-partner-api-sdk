@@ -14,7 +14,6 @@ import (
 	runt "runtime"
 	"strings"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -333,7 +332,7 @@ func (c *Client) RecordActionFeedback(ctx context.Context, notificationId string
 // NewCreateNotificationRequest calls the generic CreateNotification builder with application/json body
 func NewCreateNotificationRequest(server string, body CreateNotificationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -373,7 +372,7 @@ func NewCreateNotificationRequestWithBody(server string, contentType string, bod
 // NewDeleteNotificationsRequest calls the generic DeleteNotifications builder with application/json body
 func NewDeleteNotificationsRequest(server string, body DeleteNotificationsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -413,7 +412,7 @@ func NewDeleteNotificationsRequestWithBody(server string, contentType string, bo
 // NewRecordActionFeedbackRequest calls the generic RecordActionFeedback builder with application/json body
 func NewRecordActionFeedbackRequest(server string, notificationId string, body RecordActionFeedbackJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

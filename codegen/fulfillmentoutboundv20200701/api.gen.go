@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -328,8 +327,9 @@ type CreateFulfillmentOrderRequest struct {
 	// CodSettings The COD (Cash On Delivery) charges that you associate with a COD fulfillment order.
 	CodSettings *CODSettings `json:"codSettings,omitempty"`
 
-	// DeliveryPreferences The delivery preferences applied to the destination address. These preferences will be applied when possible and are best effort.
+	// DeliveryPreferences The delivery preferences applied to the destination address. These preferences are applied when possible and are best effort.
 	// This feature is currently supported only in the JP marketplace and not applicable for other marketplaces.
+	// For eligible orders, the default delivery preference will be to deliver the package unattended at the front door, unless you specify otherwise.
 	DeliveryPreferences *DeliveryPreferences `json:"deliveryPreferences,omitempty"`
 
 	// DeliveryWindow The time range within which a Scheduled Delivery fulfillment order should be delivered. This is only available in the JP marketplace.
@@ -376,7 +376,8 @@ type CreateFulfillmentOrderRequest struct {
 	// ShipFromCountryCode The two-character country code for the country from which the fulfillment order ships. Must be in ISO 3166-1 alpha-2 format.
 	ShipFromCountryCode *string `json:"shipFromCountryCode,omitempty"`
 
-	// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose Ship for the `fulfillmentAction`. Hold is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+	// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose `Ship` for the `fulfillmentAction`. `Hold` is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+	// Note: Shipping method service level agreements vary by marketplace. Sellers should refer to the [Seller Central](https://developer-docs.amazon.com/sp-api/docs/seller-central-urls) website in their marketplace for shipping method service level agreements and fulfillment fees.
 	ShippingSpeedCategory ShippingSpeedCategory `json:"shippingSpeedCategory"`
 }
 
@@ -500,8 +501,9 @@ type DeliveryPolicy struct {
 	Message *DeliveryMessage `json:"message,omitempty"`
 }
 
-// DeliveryPreferences The delivery preferences applied to the destination address. These preferences will be applied when possible and are best effort.
+// DeliveryPreferences The delivery preferences applied to the destination address. These preferences are applied when possible and are best effort.
 // This feature is currently supported only in the JP marketplace and not applicable for other marketplaces.
+// For eligible orders, the default delivery preference will be to deliver the package unattended at the front door, unless you specify otherwise.
 type DeliveryPreferences struct {
 	// DeliveryInstructions Additional delivery instructions. For example, this could be instructions on how to enter a building, nearby landmark or navigation instructions, 'Beware of dogs', etc.
 	DeliveryInstructions *string `json:"deliveryInstructions,omitempty"`
@@ -669,7 +671,8 @@ type FulfillmentOrder struct {
 	// SellerFulfillmentOrderId The fulfillment order identifier submitted with the `createFulfillmentOrder` operation.
 	SellerFulfillmentOrderId string `json:"sellerFulfillmentOrderId"`
 
-	// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose Ship for the `fulfillmentAction`. Hold is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+	// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose `Ship` for the `fulfillmentAction`. `Hold` is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+	// Note: Shipping method service level agreements vary by marketplace. Sellers should refer to the [Seller Central](https://developer-docs.amazon.com/sp-api/docs/seller-central-urls) website in their marketplace for shipping method service level agreements and fulfillment fees.
 	ShippingSpeedCategory ShippingSpeedCategory `json:"shippingSpeedCategory"`
 
 	// StatusUpdatedDate Date timestamp
@@ -759,7 +762,8 @@ type FulfillmentPreview struct {
 	// ScheduledDeliveryInfo Delivery information for a scheduled delivery. This is only available in the JP marketplace.
 	ScheduledDeliveryInfo *ScheduledDeliveryInfo `json:"scheduledDeliveryInfo,omitempty"`
 
-	// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose Ship for the `fulfillmentAction`. Hold is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+	// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose `Ship` for the `fulfillmentAction`. `Hold` is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+	// Note: Shipping method service level agreements vary by marketplace. Sellers should refer to the [Seller Central](https://developer-docs.amazon.com/sp-api/docs/seller-central-urls) website in their marketplace for shipping method service level agreements and fulfillment fees.
 	ShippingSpeedCategory ShippingSpeedCategory `json:"shippingSpeedCategory"`
 
 	// UnfulfillablePreviewItems An array of unfulfillable preview item information.
@@ -1217,11 +1221,14 @@ type PackageTrackingDetails struct {
 	// CurrentStatus The current delivery status of the package.
 	CurrentStatus *CurrentStatus `json:"currentStatus,omitempty"`
 
-	// CurrentStatusDescription Description corresponding to the `CurrentStatus` value.
+	// CurrentStatusDescription Description corresponding to the CurrentStatus value.
 	CurrentStatusDescription *string `json:"currentStatusDescription,omitempty"`
 
 	// CustomerTrackingLink Link on swiship.com that allows customers to track the package.
 	CustomerTrackingLink *string `json:"customerTrackingLink,omitempty"`
+
+	// DeliveryWindow The time range within which something (for example, a delivery) will occur.
+	DeliveryWindow *DateRange `json:"deliveryWindow,omitempty"`
 
 	// EstimatedArrivalDate Date timestamp
 	EstimatedArrivalDate *Timestamp `json:"estimatedArrivalDate,omitempty"`
@@ -1356,7 +1363,8 @@ type ScheduledDeliveryInfo struct {
 	DeliveryWindows DeliveryWindowList `json:"deliveryWindows"`
 }
 
-// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose Ship for the `fulfillmentAction`. Hold is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose `Ship` for the `fulfillmentAction`. `Hold` is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+// Note: Shipping method service level agreements vary by marketplace. Sellers should refer to the [Seller Central](https://developer-docs.amazon.com/sp-api/docs/seller-central-urls) website in their marketplace for shipping method service level agreements and fulfillment fees.
 type ShippingSpeedCategory string
 
 // ShippingSpeedCategoryList ShippingSpeedCategory List
@@ -1454,7 +1462,7 @@ type UpdateFulfillmentOrderItem struct {
 	// Quantity The item quantity.
 	Quantity Quantity `json:"quantity"`
 
-	// SellerFulfillmentOrderItemId Identifies the fulfillment order item to update. Created with a previous call to the `createFulfillmentOrder` operation.
+	// SellerFulfillmentOrderItemId Identifies the fulfillment order item to update. Created with a previous call to the createFulfillmentOrder operation.
 	SellerFulfillmentOrderItemId string `json:"sellerFulfillmentOrderItemId"`
 
 	// SellerSku The seller SKU of the item.
@@ -1499,7 +1507,8 @@ type UpdateFulfillmentOrderRequest struct {
 	// ShipFromCountryCode The two-character country code for the country from which the fulfillment order ships. Must be in ISO 3166-1 alpha-2 format.
 	ShipFromCountryCode *string `json:"shipFromCountryCode,omitempty"`
 
-	// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose Ship for the `fulfillmentAction`. Hold is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+	// ShippingSpeedCategory The shipping method used for the fulfillment order. When this value is `ScheduledDelivery`, choose `Ship` for the `fulfillmentAction`. `Hold` is not a valid `fulfillmentAction` value when the `shippingSpeedCategory` value is `ScheduledDelivery`.
+	// Note: Shipping method service level agreements vary by marketplace. Sellers should refer to the [Seller Central](https://developer-docs.amazon.com/sp-api/docs/seller-central-urls) website in their marketplace for shipping method service level agreements and fulfillment fees.
 	ShippingSpeedCategory *ShippingSpeedCategory `json:"shippingSpeedCategory,omitempty"`
 }
 
@@ -2174,7 +2183,7 @@ func (c *Client) GetPackageTrackingDetails(ctx context.Context, params *GetPacka
 // NewDeliveryOffersRequest calls the generic DeliveryOffers builder with application/json body
 func NewDeliveryOffersRequest(server string, body DeliveryOffersJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2467,7 +2476,7 @@ func NewListAllFulfillmentOrdersRequest(server string, params *ListAllFulfillmen
 // NewCreateFulfillmentOrderRequest calls the generic CreateFulfillmentOrder builder with application/json body
 func NewCreateFulfillmentOrderRequest(server string, body CreateFulfillmentOrderJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2507,7 +2516,7 @@ func NewCreateFulfillmentOrderRequestWithBody(server string, contentType string,
 // NewGetFulfillmentPreviewRequest calls the generic GetFulfillmentPreview builder with application/json body
 func NewGetFulfillmentPreviewRequest(server string, body GetFulfillmentPreviewJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2581,7 +2590,7 @@ func NewGetFulfillmentOrderRequest(server string, sellerFulfillmentOrderId strin
 // NewUpdateFulfillmentOrderRequest calls the generic UpdateFulfillmentOrder builder with application/json body
 func NewUpdateFulfillmentOrderRequest(server string, sellerFulfillmentOrderId string, body UpdateFulfillmentOrderJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2662,7 +2671,7 @@ func NewCancelFulfillmentOrderRequest(server string, sellerFulfillmentOrderId st
 // NewCreateFulfillmentReturnRequest calls the generic CreateFulfillmentReturn builder with application/json body
 func NewCreateFulfillmentReturnRequest(server string, sellerFulfillmentOrderId string, body CreateFulfillmentReturnJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2709,7 +2718,7 @@ func NewCreateFulfillmentReturnRequestWithBody(server string, sellerFulfillmentO
 // NewSubmitFulfillmentOrderStatusUpdateRequest calls the generic SubmitFulfillmentOrderStatusUpdate builder with application/json body
 func NewSubmitFulfillmentOrderStatusUpdateRequest(server string, sellerFulfillmentOrderId string, body SubmitFulfillmentOrderStatusUpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

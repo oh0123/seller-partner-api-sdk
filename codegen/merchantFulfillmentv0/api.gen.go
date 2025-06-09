@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -253,7 +252,7 @@ type Address struct {
 	// City The city.
 	City City `json:"City"`
 
-	// CountryCode The country code. A two-character country code, in ISO 3166-1 alpha-2 format.
+	// CountryCode The two-letter country code in [ISO 3166-1 alpha-2](https://www.iban.com/country-codes) format.
 	CountryCode CountryCode `json:"CountryCode"`
 
 	// DistrictOrCounty The district or county.
@@ -271,7 +270,7 @@ type Address struct {
 	// PostalCode The zip code or postal code.
 	PostalCode PostalCode `json:"PostalCode"`
 
-	// StateOrProvinceCode The state or province code. **Note.** Required in the Canada, US, and UK marketplaces. Also required for shipments originating from China.
+	// StateOrProvinceCode The state or province code. This is a required field in Canada, US, and UK marketplaces, and for shipments that originate in China.
 	StateOrProvinceCode *StateOrProvinceCode `json:"StateOrProvinceCode,omitempty"`
 }
 
@@ -326,9 +325,9 @@ type AvailableShippingServiceOptions struct {
 	AvailableDeliveryExperienceOptions AvailableDeliveryExperienceOptionsList `json:"AvailableDeliveryExperienceOptions"`
 }
 
-// Benefits Benefits that are included and excluded for each shipping offer. Benefits represents services provided by Amazon (eg. CLAIMS_PROTECTED, etc.) when sellers purchase shipping through Amazon. Benefit details will be made available for any shipment placed on or after January 1st 2024 00:00 UTC
+// Benefits Benefits that are included and excluded for each shipping offer. Benefits represents services provided by Amazon (for example, `CLAIMS_PROTECTED`) when sellers purchase shipping through Amazon. Benefit details are made available for any shipment placed on or after January 1st 2024 00:00 UTC.
 type Benefits struct {
-	// ExcludedBenefits A list of excluded benefit. Refer to the ExcludeBenefit object for further documentation.
+	// ExcludedBenefits A list of excluded benefits. Refer to the `ExcludeBenefit` object for further documentation.
 	ExcludedBenefits *ExcludedBenefits `json:"ExcludedBenefits,omitempty"`
 
 	// IncludedBenefits A list of included benefits.
@@ -340,7 +339,7 @@ type CancelShipmentResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Payload The details of a shipment, including the shipment status.
+	// Payload The details of a shipment. Includes the shipment status.
 	Payload *Shipment `json:"payload,omitempty"`
 }
 
@@ -362,7 +361,7 @@ type Constraint struct {
 // Constraints List of constraints.
 type Constraints = []Constraint
 
-// CountryCode The country code. A two-character country code, in ISO 3166-1 alpha-2 format.
+// CountryCode The two-letter country code in [ISO 3166-1 alpha-2](https://www.iban.com/country-codes) format.
 type CountryCode = string
 
 // CreateShipmentRequest Request schema.
@@ -391,7 +390,7 @@ type CreateShipmentResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Payload The details of a shipment, including the shipment status.
+	// Payload The details of a shipment. Includes the shipment status.
 	Payload *Shipment `json:"payload,omitempty"`
 }
 
@@ -404,12 +403,10 @@ type CurrencyAmount struct {
 	CurrencyCode string `json:"CurrencyCode"`
 }
 
-// CustomTextForLabel Custom text to print on the label.
-//
-// Note: Custom text is only included on labels that are in ZPL format (ZPL203). FedEx does not support CustomTextForLabel.
+// CustomTextForLabel Custom text to print on the label. Note: Custom text is only included on labels that are in ZPL format (ZPL203). FedEx does not support `CustomTextForLabel`.
 type CustomTextForLabel = string
 
-// DangerousGoodsDetails Details related to any dangerous goods/items that are being shipped.
+// DangerousGoodsDetails Details related to any dangerous goods or items that are shipped.
 type DangerousGoodsDetails struct {
 	// PackingGroup The specific packaging group of the item being shipped.
 	PackingGroup *DangerousGoodsDetailsPackingGroup `json:"PackingGroup,omitempty"`
@@ -417,7 +414,7 @@ type DangerousGoodsDetails struct {
 	// PackingInstruction The specific packing instruction of the item being shipped.
 	PackingInstruction *DangerousGoodsDetailsPackingInstruction `json:"PackingInstruction,omitempty"`
 
-	// TransportationRegulatoryClass The specific regulatory class  of the item being shipped.
+	// TransportationRegulatoryClass The specific regulatory class of the shipped item.
 	TransportationRegulatoryClass *string `json:"TransportationRegulatoryClass,omitempty"`
 
 	// UnitedNationsRegulatoryId The specific UNID of the item being shipped.
@@ -444,7 +441,7 @@ type EmailAddress = string
 
 // Error Error response returned when the request is unsuccessful.
 type Error struct {
-	// Code An error code that identifies the type of error that occured.
+	// Code An error code that identifies the type of error that occurred.
 	Code string `json:"code"`
 
 	// Details Additional details that can help the caller understand or fix the issue.
@@ -457,27 +454,27 @@ type Error struct {
 // ErrorList A list of error responses returned when a request is unsuccessful.
 type ErrorList = []Error
 
-// ExcludedBenefit Object representing an excluded benefit that is excluded for a shipping offer or rate.
+// ExcludedBenefit An object representing an excluded benefit that is excluded for a shipping offer or rate.
 type ExcludedBenefit struct {
-	// Benefit Benefit that is being excluded from a shipment.
+	// Benefit A benefit that is being excluded from a shipment.
 	Benefit *string `json:"Benefit,omitempty"`
 
-	// ReasonCodes List of reasons (eg. LATE_DELIVERY_RISK, etc.) indicating why a benefit is excluded for a shipping offer.
+	// ReasonCodes List of reasons why a benefit is excluded for a shipping offer (for example, `LATE_DELIVERY_RISK`).
 	ReasonCodes *ExcludedBenefitReasonCodes `json:"ReasonCodes,omitempty"`
 }
 
-// ExcludedBenefitReasonCodes List of reasons (eg. LATE_DELIVERY_RISK, etc.) indicating why a benefit is excluded for a shipping offer.
+// ExcludedBenefitReasonCodes List of reasons why a benefit is excluded for a shipping offer (for example, `LATE_DELIVERY_RISK`).
 type ExcludedBenefitReasonCodes = []string
 
-// ExcludedBenefits A list of excluded benefit. Refer to the ExcludeBenefit object for further documentation.
+// ExcludedBenefits A list of excluded benefits. Refer to the `ExcludeBenefit` object for further documentation.
 type ExcludedBenefits = []ExcludedBenefit
 
 // FileContents The document data and checksum.
 type FileContents struct {
-	// Checksum An MD5 hash to validate the PDF document data, in the form of a Base64-encoded string.
+	// Checksum An MD5 hash to validate the PDF document data, in the form of a Base64 string.
 	Checksum string `json:"Checksum"`
 
-	// Contents Data for printing labels, in the form of a Base64-encoded, GZip-compressed string.
+	// Contents Data for printing labels encoded into a Base64, GZip-compressed string.
 	Contents string `json:"Contents"`
 
 	// FileType The file type for a label.
@@ -504,11 +501,11 @@ type GetAdditionalSellerInputsResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Payload The payload for the getAdditionalSellerInputs operation.
+	// Payload The payload for the `getAdditionalSellerInputs` operation.
 	Payload *GetAdditionalSellerInputsResult `json:"payload,omitempty"`
 }
 
-// GetAdditionalSellerInputsResult The payload for the getAdditionalSellerInputs operation.
+// GetAdditionalSellerInputsResult The payload for the `getAdditionalSellerInputs` operation.
 type GetAdditionalSellerInputsResult struct {
 	// ItemLevelFieldsList A list of item level fields.
 	ItemLevelFieldsList *ItemLevelFieldsList `json:"ItemLevelFieldsList,omitempty"`
@@ -531,13 +528,13 @@ type GetEligibleShipmentServicesResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Payload The payload for the getEligibleShipmentServices operation.
+	// Payload The payload for the `getEligibleShipmentServices` operation.
 	Payload *GetEligibleShipmentServicesResult `json:"payload,omitempty"`
 }
 
-// GetEligibleShipmentServicesResult The payload for the getEligibleShipmentServices operation.
+// GetEligibleShipmentServicesResult The payload for the `getEligibleShipmentServices` operation.
 type GetEligibleShipmentServicesResult struct {
-	// RejectedShippingServiceList List of services that were for some reason unavailable for this request
+	// RejectedShippingServiceList List of services that are for some reason unavailable for this request
 	RejectedShippingServiceList *RejectedShippingServiceList `json:"RejectedShippingServiceList,omitempty"`
 
 	// ShippingServiceList A list of shipping services offers.
@@ -555,7 +552,7 @@ type GetShipmentResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Payload The details of a shipment, including the shipment status.
+	// Payload The details of a shipment. Includes the shipment status.
 	Payload *Shipment `json:"payload,omitempty"`
 }
 
@@ -570,7 +567,7 @@ type InputTargetType string
 
 // Item An Amazon order item identifier and a quantity.
 type Item struct {
-	// DangerousGoodsDetails Details related to any dangerous goods/items that are being shipped.
+	// DangerousGoodsDetails Details related to any dangerous goods or items that are shipped.
 	DangerousGoodsDetails *DangerousGoodsDetails `json:"DangerousGoodsDetails,omitempty"`
 
 	// IsHazmat When true, the item qualifies as hazardous materials (hazmat). Defaults to false.
@@ -585,7 +582,7 @@ type Item struct {
 	// ItemWeight The weight.
 	ItemWeight *Weight `json:"ItemWeight,omitempty"`
 
-	// LiquidVolume Liquid Volume.
+	// LiquidVolume Liquid volume.
 	LiquidVolume *LiquidVolume `json:"LiquidVolume,omitempty"`
 
 	// OrderItemId An Amazon-defined identifier for an individual item in an order.
@@ -613,7 +610,7 @@ type ItemLevelFields struct {
 // ItemLevelFieldsList A list of item level fields.
 type ItemLevelFieldsList = []ItemLevelFields
 
-// ItemList The list of items to be included in a shipment.
+// ItemList The list of items you want to include in a shipment.
 type ItemList = []Item
 
 // ItemQuantity The number of items.
@@ -621,9 +618,7 @@ type ItemQuantity = int32
 
 // Label Data for creating a shipping label and dimensions for printing the label.
 type Label struct {
-	// CustomTextForLabel Custom text to print on the label.
-	//
-	// Note: Custom text is only included on labels that are in ZPL format (ZPL203). FedEx does not support CustomTextForLabel.
+	// CustomTextForLabel Custom text to print on the label. Note: Custom text is only included on labels that are in ZPL format (ZPL203). FedEx does not support `CustomTextForLabel`.
 	CustomTextForLabel *CustomTextForLabel `json:"CustomTextForLabel,omitempty"`
 
 	// Dimensions Dimensions for printing a shipping label.
@@ -641,9 +636,7 @@ type Label struct {
 
 // LabelCustomization Custom text for shipping labels.
 type LabelCustomization struct {
-	// CustomTextForLabel Custom text to print on the label.
-	//
-	// Note: Custom text is only included on labels that are in ZPL format (ZPL203). FedEx does not support CustomTextForLabel.
+	// CustomTextForLabel Custom text to print on the label. Note: Custom text is only included on labels that are in ZPL format (ZPL203). FedEx does not support `CustomTextForLabel`.
 	CustomTextForLabel *CustomTextForLabel `json:"CustomTextForLabel,omitempty"`
 
 	// StandardIdForLabel The type of standard identifier to print on the label.
@@ -695,7 +688,7 @@ type Length struct {
 	Value *float32 `json:"value,omitempty"`
 }
 
-// LiquidVolume Liquid Volume.
+// LiquidVolume Liquid volume.
 type LiquidVolume struct {
 	// Unit The unit of measurement.
 	Unit LiquidVolumeUnit `json:"Unit"`
@@ -710,26 +703,24 @@ type LiquidVolumeUnit string
 // OrderItemId An Amazon-defined identifier for an individual item in an order.
 type OrderItemId = string
 
-// PackageDimension Number representing the given package dimension.
+// PackageDimension A number that represents the given package dimension.
 type PackageDimension = float64
 
 // PackageDimensions The dimensions of a package contained in a shipment.
 type PackageDimensions struct {
-	// Height Number representing the given package dimension.
+	// Height A number that represents the given package dimension.
 	Height *PackageDimension `json:"Height,omitempty"`
 
-	// Length Number representing the given package dimension.
+	// Length A number that represents the given package dimension.
 	Length *PackageDimension `json:"Length,omitempty"`
 
-	// PredefinedPackageDimensions An enumeration of predefined parcel tokens. If you specify a PredefinedPackageDimensions token, you are not obligated to use a branded package from a carrier. For example, if you specify the FedEx_Box_10kg token, you do not have to use that particular package from FedEx. You are only obligated to use a box that matches the dimensions specified by the token.
-	//
-	// Note: Please note that carriers can have restrictions on the type of package allowed for certain ship methods. Check the carrier website for all details. Example: Flat rate pricing is available when materials are sent by USPS in a USPS-produced Flat Rate Envelope or Box.
+	// PredefinedPackageDimensions An enumeration of predefined parcel tokens. If you specify a `PredefinedPackageDimensions` token, you are not obligated to use a branded package from a carrier. For example, if you specify the `FedEx_Box_10kg` token, you do not have to use that particular package from FedEx. You are only obligated to use a box that matches the dimensions specified by the token. Note: Carriers can have restrictions on the type of package allowed for certain ship methods. Check the carrier website for details. Example: Flat rate pricing is available when materials are sent by USPS in a USPS-produced Flat Rate envelope or box.
 	PredefinedPackageDimensions *PredefinedPackageDimensions `json:"PredefinedPackageDimensions,omitempty"`
 
 	// Unit The unit of length.
 	Unit *UnitOfLength `json:"Unit,omitempty"`
 
-	// Width Number representing the given package dimension.
+	// Width A number that represents the given package dimension.
 	Width *PackageDimension `json:"Width,omitempty"`
 }
 
@@ -739,17 +730,15 @@ type PhoneNumber = string
 // PostalCode The zip code or postal code.
 type PostalCode = string
 
-// PredefinedPackageDimensions An enumeration of predefined parcel tokens. If you specify a PredefinedPackageDimensions token, you are not obligated to use a branded package from a carrier. For example, if you specify the FedEx_Box_10kg token, you do not have to use that particular package from FedEx. You are only obligated to use a box that matches the dimensions specified by the token.
-//
-// Note: Please note that carriers can have restrictions on the type of package allowed for certain ship methods. Check the carrier website for all details. Example: Flat rate pricing is available when materials are sent by USPS in a USPS-produced Flat Rate Envelope or Box.
+// PredefinedPackageDimensions An enumeration of predefined parcel tokens. If you specify a `PredefinedPackageDimensions` token, you are not obligated to use a branded package from a carrier. For example, if you specify the `FedEx_Box_10kg` token, you do not have to use that particular package from FedEx. You are only obligated to use a box that matches the dimensions specified by the token. Note: Carriers can have restrictions on the type of package allowed for certain ship methods. Check the carrier website for details. Example: Flat rate pricing is available when materials are sent by USPS in a USPS-produced Flat Rate envelope or box.
 type PredefinedPackageDimensions string
 
 // RejectedShippingService Information about a rejected shipping service
 type RejectedShippingService struct {
-	// CarrierName The rejected shipping carrier name. e.g. USPS
+	// CarrierName The rejected shipping carrier name. For example, USPS.
 	CarrierName string `json:"CarrierName"`
 
-	// RejectionReasonCode A reason code meant to be consumed programatically. e.g. CARRIER_CANNOT_SHIP_TO_POBOX
+	// RejectionReasonCode A reason code meant to be consumed programatically. For example, `CARRIER_CANNOT_SHIP_TO_POBOX`.
 	RejectionReasonCode string `json:"RejectionReasonCode"`
 
 	// RejectionReasonMessage A localized human readable description of the rejected reason.
@@ -758,11 +747,11 @@ type RejectedShippingService struct {
 	// ShippingServiceId An Amazon-defined shipping service identifier.
 	ShippingServiceId ShippingServiceIdentifier `json:"ShippingServiceId"`
 
-	// ShippingServiceName The rejected shipping service localized name. e.g. FedEx Standard Overnight
+	// ShippingServiceName The rejected shipping service localized name. For example, FedEx Standard Overnight.
 	ShippingServiceName string `json:"ShippingServiceName"`
 }
 
-// RejectedShippingServiceList List of services that were for some reason unavailable for this request
+// RejectedShippingServiceList List of services that are for some reason unavailable for this request
 type RejectedShippingServiceList = []RejectedShippingService
 
 // RestrictedSetValues The set of fixed values in an additional seller input.
@@ -795,7 +784,7 @@ type SellerInputDefinition struct {
 // SellerOrderId A seller-defined order identifier.
 type SellerOrderId = string
 
-// Shipment The details of a shipment, including the shipment status.
+// Shipment The details of a shipment. Includes the shipment status.
 type Shipment struct {
 	// AmazonOrderId An Amazon-defined order identifier, in 3-7-7 format.
 	AmazonOrderId AmazonOrderId `json:"AmazonOrderId"`
@@ -806,7 +795,7 @@ type Shipment struct {
 	// Insurance Currency type and amount.
 	Insurance CurrencyAmount `json:"Insurance"`
 
-	// ItemList The list of items to be included in a shipment.
+	// ItemList The list of items you want to include in a shipment.
 	ItemList ItemList `json:"ItemList"`
 
 	// Label Data for creating a shipping label and dimensions for printing the label.
@@ -851,7 +840,7 @@ type ShipmentRequestDetails struct {
 	// AmazonOrderId An Amazon-defined order identifier, in 3-7-7 format.
 	AmazonOrderId AmazonOrderId `json:"AmazonOrderId"`
 
-	// ItemList The list of items to be included in a shipment.
+	// ItemList The list of items you want to include in a shipment.
 	ItemList ItemList `json:"ItemList"`
 
 	// LabelCustomization Custom text for shipping labels.
@@ -908,7 +897,7 @@ type ShippingService struct {
 	// AvailableShippingServiceOptions The available shipping service options.
 	AvailableShippingServiceOptions *AvailableShippingServiceOptions `json:"AvailableShippingServiceOptions,omitempty"`
 
-	// Benefits Benefits that are included and excluded for each shipping offer. Benefits represents services provided by Amazon (eg. CLAIMS_PROTECTED, etc.) when sellers purchase shipping through Amazon. Benefit details will be made available for any shipment placed on or after January 1st 2024 00:00 UTC
+	// Benefits Benefits that are included and excluded for each shipping offer. Benefits represents services provided by Amazon (for example, `CLAIMS_PROTECTED`) when sellers purchase shipping through Amazon. Benefit details are made available for any shipment placed on or after January 1st 2024 00:00 UTC.
 	Benefits *Benefits `json:"Benefits,omitempty"`
 
 	// CarrierName The name of the carrier.
@@ -950,9 +939,7 @@ type ShippingServiceList = []ShippingService
 
 // ShippingServiceOptions Extra services provided by a carrier.
 type ShippingServiceOptions struct {
-	// CarrierWillPickUp When true, the carrier will pick up the package.
-	//
-	// Note: Scheduled carrier pickup is available only using Dynamex (US), DPD (UK), and Royal Mail (UK).
+	// CarrierWillPickUp When true, the carrier will pick up the package. Note: Scheduled carrier pickup is available only using Dynamex (US), DPD (UK), and Royal Mail (UK).
 	CarrierWillPickUp bool `json:"CarrierWillPickUp"`
 
 	// CarrierWillPickUpOption Carrier will pick up option.
@@ -971,7 +958,7 @@ type ShippingServiceOptions struct {
 // StandardIdForLabel The type of standard identifier to print on the label.
 type StandardIdForLabel string
 
-// StateOrProvinceCode The state or province code. **Note.** Required in the Canada, US, and UK marketplaces. Also required for shipments originating from China.
+// StateOrProvinceCode The state or province code. This is a required field in Canada, US, and UK marketplaces, and for shipments that originate in China.
 type StateOrProvinceCode = string
 
 // TemporarilyUnavailableCarrier A carrier who is temporarily unavailable, most likely due to a service outage experienced by the carrier.
@@ -998,10 +985,10 @@ type Timestamp = time.Time
 // TrackingId The shipment tracking identifier provided by the carrier.
 type TrackingId = string
 
-// TransparencyCode The Transparency code associated with the item. The Transparency serial number that needs to be submitted can be determined by the following:
+// TransparencyCode The transparency code associated with the item. Determine the transparency serial number with:
 //
-// **1D or 2D Barcode:** This has a **T** logo. Submit either the 29-character alpha-numeric identifier beginning with **AZ** or **ZA**, or the 38-character Serialized Global Trade Item Number (SGTIN).
-// **2D Barcode SN:** Submit the 7- to 20-character serial number barcode, which likely has the prefix **SN**. The serial number will be applied to the same side of the packaging as the GTIN (UPC/EAN/ISBN) barcode.
+// **1D or 2D barcode:** This has a **T** logo. Submit either the 29-character alpha-numeric identifier beginning with **AZ** or **ZA**, or the 38-character Serialized Global Trade Item Number (SGTIN).
+// **2D barcode SN:** Submit the 7- to 20-character serial number barcode, that likely has the prefix **SN**. The serial number is applied to the same side of the packaging as the GTIN (UPC/EAN/ISBN) barcode.
 // **QR code SN:** Submit the URL that the QR code generates.
 type TransparencyCode = string
 
@@ -1316,7 +1303,7 @@ func (c *Client) GetShipment(ctx context.Context, shipmentId string) (*http.Resp
 // NewGetAdditionalSellerInputsRequest calls the generic GetAdditionalSellerInputs builder with application/json body
 func NewGetAdditionalSellerInputsRequest(server string, body GetAdditionalSellerInputsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1356,7 +1343,7 @@ func NewGetAdditionalSellerInputsRequestWithBody(server string, contentType stri
 // NewGetEligibleShipmentServicesRequest calls the generic GetEligibleShipmentServices builder with application/json body
 func NewGetEligibleShipmentServicesRequest(server string, body GetEligibleShipmentServicesJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1396,7 +1383,7 @@ func NewGetEligibleShipmentServicesRequestWithBody(server string, contentType st
 // NewCreateShipmentRequest calls the generic CreateShipment builder with application/json body
 func NewCreateShipmentRequest(server string, body CreateShipmentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

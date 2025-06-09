@@ -30,7 +30,7 @@ type Error struct {
 	// Details Additional details that can help the caller understand or fix the issue.
 	Details *string `json:"details,omitempty"`
 
-	// Message A message that describes the error condition in a human-readable form.
+	// Message A message that describes the error condition.
 	Message string `json:"message"`
 }
 

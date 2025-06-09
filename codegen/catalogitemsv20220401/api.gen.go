@@ -99,48 +99,48 @@ const (
 	GetCatalogItemParamsIncludedDataVendorDetails   GetCatalogItemParamsIncludedData = "vendorDetails"
 )
 
-// BrandRefinement Description of a brand that can be used to get more fine-grained search results.
+// BrandRefinement A brand that you can use to refine your search.
 type BrandRefinement struct {
-	// BrandName Brand name. For display and can be used as a search refinement.
+	// BrandName The brand name that you can use to refine your search.
 	BrandName string `json:"brandName"`
 
-	// NumberOfResults The estimated number of results that would still be returned if refinement key applied.
+	// NumberOfResults The estimated number of results that would be returned if you refine your search by the specified `brandName`.
 	NumberOfResults int `json:"numberOfResults"`
 }
 
-// ClassificationRefinement Description of a classification that can be used to get more fine-grained search results.
+// ClassificationRefinement A classification that you can use to refine your search.
 type ClassificationRefinement struct {
-	// ClassificationId Identifier for the classification that can be used for search refinement purposes.
+	// ClassificationId The identifier of the classification that you can use to refine your search.
 	ClassificationId string `json:"classificationId"`
 
 	// DisplayName Display name for the classification.
 	DisplayName string `json:"displayName"`
 
-	// NumberOfResults The estimated number of results that would still be returned if refinement key applied.
+	// NumberOfResults The estimated number of results that would be returned if you refine your search by the specified `classificationId`.
 	NumberOfResults int `json:"numberOfResults"`
 }
 
-// Dimension Individual dimension value of an Amazon catalog item or item package.
+// Dimension The value of an individual dimension for an Amazon catalog item or item package.
 type Dimension struct {
-	// Unit Measurement unit of the dimension value.
+	// Unit Unit of measurement for the dimension value.
 	Unit *string `json:"unit,omitempty"`
 
-	// Value Numeric dimension value.
+	// Value Numeric value of the dimension.
 	Value *float32 `json:"value,omitempty"`
 }
 
 // Dimensions Dimensions of an Amazon catalog item or item in its packaging.
 type Dimensions struct {
-	// Height Individual dimension value of an Amazon catalog item or item package.
+	// Height The value of an individual dimension for an Amazon catalog item or item package.
 	Height *Dimension `json:"height,omitempty"`
 
-	// Length Individual dimension value of an Amazon catalog item or item package.
+	// Length The value of an individual dimension for an Amazon catalog item or item package.
 	Length *Dimension `json:"length,omitempty"`
 
-	// Weight Individual dimension value of an Amazon catalog item or item package.
+	// Weight The value of an individual dimension for an Amazon catalog item or item package.
 	Weight *Dimension `json:"weight,omitempty"`
 
-	// Width Individual dimension value of an Amazon catalog item or item package.
+	// Width The value of an individual dimension for an Amazon catalog item or item package.
 	Width *Dimension `json:"width,omitempty"`
 }
 
@@ -163,82 +163,82 @@ type ErrorList struct {
 
 // Item An item in the Amazon catalog.
 type Item struct {
-	// Asin Amazon Standard Identification Number (ASIN) is the unique identifier for an item in the Amazon catalog.
+	// Asin The unique identifier of an item in the Amazon catalog.
 	Asin ItemAsin `json:"asin"`
 
-	// Attributes A JSON object that contains structured item attribute data keyed by attribute name. Catalog item attributes conform to the related product type definitions available in the Selling Partner API for Product Type Definitions.
+	// Attributes A JSON object containing structured item attribute data that is keyed by attribute name. Catalog item attributes conform to the related Amazon product type definitions that you can get from the [Product Type Definitions API](https://developer-docs.amazon.com/sp-api/docs/product-type-definitions-api-v2020-09-01-reference).
 	Attributes *ItemAttributes `json:"attributes,omitempty"`
 
-	// Classifications Array of classifications (browse nodes) associated with the item in the Amazon catalog by Amazon marketplace.
+	// Classifications An array of classifications (browse nodes) that is associated with the item in the Amazon catalog, grouped by `marketplaceId`.
 	Classifications *ItemBrowseClassifications `json:"classifications,omitempty"`
 
-	// Dimensions Array of dimensions associated with the item in the Amazon catalog by Amazon marketplace.
+	// Dimensions An array of dimensions that are associated with the item in the Amazon catalog, grouped by `marketplaceId`.
 	Dimensions *ItemDimensions `json:"dimensions,omitempty"`
 
 	// Identifiers Identifiers associated with the item in the Amazon catalog, such as UPC and EAN identifiers.
 	Identifiers *ItemIdentifiers `json:"identifiers,omitempty"`
 
-	// Images Images for an item in the Amazon catalog.
+	// Images The images for an item in the Amazon catalog.
 	Images *ItemImages `json:"images,omitempty"`
 
-	// ProductTypes Product types associated with the Amazon catalog item.
+	// ProductTypes Product types that are associated with the Amazon catalog item.
 	ProductTypes *ItemProductTypes `json:"productTypes,omitempty"`
 
-	// Relationships Relationships by marketplace for an Amazon catalog item (for example, variations).
+	// Relationships Relationships grouped by `marketplaceId` for an Amazon catalog item (for example, variations).
 	Relationships *ItemRelationships `json:"relationships,omitempty"`
 
 	// SalesRanks Sales ranks of an Amazon catalog item.
 	SalesRanks *ItemSalesRanks `json:"salesRanks,omitempty"`
 
-	// Summaries Summary details of an Amazon catalog item.
+	// Summaries Summaries of Amazon catalog items.
 	Summaries *ItemSummaries `json:"summaries,omitempty"`
 
-	// VendorDetails Vendor details associated with an Amazon catalog item. Vendor details are available to vendors only.
+	// VendorDetails The vendor details that are associated with an Amazon catalog item. Vendor details are only available to vendors.
 	VendorDetails *ItemVendorDetails `json:"vendorDetails,omitempty"`
 }
 
-// ItemAsin Amazon Standard Identification Number (ASIN) is the unique identifier for an item in the Amazon catalog.
+// ItemAsin The unique identifier of an item in the Amazon catalog.
 type ItemAsin = string
 
-// ItemAttributes A JSON object that contains structured item attribute data keyed by attribute name. Catalog item attributes conform to the related product type definitions available in the Selling Partner API for Product Type Definitions.
+// ItemAttributes A JSON object containing structured item attribute data that is keyed by attribute name. Catalog item attributes conform to the related Amazon product type definitions that you can get from the [Product Type Definitions API](https://developer-docs.amazon.com/sp-api/docs/product-type-definitions-api-v2020-09-01-reference).
 type ItemAttributes map[string]interface{}
 
-// ItemBrowseClassification Classification (browse node) associated with an Amazon catalog item.
+// ItemBrowseClassification Classification (browse node) for an Amazon catalog item.
 type ItemBrowseClassification struct {
-	// ClassificationId Identifier of the classification (browse node identifier).
+	// ClassificationId Identifier of the classification.
 	ClassificationId string `json:"classificationId"`
 
-	// DisplayName Display name for the classification (browse node).
+	// DisplayName Display name for the classification.
 	DisplayName string `json:"displayName"`
 
-	// Parent Classification (browse node) associated with an Amazon catalog item.
+	// Parent Classification (browse node) for an Amazon catalog item.
 	Parent *ItemBrowseClassification `json:"parent,omitempty"`
 }
 
-// ItemBrowseClassifications Array of classifications (browse nodes) associated with the item in the Amazon catalog by Amazon marketplace.
+// ItemBrowseClassifications An array of classifications (browse nodes) that is associated with the item in the Amazon catalog, grouped by `marketplaceId`.
 type ItemBrowseClassifications = []ItemBrowseClassificationsByMarketplace
 
-// ItemBrowseClassificationsByMarketplace Classifications (browse nodes) associated with the item in the Amazon catalog for the indicated Amazon marketplace.
+// ItemBrowseClassificationsByMarketplace Classifications (browse nodes) that are associated with the item in the Amazon catalog for the indicated `marketplaceId`.
 type ItemBrowseClassificationsByMarketplace struct {
-	// Classifications Classifications (browse nodes) associated with the item in the Amazon catalog for the indicated Amazon marketplace.
+	// Classifications Classifications (browse nodes) that are associated with the item in the Amazon catalog.
 	Classifications *[]ItemBrowseClassification `json:"classifications,omitempty"`
 
-	// MarketplaceId Amazon marketplace identifier.
+	// MarketplaceId Amazon marketplace identifier. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `json:"marketplaceId"`
 }
 
-// ItemClassificationSalesRank Sales rank of an Amazon catalog item by classification.
+// ItemClassificationSalesRank Sales rank of an Amazon catalog item.
 type ItemClassificationSalesRank struct {
-	// ClassificationId Identifier of the classification associated with the sales rank.
+	// ClassificationId Identifier of the classification that is associated with the sales rank.
 	ClassificationId string `json:"classificationId"`
 
-	// Link Corresponding Amazon retail website link, or URL, for the sales rank.
+	// Link Corresponding Amazon retail website URL for the sales category.
 	Link *string `json:"link,omitempty"`
 
-	// Rank Sales rank value.
+	// Rank Sales rank.
 	Rank int `json:"rank"`
 
-	// Title Title, or name, of the sales rank.
+	// Title Name of the sales rank.
 	Title string `json:"title"`
 }
 
@@ -247,52 +247,52 @@ type ItemContributor struct {
 	// Role Role of an individual contributor in the creation of an item, such as author or actor.
 	Role ItemContributorRole `json:"role"`
 
-	// Value Name of the contributor, such as Jane Austen.
+	// Value Name of the contributor, such as `Jane Austen`.
 	Value string `json:"value"`
 }
 
 // ItemContributorRole Role of an individual contributor in the creation of an item, such as author or actor.
 type ItemContributorRole struct {
-	// DisplayName Display name of the role in the requested locale, such as Author or Actor.
+	// DisplayName Display name of the role in the requested locale, such as `Author` or `Actor`.
 	DisplayName *string `json:"displayName,omitempty"`
 
-	// Value Role value for the Amazon catalog item, such as author or actor.
+	// Value Role value for the Amazon catalog item, such as `author` or `actor`.
 	Value string `json:"value"`
 }
 
-// ItemDimensions Array of dimensions associated with the item in the Amazon catalog by Amazon marketplace.
+// ItemDimensions An array of dimensions that are associated with the item in the Amazon catalog, grouped by `marketplaceId`.
 type ItemDimensions = []ItemDimensionsByMarketplace
 
-// ItemDimensionsByMarketplace Dimensions associated with the item in the Amazon catalog for the indicated Amazon marketplace.
+// ItemDimensionsByMarketplace Dimensions that are associated with the item in the Amazon catalog for the indicated `marketplaceId`.
 type ItemDimensionsByMarketplace struct {
 	// Item Dimensions of an Amazon catalog item or item in its packaging.
 	Item *Dimensions `json:"item,omitempty"`
 
-	// MarketplaceId Amazon marketplace identifier.
+	// MarketplaceId Amazon marketplace identifier. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `json:"marketplaceId"`
 
 	// Package Dimensions of an Amazon catalog item or item in its packaging.
 	Package *Dimensions `json:"package,omitempty"`
 }
 
-// ItemDisplayGroupSalesRank Sales rank of an Amazon catalog item by website display group.
+// ItemDisplayGroupSalesRank Sales rank of an Amazon catalog item, grouped by website display group.
 type ItemDisplayGroupSalesRank struct {
-	// Link Corresponding Amazon retail website link, or URL, for the sales rank.
+	// Link Corresponding Amazon retail website URL for the sales rank.
 	Link *string `json:"link,omitempty"`
 
-	// Rank Sales rank value.
+	// Rank Sales rank.
 	Rank int `json:"rank"`
 
-	// Title Title, or name, of the sales rank.
+	// Title Name of the sales rank.
 	Title string `json:"title"`
 
-	// WebsiteDisplayGroup Name of the website display group associated with the sales rank
+	// WebsiteDisplayGroup Name of the website display group that is associated with the sales rank
 	WebsiteDisplayGroup string `json:"websiteDisplayGroup"`
 }
 
-// ItemIdentifier Identifier associated with the item in the Amazon catalog, such as a UPC or EAN identifier.
+// ItemIdentifier The identifier that is associated with the item in the Amazon catalog, such as a UPC or EAN identifier.
 type ItemIdentifier struct {
-	// Identifier Identifier.
+	// Identifier Identifier of the item.
 	Identifier string `json:"identifier"`
 
 	// IdentifierType Type of identifier, such as UPC, EAN, or ISBN.
@@ -302,12 +302,12 @@ type ItemIdentifier struct {
 // ItemIdentifiers Identifiers associated with the item in the Amazon catalog, such as UPC and EAN identifiers.
 type ItemIdentifiers = []ItemIdentifiersByMarketplace
 
-// ItemIdentifiersByMarketplace Identifiers associated with the item in the Amazon catalog for the indicated Amazon marketplace.
+// ItemIdentifiersByMarketplace Identifiers that are associated with the item in the Amazon catalog, grouped by `marketplaceId`.
 type ItemIdentifiersByMarketplace struct {
-	// Identifiers Identifiers associated with the item in the Amazon catalog for the indicated Amazon marketplace.
+	// Identifiers Identifiers associated with the item in the Amazon catalog for the indicated `marketplaceId`.
 	Identifiers []ItemIdentifier `json:"identifiers"`
 
-	// MarketplaceId Amazon marketplace identifier.
+	// MarketplaceId Amazon marketplace identifier. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).identifier.
 	MarketplaceId string `json:"marketplaceId"`
 }
 
@@ -316,7 +316,7 @@ type ItemImage struct {
 	// Height Height of the image in pixels.
 	Height int `json:"height"`
 
-	// Link Link, or URL, for the image.
+	// Link URL for the image.
 	Link string `json:"link"`
 
 	// Variant Variant of the image, such as `MAIN` or `PT01`.
@@ -329,54 +329,54 @@ type ItemImage struct {
 // ItemImageVariant Variant of the image, such as `MAIN` or `PT01`.
 type ItemImageVariant string
 
-// ItemImages Images for an item in the Amazon catalog.
+// ItemImages The images for an item in the Amazon catalog.
 type ItemImages = []ItemImagesByMarketplace
 
-// ItemImagesByMarketplace Images for an item in the Amazon catalog for the indicated Amazon marketplace.
+// ItemImagesByMarketplace Images for an item in the Amazon catalog, grouped by `marketplaceId`.
 type ItemImagesByMarketplace struct {
-	// Images Images for an item in the Amazon catalog for the indicated Amazon marketplace.
+	// Images Images for an item in the Amazon catalog, grouped by `marketplaceId`.
 	Images []ItemImage `json:"images"`
 
-	// MarketplaceId Amazon marketplace identifier.
+	// MarketplaceId Amazon marketplace identifier. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `json:"marketplaceId"`
 }
 
-// ItemProductTypeByMarketplace Product type associated with the Amazon catalog item for the indicated Amazon marketplace.
+// ItemProductTypeByMarketplace Product type that is associated with the Amazon catalog item, grouped by `marketplaceId`.
 type ItemProductTypeByMarketplace struct {
-	// MarketplaceId Amazon marketplace identifier.
+	// MarketplaceId Amazon marketplace identifier. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId *string `json:"marketplaceId,omitempty"`
 
-	// ProductType Name of the product type associated with the Amazon catalog item.
+	// ProductType Name of the product type that is associated with the Amazon catalog item.
 	ProductType *string `json:"productType,omitempty"`
 }
 
-// ItemProductTypes Product types associated with the Amazon catalog item.
+// ItemProductTypes Product types that are associated with the Amazon catalog item.
 type ItemProductTypes = []ItemProductTypeByMarketplace
 
 // ItemRelationship Relationship details for an Amazon catalog item.
 type ItemRelationship struct {
-	// ChildAsins Identifiers (ASINs) of the related items that are children of this item.
+	// ChildAsins ASINs of the related items that are children of this item.
 	ChildAsins *[]string `json:"childAsins,omitempty"`
 
-	// ParentAsins Identifiers (ASINs) of the related items that are parents of this item.
+	// ParentAsins ASINs of the related items that are parents of this item.
 	ParentAsins *[]string `json:"parentAsins,omitempty"`
 
 	// Type Type of relationship.
 	Type ItemRelationshipType `json:"type"`
 
-	// VariationTheme Variation theme indicating the combination of Amazon item catalog attributes that define the variation family.
+	// VariationTheme The variation theme is a list of Amazon catalog item attributes that define the variation family.
 	VariationTheme *ItemVariationTheme `json:"variationTheme,omitempty"`
 }
 
 // ItemRelationshipType Type of relationship.
 type ItemRelationshipType string
 
-// ItemRelationships Relationships by marketplace for an Amazon catalog item (for example, variations).
+// ItemRelationships Relationships grouped by `marketplaceId` for an Amazon catalog item (for example, variations).
 type ItemRelationships = []ItemRelationshipsByMarketplace
 
-// ItemRelationshipsByMarketplace Relationship details for the Amazon catalog item for the indicated Amazon marketplace.
+// ItemRelationshipsByMarketplace Relationship details for the Amazon catalog item for the specified Amazon `marketplaceId`.
 type ItemRelationshipsByMarketplace struct {
-	// MarketplaceId Amazon marketplace identifier.
+	// MarketplaceId Amazon marketplace identifier. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `json:"marketplaceId"`
 
 	// Relationships Relationships for the item.
@@ -386,209 +386,209 @@ type ItemRelationshipsByMarketplace struct {
 // ItemSalesRanks Sales ranks of an Amazon catalog item.
 type ItemSalesRanks = []ItemSalesRanksByMarketplace
 
-// ItemSalesRanksByMarketplace Sales ranks of an Amazon catalog item for the indicated Amazon marketplace.
+// ItemSalesRanksByMarketplace Sales ranks of an Amazon catalog item, grouped by `marketplaceId`.
 type ItemSalesRanksByMarketplace struct {
-	// ClassificationRanks Sales ranks of an Amazon catalog item for an Amazon marketplace by classification.
+	// ClassificationRanks Sales ranks of an Amazon catalog item for a `marketplaceId`, grouped by classification.
 	ClassificationRanks *[]ItemClassificationSalesRank `json:"classificationRanks,omitempty"`
 
-	// DisplayGroupRanks Sales ranks of an Amazon catalog item for an Amazon marketplace by website display group.
+	// DisplayGroupRanks Sales ranks of an Amazon catalog item for a `marketplaceId`, grouped by website display group.
 	DisplayGroupRanks *[]ItemDisplayGroupSalesRank `json:"displayGroupRanks,omitempty"`
 
-	// MarketplaceId Amazon marketplace identifier.
+	// MarketplaceId Amazon marketplace identifier. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `json:"marketplaceId"`
 }
 
-// ItemSearchResults Items in the Amazon catalog and search related metadata.
+// ItemSearchResults Items in the Amazon catalog and search-related metadata.
 type ItemSearchResults struct {
 	// Items A list of items from the Amazon catalog.
 	Items []Item `json:"items"`
 
-	// NumberOfResults For `identifiers`-based searches, the total number of Amazon catalog items found. For `keywords`-based searches, the estimated total number of Amazon catalog items matched by the search query (only results up to the page count limit will be returned per request regardless of the number found).
+	// NumberOfResults For searches that are based on `identifiers`, `numberOfResults` is the total number of Amazon catalog items found. For searches that are based on `keywords`, `numberOfResults` is the estimated total number of Amazon catalog items that are matched by the search query. Only results up to the page count limit are returned per request regardless of the number found.
 	//
-	// Note: The maximum number of items (ASINs) that can be returned and paged through is 1000.
+	// **Note:** The maximum number of items (ASINs) that can be returned and paged through is 1,000.
 	NumberOfResults int `json:"numberOfResults"`
 
-	// Pagination When a request produces a response that exceeds the `pageSize`, pagination occurs. This means the response is divided into individual pages. To retrieve the next page or the previous page, you must pass the `nextToken` value or the `previousToken` value as the `pageToken` parameter in the next request. When you receive the last page, there will be no `nextToken` key in the pagination object.
+	// Pagination Pagination occurs when a request produces a response that exceeds the `pageSize`. This means that the response is divided into individual pages. To retrieve the next page or the previous page of results, you must pass the `nextToken` value or the `previousToken` value as the `pageToken` parameter in the next request. There is no `nextToken` in the pagination object on the last page.
 	Pagination Pagination `json:"pagination"`
 
-	// Refinements Search refinements.
+	// Refinements Optional fields that you can use to refine your search results.
 	Refinements Refinements `json:"refinements"`
 }
 
-// ItemSummaries Summary details of an Amazon catalog item.
+// ItemSummaries Summaries of Amazon catalog items.
 type ItemSummaries = []ItemSummaryByMarketplace
 
-// ItemSummaryByMarketplace Summary details of an Amazon catalog item for the indicated Amazon marketplace.
+// ItemSummaryByMarketplace Information about an Amazon catalog item for the indicated `marketplaceId`.
 type ItemSummaryByMarketplace struct {
-	// AdultProduct Identifies an Amazon catalog item is intended for an adult audience or is sexual in nature.
+	// AdultProduct When `true`, the Amazon catalog item is intended for an adult audience or is sexual in nature.
 	AdultProduct *bool `json:"adultProduct,omitempty"`
 
-	// Autographed Identifies an Amazon catalog item is autographed by a player or celebrity.
+	// Autographed When `true`, the Amazon catalog item is autographed.
 	Autographed *bool `json:"autographed,omitempty"`
 
-	// Brand Name of the brand associated with an Amazon catalog item.
+	// Brand Name of the brand that is associated with the Amazon catalog item.
 	Brand *string `json:"brand,omitempty"`
 
-	// BrowseClassification Classification (browse node) associated with an Amazon catalog item.
+	// BrowseClassification Classification (browse node) for an Amazon catalog item.
 	BrowseClassification *ItemBrowseClassification `json:"browseClassification,omitempty"`
 
-	// Color Name of the color associated with an Amazon catalog item.
+	// Color The color that is associated with the Amazon catalog item.
 	Color *string `json:"color,omitempty"`
 
-	// Contributors Individual contributors to the creation of an item, such as the authors or actors.
+	// Contributors Individual contributors to the creation of the item, such as the authors or actors.
 	Contributors *[]ItemContributor `json:"contributors,omitempty"`
 
-	// ItemClassification Classification type associated with the Amazon catalog item.
+	// ItemClassification Classification type that is associated with the Amazon catalog item.
 	ItemClassification *ItemSummaryByMarketplaceItemClassification `json:"itemClassification,omitempty"`
 
-	// ItemName Name, or title, associated with an Amazon catalog item.
+	// ItemName The name that is associated with the Amazon catalog item.
 	ItemName *string `json:"itemName,omitempty"`
 
-	// Manufacturer Name of the manufacturer associated with an Amazon catalog item.
+	// Manufacturer The name of the manufacturer that is associated with the Amazon catalog item.
 	Manufacturer *string `json:"manufacturer,omitempty"`
 
-	// MarketplaceId Amazon marketplace identifier.
+	// MarketplaceId Amazon marketplace identifier. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `json:"marketplaceId"`
 
-	// Memorabilia Identifies an Amazon catalog item is memorabilia valued for its connection with historical events, culture, or entertainment.
+	// Memorabilia When true, the item is classified as memorabilia.
 	Memorabilia *bool `json:"memorabilia,omitempty"`
 
-	// ModelNumber Model number associated with an Amazon catalog item.
+	// ModelNumber The model number that is associated with the Amazon catalog item.
 	ModelNumber *string `json:"modelNumber,omitempty"`
 
-	// PackageQuantity Quantity of an Amazon catalog item in one package.
+	// PackageQuantity The quantity of the Amazon catalog item within one package.
 	PackageQuantity *int `json:"packageQuantity,omitempty"`
 
-	// PartNumber Part number associated with an Amazon catalog item.
+	// PartNumber The part number that is associated with the Amazon catalog item.
 	PartNumber *string `json:"partNumber,omitempty"`
 
-	// ReleaseDate First date on which an Amazon catalog item is shippable to customers.
+	// ReleaseDate The earliest date on which the Amazon catalog item can be shipped to customers.
 	ReleaseDate *openapi_types.Date `json:"releaseDate,omitempty"`
 
-	// Size Name of the size associated with an Amazon catalog item.
+	// Size The name of the size of the Amazon catalog item.
 	Size *string `json:"size,omitempty"`
 
-	// Style Name of the style associated with an Amazon catalog item.
+	// Style The name of the style that is associated with the Amazon catalog item.
 	Style *string `json:"style,omitempty"`
 
-	// TradeInEligible Identifies an Amazon catalog item is eligible for trade-in.
+	// TradeInEligible When true, the Amazon catalog item is eligible for trade-in.
 	TradeInEligible *bool `json:"tradeInEligible,omitempty"`
 
-	// WebsiteDisplayGroup Identifier of the website display group associated with an Amazon catalog item.
+	// WebsiteDisplayGroup The identifier of the website display group that is associated with the Amazon catalog item.
 	WebsiteDisplayGroup *string `json:"websiteDisplayGroup,omitempty"`
 
-	// WebsiteDisplayGroupName Display name of the website display group associated with an Amazon catalog item.
+	// WebsiteDisplayGroupName The display name of the website display group that is associated with the Amazon catalog item.
 	WebsiteDisplayGroupName *string `json:"websiteDisplayGroupName,omitempty"`
 }
 
-// ItemSummaryByMarketplaceItemClassification Classification type associated with the Amazon catalog item.
+// ItemSummaryByMarketplaceItemClassification Classification type that is associated with the Amazon catalog item.
 type ItemSummaryByMarketplaceItemClassification string
 
-// ItemVariationTheme Variation theme indicating the combination of Amazon item catalog attributes that define the variation family.
+// ItemVariationTheme The variation theme is a list of Amazon catalog item attributes that define the variation family.
 type ItemVariationTheme struct {
-	// Attributes Names of the Amazon catalog item attributes associated with the variation theme.
+	// Attributes Names of the Amazon catalog item attributes that are associated with the variation theme.
 	Attributes *[]string `json:"attributes,omitempty"`
 
-	// Theme Variation theme indicating the combination of Amazon item catalog attributes that define the variation family.
+	// Theme Variation theme that indicates the combination of Amazon catalog item attributes that define the variation family.
 	Theme *string `json:"theme,omitempty"`
 }
 
-// ItemVendorDetails Vendor details associated with an Amazon catalog item. Vendor details are available to vendors only.
+// ItemVendorDetails The vendor details that are associated with an Amazon catalog item. Vendor details are only available to vendors.
 type ItemVendorDetails = []ItemVendorDetailsByMarketplace
 
-// ItemVendorDetailsByMarketplace Vendor details associated with an Amazon catalog item for the indicated Amazon marketplace.
+// ItemVendorDetailsByMarketplace The vendor details that are associated with an Amazon catalog item for the specified `marketplaceId`.
 type ItemVendorDetailsByMarketplace struct {
-	// BrandCode Brand code associated with an Amazon catalog item.
+	// BrandCode The brand code that is associated with an Amazon catalog item.
 	BrandCode *string `json:"brandCode,omitempty"`
 
-	// ManufacturerCode Manufacturer code associated with an Amazon catalog item.
+	// ManufacturerCode The manufacturer code that is associated with an Amazon catalog item.
 	ManufacturerCode *string `json:"manufacturerCode,omitempty"`
 
-	// ManufacturerCodeParent Parent vendor code of the manufacturer code.
+	// ManufacturerCodeParent The parent vendor code of the manufacturer code.
 	ManufacturerCodeParent *string `json:"manufacturerCodeParent,omitempty"`
 
-	// MarketplaceId Amazon marketplace identifier.
+	// MarketplaceId Amazon marketplace identifier. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId string `json:"marketplaceId"`
 
-	// ProductCategory Product category or subcategory associated with an Amazon catalog item.
+	// ProductCategory The product category or subcategory that is associated with an Amazon catalog item.
 	ProductCategory *ItemVendorDetailsCategory `json:"productCategory,omitempty"`
 
-	// ProductGroup Product group associated with an Amazon catalog item.
+	// ProductGroup The product group that is associated with an Amazon catalog item.
 	ProductGroup *string `json:"productGroup,omitempty"`
 
-	// ProductSubcategory Product category or subcategory associated with an Amazon catalog item.
+	// ProductSubcategory The product category or subcategory that is associated with an Amazon catalog item.
 	ProductSubcategory *ItemVendorDetailsCategory `json:"productSubcategory,omitempty"`
 
-	// ReplenishmentCategory Replenishment category associated with an Amazon catalog item.
+	// ReplenishmentCategory The replenishment category that is associated with an Amazon catalog item.
 	ReplenishmentCategory *ItemVendorDetailsByMarketplaceReplenishmentCategory `json:"replenishmentCategory,omitempty"`
 }
 
-// ItemVendorDetailsByMarketplaceReplenishmentCategory Replenishment category associated with an Amazon catalog item.
+// ItemVendorDetailsByMarketplaceReplenishmentCategory The replenishment category that is associated with an Amazon catalog item.
 type ItemVendorDetailsByMarketplaceReplenishmentCategory string
 
-// ItemVendorDetailsCategory Product category or subcategory associated with an Amazon catalog item.
+// ItemVendorDetailsCategory The product category or subcategory that is associated with an Amazon catalog item.
 type ItemVendorDetailsCategory struct {
-	// DisplayName Display name of the product category or subcategory
+	// DisplayName The display name of the product category or subcategory.
 	DisplayName *string `json:"displayName,omitempty"`
 
-	// Value Value (code) of the product category or subcategory.
+	// Value The code that identifies the product category or subcategory.
 	Value *string `json:"value,omitempty"`
 }
 
-// Pagination When a request produces a response that exceeds the `pageSize`, pagination occurs. This means the response is divided into individual pages. To retrieve the next page or the previous page, you must pass the `nextToken` value or the `previousToken` value as the `pageToken` parameter in the next request. When you receive the last page, there will be no `nextToken` key in the pagination object.
+// Pagination Pagination occurs when a request produces a response that exceeds the `pageSize`. This means that the response is divided into individual pages. To retrieve the next page or the previous page of results, you must pass the `nextToken` value or the `previousToken` value as the `pageToken` parameter in the next request. There is no `nextToken` in the pagination object on the last page.
 type Pagination struct {
-	// NextToken A token that can be used to fetch the next page.
+	// NextToken A token that you can use to retrieve the next page.
 	NextToken *string `json:"nextToken,omitempty"`
 
-	// PreviousToken A token that can be used to fetch the previous page.
+	// PreviousToken A token that you can use to retrieve the previous page.
 	PreviousToken *string `json:"previousToken,omitempty"`
 }
 
-// Refinements Search refinements.
+// Refinements Optional fields that you can use to refine your search results.
 type Refinements struct {
-	// Brands Brand search refinements.
+	// Brands A list of brands you can use to refine your search.
 	Brands []BrandRefinement `json:"brands"`
 
-	// Classifications Classification search refinements.
+	// Classifications A list of classifications you can use to refine your search.
 	Classifications []ClassificationRefinement `json:"classifications"`
 }
 
 // SearchCatalogItemsParams defines parameters for SearchCatalogItems.
 type SearchCatalogItemsParams struct {
-	// Identifiers A comma-delimited list of product identifiers to search the Amazon catalog for. **Note:** Cannot be used with `keywords`.
+	// Identifiers A comma-delimited list of product identifiers that you can use to search the Amazon catalog. **Note:** You cannot include `identifiers` and `keywords` in the same request.
 	Identifiers *[]string `form:"identifiers,omitempty" json:"identifiers,omitempty"`
 
-	// IdentifiersType Type of product identifiers to search the Amazon catalog for. **Note:** Required when `identifiers` are provided.
+	// IdentifiersType The type of product identifiers that you can use to search the Amazon catalog. **Note:** `identifiersType` is required when `identifiers` is in the request.
 	IdentifiersType *SearchCatalogItemsParamsIdentifiersType `form:"identifiersType,omitempty" json:"identifiersType,omitempty"`
 
-	// MarketplaceIds A comma-delimited list of Amazon marketplace identifiers for the request.
+	// MarketplaceIds A comma-delimited list of Amazon marketplace identifiers. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 
-	// IncludedData A comma-delimited list of data sets to include in the response. Default: `summaries`.
+	// IncludedData A comma-delimited list of datasets to include in the response.
 	IncludedData *[]SearchCatalogItemsParamsIncludedData `form:"includedData,omitempty" json:"includedData,omitempty"`
 
-	// Locale Locale for retrieving localized summaries. Defaults to the primary locale of the marketplace.
+	// Locale The locale for which you want to retrieve localized summaries. Defaults to the primary locale of the marketplace.
 	Locale *string `form:"locale,omitempty" json:"locale,omitempty"`
 
 	// SellerId A selling partner identifier, such as a seller account or vendor code. **Note:** Required when `identifiersType` is `SKU`.
 	SellerId *string `form:"sellerId,omitempty" json:"sellerId,omitempty"`
 
-	// Keywords A comma-delimited list of words to search the Amazon catalog for. **Note:** Cannot be used with `identifiers`.
+	// Keywords A comma-delimited list of keywords that you can use to search the Amazon catalog. **Note:** You cannot include `keywords` and `identifiers` in the same request.
 	Keywords *[]string `form:"keywords,omitempty" json:"keywords,omitempty"`
 
-	// BrandNames A comma-delimited list of brand names to limit the search for `keywords`-based queries. **Note:** Cannot be used with `identifiers`.
+	// BrandNames A comma-delimited list of brand names that you can use to limit the search in queries based on `keywords`. **Note:** Cannot be used with `identifiers`.
 	BrandNames *[]string `form:"brandNames,omitempty" json:"brandNames,omitempty"`
 
-	// ClassificationIds A comma-delimited list of classification identifiers to limit the search for `keywords`-based queries. **Note:** Cannot be used with `identifiers`.
+	// ClassificationIds A comma-delimited list of classification identifiers that you can use to limit the search in queries based on `keywords`. **Note:** Cannot be used with `identifiers`.
 	ClassificationIds *[]string `form:"classificationIds,omitempty" json:"classificationIds,omitempty"`
 
-	// PageSize Number of results to be returned per page.
+	// PageSize The number of results to include on each page.
 	PageSize *int `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 
-	// PageToken A token to fetch a certain page when there are multiple pages worth of results.
+	// PageToken A token that you can use to fetch a specific page when there are multiple pages of results.
 	PageToken *string `form:"pageToken,omitempty" json:"pageToken,omitempty"`
 
-	// KeywordsLocale The language of the keywords provided for `keywords`-based queries. Defaults to the primary locale of the marketplace. **Note:** Cannot be used with `identifiers`.
+	// KeywordsLocale The language of the keywords that are included in queries based on `keywords`. Defaults to the primary locale of the marketplace. **Note:** Cannot be used with `identifiers`.
 	KeywordsLocale *string `form:"keywordsLocale,omitempty" json:"keywordsLocale,omitempty"`
 }
 
@@ -600,13 +600,13 @@ type SearchCatalogItemsParamsIncludedData string
 
 // GetCatalogItemParams defines parameters for GetCatalogItem.
 type GetCatalogItemParams struct {
-	// MarketplaceIds A comma-delimited list of Amazon marketplace identifiers. Data sets in the response contain data only for the specified marketplaces.
+	// MarketplaceIds A comma-delimited list of Amazon marketplace identifiers. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceIds []string `form:"marketplaceIds" json:"marketplaceIds"`
 
-	// IncludedData A comma-delimited list of data sets to include in the response. Default: `summaries`.
+	// IncludedData A comma-delimited list of datasets to include in the response.
 	IncludedData *[]GetCatalogItemParamsIncludedData `form:"includedData,omitempty" json:"includedData,omitempty"`
 
-	// Locale Locale for retrieving localized summaries. Defaults to the primary locale of the marketplace.
+	// Locale The locale for which you want to retrieve localized summaries. Defaults to the primary locale of the marketplace.
 	Locale *string `form:"locale,omitempty" json:"locale,omitempty"`
 }
 

@@ -56,7 +56,6 @@ const (
 	FBAINB0103          ItemEligibilityPreviewIneligibilityReasonList = "FBA_INB_0103"
 	FBAINB0104          ItemEligibilityPreviewIneligibilityReasonList = "FBA_INB_0104"
 	FBAINB0197          ItemEligibilityPreviewIneligibilityReasonList = "FBA_INB_0197"
-	FBAINB0342          ItemEligibilityPreviewIneligibilityReasonList = "FBA_INB_0342"
 	UNKNOWNINBERRORCODE ItemEligibilityPreviewIneligibilityReasonList = "UNKNOWN_INB_ERROR_CODE"
 )
 

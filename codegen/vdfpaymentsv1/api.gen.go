@@ -14,8 +14,6 @@ import (
 	runt "runtime"
 	"strings"
 	"time"
-
-	"github.com/bytedance/sonic"
 )
 
 // Defines values for AdditionalDetailsType.
@@ -59,7 +57,7 @@ const (
 	TaxRegistrationDetailTaxRegistrationTypeVAT TaxRegistrationDetailTaxRegistrationType = "VAT"
 )
 
-// AdditionalDetails A field where the selling party provides additional information.
+// AdditionalDetails A field where the selling party can provide additional information for tax-related or any other purposes.
 type AdditionalDetails struct {
 	// Detail The detail of the additional information provided by the selling party.
 	Detail string `json:"detail"`
@@ -143,12 +141,12 @@ type Error struct {
 // ErrorList A list of error responses returned when a request is unsuccessful.
 type ErrorList = []Error
 
-// InvoiceDetail Represents the invoice details, including the invoice number, date, parties involved, payment terms, totals, taxes, charges, and line items.
+// InvoiceDetail Represents the details of an invoice, including invoice number, date, parties involved, payment terms, totals, taxes, charges, and line items.
 type InvoiceDetail struct {
 	// AdditionalDetails Additional details provided by the selling party, for tax-related or other purposes.
 	AdditionalDetails *[]AdditionalDetails `json:"additionalDetails,omitempty"`
 
-	// BillToParty Name, address, and tax details of a party.
+	// BillToParty Name, address and tax details of a party.
 	BillToParty *PartyIdentification `json:"billToParty,omitempty"`
 
 	// ChargeDetails Total charge amount details for all line items.
@@ -172,10 +170,10 @@ type InvoiceDetail struct {
 	// ReferenceNumber An additional unique reference number used for regulatory or other purposes.
 	ReferenceNumber *string `json:"referenceNumber,omitempty"`
 
-	// RemitToParty Name, address, and tax details of a party.
+	// RemitToParty Name, address and tax details of a party.
 	RemitToParty PartyIdentification `json:"remitToParty"`
 
-	// ShipFromParty Name, address, and tax details of a party.
+	// ShipFromParty Name, address and tax details of a party.
 	ShipFromParty PartyIdentification `json:"shipFromParty"`
 
 	// ShipToCountryCode Ship-to country code.
@@ -185,7 +183,7 @@ type InvoiceDetail struct {
 	TaxTotals *[]TaxDetail `json:"taxTotals,omitempty"`
 }
 
-// InvoiceItem Details of the invoice items.
+// InvoiceItem Provides the details of the items in this invoice.
 type InvoiceItem struct {
 	// BuyerProductIdentifier Buyer's standard identification number (ASIN) of an item.
 	BuyerProductIdentifier *string `json:"buyerProductIdentifier,omitempty"`
@@ -236,7 +234,7 @@ type Money struct {
 	CurrencyCode string `json:"currencyCode"`
 }
 
-// PartyIdentification Name, address, and tax details of a party.
+// PartyIdentification Name, address and tax details of a party.
 type PartyIdentification struct {
 	// Address Address of the party.
 	Address *Address `json:"address,omitempty"`
@@ -250,7 +248,7 @@ type PartyIdentification struct {
 
 // SubmitInvoiceRequest The request schema for the submitInvoice operation.
 type SubmitInvoiceRequest struct {
-	// Invoices An array of invoice details you want to submit.
+	// Invoices An array of invoice details to be submitted.
 	Invoices *[]InvoiceDetail `json:"invoices,omitempty"`
 }
 
@@ -259,7 +257,7 @@ type SubmitInvoiceResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Payload Response that contains the transaction ID.
+	// Payload Response containing the transaction ID.
 	Payload *TransactionReference `json:"payload,omitempty"`
 }
 
@@ -289,7 +287,7 @@ type TaxRegistrationDetail struct {
 	// TaxRegistrationMessage Tax registration message that can be used for additional tax related details.
 	TaxRegistrationMessage *string `json:"taxRegistrationMessage,omitempty"`
 
-	// TaxRegistrationNumber Tax registration number for the entity. For example, VAT ID or Consumption Tax ID.
+	// TaxRegistrationNumber Tax registration number for the entity. For example, VAT ID, Consumption Tax ID.
 	TaxRegistrationNumber string `json:"taxRegistrationNumber"`
 
 	// TaxRegistrationType Tax registration type for the entity.
@@ -299,7 +297,7 @@ type TaxRegistrationDetail struct {
 // TaxRegistrationDetailTaxRegistrationType Tax registration type for the entity.
 type TaxRegistrationDetailTaxRegistrationType string
 
-// TransactionReference Response that contains the transaction ID.
+// TransactionReference Response containing the transaction ID.
 type TransactionReference struct {
 	// TransactionId GUID to identify this transaction. This value can be used with the Transaction Status API to return the status of this transaction.
 	TransactionId *string `json:"transactionId,omitempty"`
@@ -453,7 +451,7 @@ func (c *Client) SubmitInvoice(ctx context.Context, body SubmitInvoiceJSONReques
 // NewSubmitInvoiceRequest calls the generic SubmitInvoice builder with application/json body
 func NewSubmitInvoiceRequest(server string, body SubmitInvoiceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

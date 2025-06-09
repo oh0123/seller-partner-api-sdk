@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -475,6 +474,15 @@ type ExceptionDates struct {
 	OpenIntervals *[]OpenInterval `json:"OpenIntervals,omitempty"`
 }
 
+// ExportInfo Contains information that is related to the export of an order item.
+type ExportInfo struct {
+	// ExportCharge The monetary value of the order.
+	ExportCharge *Money `json:"ExportCharge,omitempty"`
+
+	// ExportChargeModel Holds the `ExportCharge` collection model that is associated with the specified order item.\n\n**Possible values**: `AMAZON_FACILITATED`: Import/export charge is withheld by Amazon and remitted to the customs authority by the carrier on behalf of the buyer/seller.
+	ExportChargeModel *string `json:"ExportChargeModel,omitempty"`
+}
+
 // FulfillmentInstruction Contains the instructions about the fulfillment, such as the location from where you want the order filled.
 type FulfillmentInstruction struct {
 	// FulfillmentSupplySourceId The `sourceId` of the location from where you want the order fulfilled.
@@ -864,6 +872,9 @@ type OrderItem struct {
 
 	// DeemedResellerCategory The category of deemed reseller. This applies to selling partners that are not based in the EU and is used to help them meet the VAT Deemed Reseller tax laws in the EU and UK.
 	DeemedResellerCategory *OrderItemDeemedResellerCategory `json:"DeemedResellerCategory,omitempty"`
+
+	// ExportInfo Contains information that is related to the export of an order item.
+	ExportInfo *ExportInfo `json:"ExportInfo,omitempty"`
 
 	// IossNumber The IOSS number of the marketplace. Sellers shipping to the EU from outside the EU must provide this IOSS number to their carrier when Amazon has collected the VAT on the sale.
 	IossNumber *string `json:"IossNumber,omitempty"`
@@ -2531,7 +2542,7 @@ func NewGetOrderRegulatedInfoRequest(server string, orderId string) (*http.Reque
 // NewUpdateVerificationStatusRequest calls the generic UpdateVerificationStatus builder with application/json body
 func NewUpdateVerificationStatusRequest(server string, orderId string, body UpdateVerificationStatusJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2578,7 +2589,7 @@ func NewUpdateVerificationStatusRequestWithBody(server string, orderId string, c
 // NewUpdateShipmentStatusRequest calls the generic UpdateShipmentStatus builder with application/json body
 func NewUpdateShipmentStatusRequest(server string, orderId string, body UpdateShipmentStatusJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2625,7 +2636,7 @@ func NewUpdateShipmentStatusRequestWithBody(server string, orderId string, conte
 // NewConfirmShipmentRequest calls the generic ConfirmShipment builder with application/json body
 func NewConfirmShipmentRequest(server string, orderId string, body ConfirmShipmentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

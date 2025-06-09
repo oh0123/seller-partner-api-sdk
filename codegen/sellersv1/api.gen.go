@@ -26,16 +26,10 @@ const (
 	AccountBusinessTypeSTATEOWNED           AccountBusinessType = "STATE_OWNED"
 )
 
-// Defines values for MarketplaceLevelAttributesListingStatus.
+// Defines values for AccountSellingPlan.
 const (
-	ACTIVE   MarketplaceLevelAttributesListingStatus = "ACTIVE"
-	INACTIVE MarketplaceLevelAttributesListingStatus = "INACTIVE"
-)
-
-// Defines values for MarketplaceLevelAttributesSellingPlan.
-const (
-	MarketplaceLevelAttributesSellingPlanINDIVIDUAL   MarketplaceLevelAttributesSellingPlan = "INDIVIDUAL"
-	MarketplaceLevelAttributesSellingPlanPROFESSIONAL MarketplaceLevelAttributesSellingPlan = "PROFESSIONAL"
+	AccountSellingPlanINDIVIDUAL   AccountSellingPlan = "INDIVIDUAL"
+	AccountSellingPlanPROFESSIONAL AccountSellingPlan = "PROFESSIONAL"
 )
 
 // Account The response schema for the `getAccount` operation.
@@ -46,15 +40,21 @@ type Account struct {
 	// BusinessType The type of business registered for the seller account.
 	BusinessType AccountBusinessType `json:"businessType"`
 
-	// MarketplaceLevelAttributes A list of details of the marketplaces where the seller account is active.
-	MarketplaceLevelAttributes []MarketplaceLevelAttributes `json:"marketplaceLevelAttributes"`
+	// MarketplaceParticipationList List of marketplace participations.
+	MarketplaceParticipationList MarketplaceParticipationList `json:"marketplaceParticipationList"`
 
 	// PrimaryContact Information about the seller's primary contact.
 	PrimaryContact *PrimaryContact `json:"primaryContact,omitempty"`
+
+	// SellingPlan The selling plan details.
+	SellingPlan AccountSellingPlan `json:"sellingPlan"`
 }
 
 // AccountBusinessType The type of business registered for the seller account.
 type AccountBusinessType string
+
+// AccountSellingPlan The selling plan details.
+type AccountSellingPlan string
 
 // Address Represents an address
 type Address struct {
@@ -149,27 +149,6 @@ type Marketplace struct {
 	Name string `json:"name"`
 }
 
-// MarketplaceLevelAttributes Attributes that define the seller's presence and status within a specific marketplace. These attributes include the marketplace details, store name, listing status, and the selling plan the seller is subscribed to.
-type MarketplaceLevelAttributes struct {
-	// ListingStatus The current status of the seller's listings.
-	ListingStatus MarketplaceLevelAttributesListingStatus `json:"listingStatus"`
-
-	// Marketplace Information about an Amazon marketplace where a seller can list items and customers can view and purchase items.
-	Marketplace Marketplace `json:"marketplace"`
-
-	// SellingPlan The selling plan details.
-	SellingPlan MarketplaceLevelAttributesSellingPlan `json:"sellingPlan"`
-
-	// StoreName The name of the seller's store as displayed in the marketplace.
-	StoreName string `json:"storeName"`
-}
-
-// MarketplaceLevelAttributesListingStatus The current status of the seller's listings.
-type MarketplaceLevelAttributesListingStatus string
-
-// MarketplaceLevelAttributesSellingPlan The selling plan details.
-type MarketplaceLevelAttributesSellingPlan string
-
 // MarketplaceParticipation defines model for MarketplaceParticipation.
 type MarketplaceParticipation struct {
 	// Marketplace Information about an Amazon marketplace where a seller can list items and customers can view and purchase items.
@@ -177,6 +156,9 @@ type MarketplaceParticipation struct {
 
 	// Participation Information that is specific to a seller in a marketplace.
 	Participation Participation `json:"participation"`
+
+	// StoreName The name of the seller's store as displayed in the marketplace.
+	StoreName string `json:"storeName"`
 }
 
 // MarketplaceParticipationList List of marketplace participations.

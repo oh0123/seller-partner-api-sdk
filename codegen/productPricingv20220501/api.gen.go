@@ -13,8 +13,6 @@ import (
 	"net/url"
 	runt "runtime"
 	"strings"
-
-	"github.com/bytedance/sonic"
 )
 
 // Defines values for CompetitiveSummaryIncludedData.
@@ -40,6 +38,7 @@ const (
 
 // Defines values for FeaturedOfferSegmentCustomerMembership.
 const (
+	DEFAULT  FeaturedOfferSegmentCustomerMembership = "DEFAULT"
 	NONPRIME FeaturedOfferSegmentCustomerMembership = "NON_PRIME"
 	PRIME    FeaturedOfferSegmentCustomerMembership = "PRIME"
 )
@@ -61,7 +60,7 @@ const (
 
 // Defines values for LowestPricedOffersInputOfferType.
 const (
-	CONSUMER LowestPricedOffersInputOfferType = "CONSUMER"
+	Consumer LowestPricedOffersInputOfferType = "Consumer"
 )
 
 // Defines values for OfferSubCondition.
@@ -105,30 +104,30 @@ const (
 	SegmentedFeaturedOfferSubConditionWarranty            SegmentedFeaturedOfferSubCondition = "Warranty"
 )
 
-// Asin The Amazon Standard Identification Number (ASIN) of the item.
+// Asin The ASIN of the item.
 type Asin = string
 
 // BatchRequest The common properties for individual requests within a batch.
 type BatchRequest struct {
-	// Body Additional HTTP body information associated with an individual request within a batch.
+	// Body Additional HTTP body information that is associated with an individual request within a batch.
 	Body *HttpBody `json:"body,omitempty"`
 
-	// Headers A mapping of additional HTTP headers to send/receive for an individual request within a batch.
+	// Headers A mapping of additional HTTP headers to send or receive for an individual request within a batch.
 	Headers *HttpHeaders `json:"headers,omitempty"`
 
 	// Method The HTTP method associated with an individual request within a batch.
 	Method HttpMethod `json:"method"`
 
-	// Uri The URI associated with an individual request within a batch. For `FeaturedOfferExpectedPrice`, this should be `/products/pricing/2022-05-01/offer/featuredOfferExpectedPrice`.
+	// Uri The URI associated with an individual request within a batch. For `FeaturedOfferExpectedPrice`, this is `/products/pricing/2022-05-01/offer/featuredOfferExpectedPrice`.
 	Uri string `json:"uri"`
 }
 
 // BatchResponse The common properties for responses to individual requests within a batch.
 type BatchResponse struct {
-	// Headers A mapping of additional HTTP headers to send/receive for an individual request within a batch.
+	// Headers A mapping of additional HTTP headers to send or receive for an individual request within a batch.
 	Headers HttpHeaders `json:"headers"`
 
-	// Status The HTTP status line associated with the response to an individual request within a batch. For more information, consult [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
+	// Status The HTTP status line associated with the response for an individual request within a batch. For more information, refer to [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
 	Status HttpStatusLine `json:"status"`
 }
 
@@ -138,33 +137,33 @@ type CompetitiveSummaryBatchRequest struct {
 	Requests CompetitiveSummaryRequestList `json:"requests"`
 }
 
-// CompetitiveSummaryBatchResponse The response schema of the `competitiveSummaryBatch` operation.
+// CompetitiveSummaryBatchResponse The response schema for the `competitiveSummaryBatch` operation.
 type CompetitiveSummaryBatchResponse struct {
-	// Responses The response list of the `competitiveSummaryBatch` operation.
+	// Responses The response list for the `competitiveSummaryBatch` operation.
 	Responses CompetitiveSummaryResponseList `json:"responses"`
 }
 
-// CompetitiveSummaryIncludedData The supported types of data in the `getCompetitiveSummary` API.
+// CompetitiveSummaryIncludedData The supported data types in the `getCompetitiveSummary` API.
 type CompetitiveSummaryIncludedData string
 
 // CompetitiveSummaryRequest An individual `competitiveSummary` request for an ASIN and `marketplaceId`.
 type CompetitiveSummaryRequest struct {
-	// Asin The Amazon Standard Identification Number (ASIN) of the item.
+	// Asin The ASIN of the item.
 	Asin Asin `json:"asin"`
 
 	// IncludedData The list of requested competitive pricing data for the product.
 	IncludedData []CompetitiveSummaryIncludedData `json:"includedData"`
 
-	// LowestPricedOffersInputs The list of `lowestPricedOffersInput` parameters used to build the `lowestPricedOffers` in the response. This attribute is valid only if `lowestPricedOffers` is requested in `includedData`.
+	// LowestPricedOffersInputs The list of `lowestPricedOffersInput` parameters that are used to build `lowestPricedOffers` in the response. This attribute is only valid if `lowestPricedOffers` is requested in `includedData`
 	LowestPricedOffersInputs *[]LowestPricedOffersInput `json:"lowestPricedOffersInputs,omitempty"`
 
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which data is returned.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId MarketplaceId `json:"marketplaceId"`
 
 	// Method The HTTP method associated with an individual request within a batch.
 	Method HttpMethod `json:"method"`
 
-	// Uri The URI associated with the individual APIs being called as part of the batch request.
+	// Uri The URI associated with the individual APIs that are called as part of the batch request.
 	Uri HttpUri `json:"uri"`
 }
 
@@ -176,32 +175,32 @@ type CompetitiveSummaryResponse struct {
 	// Body The `competitiveSummaryResponse` body for a requested ASIN and `marketplaceId`.
 	Body CompetitiveSummaryResponseBody `json:"body"`
 
-	// Status The HTTP status line associated with the response to an individual request within a batch. For more information, consult [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
+	// Status The HTTP status line associated with the response for an individual request within a batch. For more information, refer to [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
 	Status HttpStatusLine `json:"status"`
 }
 
 // CompetitiveSummaryResponseBody The `competitiveSummaryResponse` body for a requested ASIN and `marketplaceId`.
 type CompetitiveSummaryResponseBody struct {
-	// Asin The Amazon Standard Identification Number (ASIN) of the item.
+	// Asin The ASIN of the item.
 	Asin Asin `json:"asin"`
 
-	// Errors A list of error responses returned when a request is unsuccessful.
+	// Errors A list of error responses that are returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// FeaturedBuyingOptions A list of featured buying options for the given ASIN `marketplaceId` combination.
+	// FeaturedBuyingOptions A list of featured buying options for the specified ASIN `marketplaceId` combination.
 	FeaturedBuyingOptions *[]FeaturedBuyingOption `json:"featuredBuyingOptions,omitempty"`
 
-	// LowestPricedOffers A list of the lowest priced offers for the given ASIN `marketplaceId` combination.
+	// LowestPricedOffers A list of lowest priced offers for the specified ASIN `marketplaceId` combination.
 	LowestPricedOffers *[]LowestPricedOffer `json:"lowestPricedOffers,omitempty"`
 
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which data is returned.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId MarketplaceId `json:"marketplaceId"`
 
-	// ReferencePrices A list of reference prices for the given ASIN `marketplaceId` combination.
+	// ReferencePrices A list of reference prices for the specified ASIN `marketplaceId` combination.
 	ReferencePrices *[]ReferencePrice `json:"referencePrices,omitempty"`
 }
 
-// CompetitiveSummaryResponseList The response list of the `competitiveSummaryBatch` operation.
+// CompetitiveSummaryResponseList The response list for the `competitiveSummaryBatch` operation.
 type CompetitiveSummaryResponseList = []CompetitiveSummaryResponse
 
 // Condition The condition of the item.
@@ -219,25 +218,25 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-// ErrorList A list of error responses returned when a request is unsuccessful.
+// ErrorList A list of error responses that are returned when a request is unsuccessful.
 type ErrorList = []Error
 
 // Errors A list of error responses returned when a request is unsuccessful.
 type Errors struct {
-	// Errors A list of error responses returned when a request is unsuccessful.
+	// Errors A list of error responses that are returned when a request is unsuccessful.
 	Errors ErrorList `json:"errors"`
 }
 
-// FeaturedBuyingOption Describes a featured buying option which includes a list of segmented featured offers for a particular item condition.
+// FeaturedBuyingOption Describes a featured buying option, which includes a list of segmented featured offers for a particular item condition.
 type FeaturedBuyingOption struct {
-	// BuyingOptionType The buying option type of the featured offer. This field represents the buying options that a customer sees on the detail page. For example, B2B, Fresh, and Subscribe n Save. Currently supports `NEW`
+	// BuyingOptionType The buying option type for the featured offer. `buyingOptionType` represents the buying options that a customer receives on the detail page, such as `B2B`, `Fresh`, and `Subscribe n Save`. `buyingOptionType` currently supports `NEW` as a value.
 	BuyingOptionType FeaturedBuyingOptionBuyingOptionType `json:"buyingOptionType"`
 
-	// SegmentedFeaturedOffers A list of segmented featured offers for the current buying option type. A segment can be considered as a group of regional contexts that all have the same featured offer. A regional context is a combination of factors such as customer type, region or postal code and buying option.
+	// SegmentedFeaturedOffers A list of segmented featured offers for the current buying option type. A segment can be considered as a group of regional contexts that all have the same featured offer. A regional context is a combination of factors such as customer type, region, or postal code and buying option.
 	SegmentedFeaturedOffers []SegmentedFeaturedOffer `json:"segmentedFeaturedOffers"`
 }
 
-// FeaturedBuyingOptionBuyingOptionType The buying option type of the featured offer. This field represents the buying options that a customer sees on the detail page. For example, B2B, Fresh, and Subscribe n Save. Currently supports `NEW`
+// FeaturedBuyingOptionBuyingOptionType The buying option type for the featured offer. `buyingOptionType` represents the buying options that a customer receives on the detail page, such as `B2B`, `Fresh`, and `Subscribe n Save`. `buyingOptionType` currently supports `NEW` as a value.
 type FeaturedBuyingOptionBuyingOptionType string
 
 // FeaturedOffer Schema for `currentFeaturedOffer` or `competingFeaturedOffer`.
@@ -245,50 +244,56 @@ type FeaturedOffer struct {
 	// Condition The condition of the item.
 	Condition *Condition `json:"condition,omitempty"`
 
-	// OfferIdentifier Identifies an offer from a particular seller on an ASIN.
+	// OfferIdentifier Identifies an offer from a particular seller for a specified ASIN.
 	OfferIdentifier OfferIdentifier `json:"offerIdentifier"`
 
-	// Price Schema for item's price information, including listing price, shipping price, and Amazon points.
+	// Price The schema for item's price information, including listing price, shipping price, and Amazon Points.
 	Price *Price `json:"price,omitempty"`
 }
 
 // FeaturedOfferExpectedPrice The item price at or below which the target offer may be featured.
 type FeaturedOfferExpectedPrice struct {
-	// ListingPrice Currency type and monetary value. Schema for demonstrating pricing info.
+	// ListingPrice Currency type and monetary value schema to demonstrate pricing information.
 	ListingPrice MoneyType `json:"listingPrice"`
 
-	// Points The number of Amazon Points offered with the purchase of an item, and their monetary value.
+	// Points The number of Amazon Points that are offered with the purchase of an item and the monetary value of these points.
 	Points *Points `json:"points,omitempty"`
 }
 
 // FeaturedOfferExpectedPriceRequest defines model for FeaturedOfferExpectedPriceRequest.
 type FeaturedOfferExpectedPriceRequest struct {
-	// Body Additional HTTP body information associated with an individual request within a batch.
+	// Body Additional HTTP body information that is associated with an individual request within a batch.
 	Body *HttpBody `json:"body,omitempty"`
 
-	// Headers A mapping of additional HTTP headers to send/receive for an individual request within a batch.
+	// Headers A mapping of additional HTTP headers to send or receive for an individual request within a batch.
 	Headers *HttpHeaders `json:"headers,omitempty"`
 
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which data is returned.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId MarketplaceId `json:"marketplaceId"`
 
 	// Method The HTTP method associated with an individual request within a batch.
 	Method HttpMethod `json:"method"`
 
+	// Segment Input segment for featured offer expected price. The segment contains the location information for which featured offer expected price is requested.
+	Segment *Segment `json:"segment,omitempty"`
+
 	// Sku The seller SKU of the item.
 	Sku Sku `json:"sku"`
 
-	// Uri The URI associated with an individual request within a batch. For `FeaturedOfferExpectedPrice`, this should be `/products/pricing/2022-05-01/offer/featuredOfferExpectedPrice`.
+	// Uri The URI associated with an individual request within a batch. For `FeaturedOfferExpectedPrice`, this is `/products/pricing/2022-05-01/offer/featuredOfferExpectedPrice`.
 	Uri string `json:"uri"`
 }
 
-// FeaturedOfferExpectedPriceRequestList A batched list of featured offer expected price requests.
+// FeaturedOfferExpectedPriceRequestList A batched list of FOEP requests.
 type FeaturedOfferExpectedPriceRequestList = []FeaturedOfferExpectedPriceRequest
 
 // FeaturedOfferExpectedPriceRequestParams The parameters for an individual request.
 type FeaturedOfferExpectedPriceRequestParams struct {
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which data is returned.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId MarketplaceId `json:"marketplaceId"`
+
+	// Segment Input segment for featured offer expected price. The segment contains the location information for which featured offer expected price is requested.
+	Segment *Segment `json:"segment,omitempty"`
 
 	// Sku The seller SKU of the item.
 	Sku Sku `json:"sku"`
@@ -296,35 +301,35 @@ type FeaturedOfferExpectedPriceRequestParams struct {
 
 // FeaturedOfferExpectedPriceResponse defines model for FeaturedOfferExpectedPriceResponse.
 type FeaturedOfferExpectedPriceResponse struct {
-	// Body The featured offer expected price response data for a requested SKU.
+	// Body The FOEP response data for a requested SKU.
 	Body *FeaturedOfferExpectedPriceResponseBody `json:"body,omitempty"`
 
-	// Headers A mapping of additional HTTP headers to send/receive for an individual request within a batch.
+	// Headers A mapping of additional HTTP headers to send or receive for an individual request within a batch.
 	Headers HttpHeaders `json:"headers"`
 
 	// Request The parameters for an individual request.
 	Request FeaturedOfferExpectedPriceRequestParams `json:"request"`
 
-	// Status The HTTP status line associated with the response to an individual request within a batch. For more information, consult [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
+	// Status The HTTP status line associated with the response for an individual request within a batch. For more information, refer to [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
 	Status HttpStatusLine `json:"status"`
 }
 
-// FeaturedOfferExpectedPriceResponseBody The featured offer expected price response data for a requested SKU.
+// FeaturedOfferExpectedPriceResponseBody The FOEP response data for a requested SKU.
 type FeaturedOfferExpectedPriceResponseBody struct {
-	// Errors A list of error responses returned when a request is unsuccessful.
+	// Errors A list of error responses that are returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// FeaturedOfferExpectedPriceResults A list of featured offer expected price results for the requested offer.
+	// FeaturedOfferExpectedPriceResults A list of FOEP results for the requested offer.
 	FeaturedOfferExpectedPriceResults *FeaturedOfferExpectedPriceResultList `json:"featuredOfferExpectedPriceResults,omitempty"`
 
-	// OfferIdentifier Identifies an offer from a particular seller on an ASIN.
+	// OfferIdentifier Identifies an offer from a particular seller for a specified ASIN.
 	OfferIdentifier *OfferIdentifier `json:"offerIdentifier,omitempty"`
 }
 
-// FeaturedOfferExpectedPriceResponseList A batched list of featured offer expected price responses.
+// FeaturedOfferExpectedPriceResponseList A batched list of FOEP responses.
 type FeaturedOfferExpectedPriceResponseList = []FeaturedOfferExpectedPriceResponse
 
-// FeaturedOfferExpectedPriceResult The featured offer expected price result data for the requested offer.
+// FeaturedOfferExpectedPriceResult The FOEP result data for the requested offer.
 type FeaturedOfferExpectedPriceResult struct {
 	// CompetingFeaturedOffer Schema for `currentFeaturedOffer` or `competingFeaturedOffer`.
 	CompetingFeaturedOffer *FeaturedOffer `json:"competingFeaturedOffer,omitempty"`
@@ -335,23 +340,23 @@ type FeaturedOfferExpectedPriceResult struct {
 	// FeaturedOfferExpectedPrice The item price at or below which the target offer may be featured.
 	FeaturedOfferExpectedPrice *FeaturedOfferExpectedPrice `json:"featuredOfferExpectedPrice,omitempty"`
 
-	// ResultStatus The status of the featured offer expected price computation. Possible values include `VALID_FOEP`, `NO_COMPETING_OFFER`, `OFFER_NOT_ELIGIBLE`, `OFFER_NOT_FOUND`, `ASIN_NOT_ELIGIBLE`. Additional values may be added in the future.
+	// ResultStatus The status of the FOEP computation. Possible values include `VALID_FOEP`, `NO_COMPETING_OFFER`, `OFFER_NOT_ELIGIBLE`, `OFFER_NOT_FOUND`, and `ASIN_NOT_ELIGIBLE`. Additional values might be added in the future.
 	ResultStatus string `json:"resultStatus"`
 }
 
-// FeaturedOfferExpectedPriceResultList A list of featured offer expected price results for the requested offer.
+// FeaturedOfferExpectedPriceResultList A list of FOEP results for the requested offer.
 type FeaturedOfferExpectedPriceResultList = []FeaturedOfferExpectedPriceResult
 
 // FeaturedOfferSegment Describes the segment in which the offer is featured.
 type FeaturedOfferSegment struct {
-	// CustomerMembership The customer membership type that make up this segment
+	// CustomerMembership The customer membership type that makes up this segment
 	CustomerMembership FeaturedOfferSegmentCustomerMembership `json:"customerMembership"`
 
-	// SegmentDetails The details about the segment.
+	// SegmentDetails The details about the segment. The FeaturedOfferExpectedPrice API uses only the sampleLocation portion as input.
 	SegmentDetails SegmentDetails `json:"segmentDetails"`
 }
 
-// FeaturedOfferSegmentCustomerMembership The customer membership type that make up this segment
+// FeaturedOfferSegmentCustomerMembership The customer membership type that makes up this segment
 type FeaturedOfferSegmentCustomerMembership string
 
 // FulfillmentType Indicates whether the item is fulfilled by Amazon or by the seller (merchant).
@@ -359,62 +364,62 @@ type FulfillmentType string
 
 // GetFeaturedOfferExpectedPriceBatchRequest The request body for the `getFeaturedOfferExpectedPriceBatch` operation.
 type GetFeaturedOfferExpectedPriceBatchRequest struct {
-	// Requests A batched list of featured offer expected price requests.
+	// Requests A batched list of FOEP requests.
 	Requests *FeaturedOfferExpectedPriceRequestList `json:"requests,omitempty"`
 }
 
 // GetFeaturedOfferExpectedPriceBatchResponse The response schema for the `getFeaturedOfferExpectedPriceBatch` operation.
 type GetFeaturedOfferExpectedPriceBatchResponse struct {
-	// Responses A batched list of featured offer expected price responses.
+	// Responses A batched list of FOEP responses.
 	Responses *FeaturedOfferExpectedPriceResponseList `json:"responses,omitempty"`
 }
 
-// HttpBody Additional HTTP body information associated with an individual request within a batch.
+// HttpBody Additional HTTP body information that is associated with an individual request within a batch.
 type HttpBody map[string]interface{}
 
-// HttpHeaders A mapping of additional HTTP headers to send/receive for an individual request within a batch.
+// HttpHeaders A mapping of additional HTTP headers to send or receive for an individual request within a batch.
 type HttpHeaders map[string]string
 
 // HttpMethod The HTTP method associated with an individual request within a batch.
 type HttpMethod string
 
-// HttpStatusLine The HTTP status line associated with the response to an individual request within a batch. For more information, consult [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
+// HttpStatusLine The HTTP status line associated with the response for an individual request within a batch. For more information, refer to [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
 type HttpStatusLine struct {
-	// ReasonPhrase The HTTP response Reason-Phase.
+	// ReasonPhrase The HTTP response reason phrase.
 	ReasonPhrase *string `json:"reasonPhrase,omitempty"`
 
-	// StatusCode The HTTP response Status-Code.
+	// StatusCode The HTTP response status code.
 	StatusCode *int `json:"statusCode,omitempty"`
 }
 
-// HttpUri The URI associated with the individual APIs being called as part of the batch request.
+// HttpUri The URI associated with the individual APIs that are called as part of the batch request.
 type HttpUri = string
 
-// LowestPricedOffer The lowest priced offer for the requested item condition and offer type.
+// LowestPricedOffer Describes the lowest priced offers for the specified item condition and offer type.
 type LowestPricedOffer struct {
-	// LowestPricedOffersInput The input required for building the `LowestPricedOffers` data in the response.
+	// LowestPricedOffersInput The input required for building `LowestPricedOffers` data in the response.
 	LowestPricedOffersInput LowestPricedOffersInput `json:"lowestPricedOffersInput"`
 
-	// Offers A list of up to 20 lowest priced offers that match the criteria specified in the `lowestPricedOffersInput` parameter.
+	// Offers A list of up to 20 lowest priced offers that match the criteria specified in `lowestPricedOffersInput`.
 	Offers []Offer `json:"offers"`
 }
 
-// LowestPricedOffersInput The input required for building the `LowestPricedOffers` data in the response.
+// LowestPricedOffersInput The input required for building `LowestPricedOffers` data in the response.
 type LowestPricedOffersInput struct {
 	// ItemCondition The condition of the item.
 	ItemCondition Condition `json:"itemCondition"`
 
-	// OfferType The type of offers requested for the `LowestPricedOffers`. The `offerType` options are `Consumer` or `Business`. The default `offerType` is `Consumer`.
+	// OfferType The input parameter specifies the type of offers requested for `LowestPricedOffers`. This applies to `Consumer` and `Business` offers. `Consumer` is the default `offerType`.
 	OfferType LowestPricedOffersInputOfferType `json:"offerType"`
 }
 
-// LowestPricedOffersInputOfferType The type of offers requested for the `LowestPricedOffers`. The `offerType` options are `Consumer` or `Business`. The default `offerType` is `Consumer`.
+// LowestPricedOffersInputOfferType The input parameter specifies the type of offers requested for `LowestPricedOffers`. This applies to `Consumer` and `Business` offers. `Consumer` is the default `offerType`.
 type LowestPricedOffersInputOfferType string
 
-// MarketplaceId A marketplace identifier. Specifies the marketplace for which data is returned.
+// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 type MarketplaceId = string
 
-// MoneyType Currency type and monetary value. Schema for demonstrating pricing info.
+// MoneyType Currency type and monetary value schema to demonstrate pricing information.
 type MoneyType struct {
 	// Amount The monetary value.
 	Amount *float32 `json:"amount,omitempty"`
@@ -431,10 +436,10 @@ type Offer struct {
 	// FulfillmentType Indicates whether the item is fulfilled by Amazon or by the seller (merchant).
 	FulfillmentType FulfillmentType `json:"fulfillmentType"`
 
-	// ListingPrice Currency type and monetary value. Schema for demonstrating pricing info.
+	// ListingPrice Currency type and monetary value schema to demonstrate pricing information.
 	ListingPrice MoneyType `json:"listingPrice"`
 
-	// Points The number of Amazon Points offered with the purchase of an item, and their monetary value.
+	// Points The number of Amazon Points that are offered with the purchase of an item and the monetary value of these points.
 	Points *Points `json:"points,omitempty"`
 
 	// PrimeDetails Amazon Prime details.
@@ -446,49 +451,58 @@ type Offer struct {
 	// ShippingOptions A list of shipping options associated with this offer
 	ShippingOptions *[]ShippingOption `json:"shippingOptions,omitempty"`
 
-	// SubCondition The item subcondition for the offer.
+	// SubCondition The item subcondition of the offer.
 	SubCondition *OfferSubCondition `json:"subCondition,omitempty"`
 }
 
-// OfferSubCondition The item subcondition for the offer.
+// OfferSubCondition The item subcondition of the offer.
 type OfferSubCondition string
 
-// OfferIdentifier Identifies an offer from a particular seller on an ASIN.
+// OfferIdentifier Identifies an offer from a particular seller for a specified ASIN.
 type OfferIdentifier struct {
-	// Asin The Amazon Standard Identification Number (ASIN) of the item.
+	// Asin The ASIN of the item.
 	Asin Asin `json:"asin"`
 
 	// FulfillmentType Indicates whether the item is fulfilled by Amazon or by the seller (merchant).
 	FulfillmentType *FulfillmentType `json:"fulfillmentType,omitempty"`
 
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which data is returned.
+	// MarketplaceId The marketplace ID is the globally unique identifier of a marketplace. To find the ID for your marketplace, refer to [Marketplace IDs](https://developer-docs.amazon.com/sp-api/docs/marketplace-ids).
 	MarketplaceId MarketplaceId `json:"marketplaceId"`
 
 	// SellerId The seller identifier for the offer.
 	SellerId *string `json:"sellerId,omitempty"`
 
-	// Sku The seller stock keeping unit (SKU) of the item. This will only be present for the target offer, which belongs to the requesting seller.
+	// Sku The seller SKU of the item. This will only be present for the target offer, which belongs to the requesting seller.
 	Sku *string `json:"sku,omitempty"`
 }
 
-// Points The number of Amazon Points offered with the purchase of an item, and their monetary value.
+// Points The number of Amazon Points that are offered with the purchase of an item and the monetary value of these points.
 type Points struct {
-	// PointsMonetaryValue Currency type and monetary value. Schema for demonstrating pricing info.
+	// PointsMonetaryValue Currency type and monetary value schema to demonstrate pricing information.
 	PointsMonetaryValue *MoneyType `json:"pointsMonetaryValue,omitempty"`
 
-	// PointsNumber The number of points.
+	// PointsNumber The number of Amazon Points.
 	PointsNumber *int32 `json:"pointsNumber,omitempty"`
 }
 
-// Price Schema for item's price information, including listing price, shipping price, and Amazon points.
+// PostalCode Postal code value with country code
+type PostalCode struct {
+	// CountryCode Country code value
+	CountryCode *string `json:"countryCode,omitempty"`
+
+	// Value Postal code value
+	Value *string `json:"value,omitempty"`
+}
+
+// Price The schema for item's price information, including listing price, shipping price, and Amazon Points.
 type Price struct {
-	// ListingPrice Currency type and monetary value. Schema for demonstrating pricing info.
+	// ListingPrice Currency type and monetary value schema to demonstrate pricing information.
 	ListingPrice MoneyType `json:"listingPrice"`
 
-	// Points The number of Amazon Points offered with the purchase of an item, and their monetary value.
+	// Points The number of Amazon Points that are offered with the purchase of an item and the monetary value of these points.
 	Points *Points `json:"points,omitempty"`
 
-	// ShippingPrice Currency type and monetary value. Schema for demonstrating pricing info.
+	// ShippingPrice Currency type and monetary value schema to demonstrate pricing information.
 	ShippingPrice *MoneyType `json:"shippingPrice,omitempty"`
 }
 
@@ -501,19 +515,34 @@ type PrimeDetails struct {
 // PrimeDetailsEligibility Indicates whether the offer is an Amazon Prime offer.
 type PrimeDetailsEligibility string
 
-// ReferencePrice The reference price for the given ASIN `marketplaceId` combination.
+// ReferencePrice The reference price for the specified ASIN `marketplaceId` combination.
 type ReferencePrice struct {
-	// Name The name of the reference price like `CompetitivePriceThreshold`.
+	// Name The name of the reference price, such as `CompetitivePriceThreshold` and `WasPrice`. For reference price definitions, refer to the [Use Case Guide](https://developer-docs.amazon.com/sp-api/docs/product-pricing-api-v2022-05-01-use-case-guide).
 	Name string `json:"name"`
 
-	// Price Currency type and monetary value. Schema for demonstrating pricing info.
+	// Price Currency type and monetary value schema to demonstrate pricing information.
 	Price MoneyType `json:"price"`
 }
 
-// SegmentDetails The details about the segment.
+// SampleLocation Information about a location. It uses a postal code to identify the location.
+type SampleLocation struct {
+	// PostalCode Postal code value with country code
+	PostalCode *PostalCode `json:"postalCode,omitempty"`
+}
+
+// Segment Input segment for featured offer expected price. The segment contains the location information for which featured offer expected price is requested.
+type Segment struct {
+	// SegmentDetails The details about the segment. The FeaturedOfferExpectedPrice API uses only the sampleLocation portion as input.
+	SegmentDetails *SegmentDetails `json:"segmentDetails,omitempty"`
+}
+
+// SegmentDetails The details about the segment. The FeaturedOfferExpectedPrice API uses only the sampleLocation portion as input.
 type SegmentDetails struct {
-	// GlanceViewWeightPercentage Glance view weight percentage for this segment. The glance views for this segment as a percentage of total glance views across all segments on the ASIN. A higher percentage indicates more Amazon customers see this offer as the Featured Offer.
+	// GlanceViewWeightPercentage The glance view weighted percentage for this segment, which is the glance views for this segment as a percentage of total glance views across all segments for the ASIN. A higher percentage indicates that more Amazon customers receive this offer as the Featured Offer.
 	GlanceViewWeightPercentage *float32 `json:"glanceViewWeightPercentage,omitempty"`
+
+	// SampleLocation Information about a location. It uses a postal code to identify the location.
+	SampleLocation *SampleLocation `json:"sampleLocation,omitempty"`
 }
 
 // SegmentedFeaturedOffer defines model for SegmentedFeaturedOffer.
@@ -527,10 +556,10 @@ type SegmentedFeaturedOffer struct {
 	// FulfillmentType Indicates whether the item is fulfilled by Amazon or by the seller (merchant).
 	FulfillmentType FulfillmentType `json:"fulfillmentType"`
 
-	// ListingPrice Currency type and monetary value. Schema for demonstrating pricing info.
+	// ListingPrice Currency type and monetary value schema to demonstrate pricing information.
 	ListingPrice MoneyType `json:"listingPrice"`
 
-	// Points The number of Amazon Points offered with the purchase of an item, and their monetary value.
+	// Points The number of Amazon Points that are offered with the purchase of an item and the monetary value of these points.
 	Points *Points `json:"points,omitempty"`
 
 	// PrimeDetails Amazon Prime details.
@@ -542,19 +571,19 @@ type SegmentedFeaturedOffer struct {
 	// ShippingOptions A list of shipping options associated with this offer
 	ShippingOptions *[]ShippingOption `json:"shippingOptions,omitempty"`
 
-	// SubCondition The item subcondition for the offer.
+	// SubCondition The item subcondition of the offer.
 	SubCondition *SegmentedFeaturedOfferSubCondition `json:"subCondition,omitempty"`
 }
 
-// SegmentedFeaturedOfferSubCondition The item subcondition for the offer.
+// SegmentedFeaturedOfferSubCondition The item subcondition of the offer.
 type SegmentedFeaturedOfferSubCondition string
 
 // ShippingOption The shipping option available for the offer.
 type ShippingOption struct {
-	// Price Currency type and monetary value. Schema for demonstrating pricing info.
+	// Price Currency type and monetary value schema to demonstrate pricing information.
 	Price MoneyType `json:"price"`
 
-	// ShippingOptionType The type of the shipping option.
+	// ShippingOptionType The type of shipping option.
 	ShippingOptionType interface{} `json:"shippingOptionType"`
 }
 
@@ -757,7 +786,7 @@ func (c *Client) GetFeaturedOfferExpectedPriceBatch(ctx context.Context, body Ge
 // NewGetCompetitiveSummaryRequest calls the generic GetCompetitiveSummary builder with application/json body
 func NewGetCompetitiveSummaryRequest(server string, body GetCompetitiveSummaryJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -797,7 +826,7 @@ func NewGetCompetitiveSummaryRequestWithBody(server string, contentType string, 
 // NewGetFeaturedOfferExpectedPriceBatchRequest calls the generic GetFeaturedOfferExpectedPriceBatch builder with application/json body
 func NewGetFeaturedOfferExpectedPriceBatchRequest(server string, body GetFeaturedOfferExpectedPriceBatchJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

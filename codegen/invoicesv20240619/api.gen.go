@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
@@ -844,7 +843,7 @@ func NewGetInvoicesExportsRequest(server string, params *GetInvoicesExportsParam
 // NewCreateInvoicesExportRequest calls the generic CreateInvoicesExport builder with application/json body
 func NewCreateInvoicesExportRequest(server string, body CreateInvoicesExportJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

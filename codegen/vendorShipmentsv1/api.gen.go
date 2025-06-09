@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -80,6 +79,11 @@ const (
 	Eaches ItemQuantityUnitOfMeasure = "Eaches"
 )
 
+// Defines values for LabelDataLabelFormat.
+const (
+	PDF LabelDataLabelFormat = "PDF"
+)
+
 // Defines values for ShipmentCurrentShipmentStatus.
 const (
 	ShipmentCurrentShipmentStatusCarrierAssigned         ShipmentCurrentShipmentStatus = "CarrierAssigned"
@@ -124,6 +128,12 @@ const (
 	ShipmentConfirmationShipmentTypeTruckLoad         ShipmentConfirmationShipmentType = "TruckLoad"
 )
 
+// Defines values for ShipmentInformationShipMode.
+const (
+	ShipmentInformationShipModeLTL         ShipmentInformationShipMode = "LTL"
+	ShipmentInformationShipModeSmallParcel ShipmentInformationShipMode = "SmallParcel"
+)
+
 // Defines values for ShipmentStatusDetailsShipmentStatus.
 const (
 	ShipmentStatusDetailsShipmentStatusCarrierAssigned         ShipmentStatusDetailsShipmentStatus = "CarrierAssigned"
@@ -145,11 +155,19 @@ const (
 	VAT TaxRegistrationDetailsTaxRegistrationType = "VAT"
 )
 
+// Defines values for TotalWeightUnitOfMeasure.
+const (
+	GRAMS     TotalWeightUnitOfMeasure = "GRAMS"
+	KILOGRAMS TotalWeightUnitOfMeasure = "KILOGRAMS"
+	OUNCES    TotalWeightUnitOfMeasure = "OUNCES"
+	POUNDS    TotalWeightUnitOfMeasure = "POUNDS"
+)
+
 // Defines values for TransportationDetailsShipMode.
 const (
-	TransportationDetailsShipModeLessThanTruckLoad TransportationDetailsShipMode = "LessThanTruckLoad"
-	TransportationDetailsShipModeSmallParcel       TransportationDetailsShipMode = "SmallParcel"
-	TransportationDetailsShipModeTruckLoad         TransportationDetailsShipMode = "TruckLoad"
+	LessThanTruckLoad TransportationDetailsShipMode = "LessThanTruckLoad"
+	SmallParcel       TransportationDetailsShipMode = "SmallParcel"
+	TruckLoad         TransportationDetailsShipMode = "TruckLoad"
 )
 
 // Defines values for TransportationDetailsTransportationMode.
@@ -184,8 +202,14 @@ const (
 
 // Defines values for GetShipmentDetailsParamsSortOrder.
 const (
-	ASC  GetShipmentDetailsParamsSortOrder = "ASC"
-	DESC GetShipmentDetailsParamsSortOrder = "DESC"
+	GetShipmentDetailsParamsSortOrderASC  GetShipmentDetailsParamsSortOrder = "ASC"
+	GetShipmentDetailsParamsSortOrderDESC GetShipmentDetailsParamsSortOrder = "DESC"
+)
+
+// Defines values for GetShipmentLabelsParamsSortOrder.
+const (
+	GetShipmentLabelsParamsSortOrderASC  GetShipmentLabelsParamsSortOrder = "ASC"
+	GetShipmentLabelsParamsSortOrderDESC GetShipmentLabelsParamsSortOrder = "DESC"
 )
 
 // Address Address of the party.
@@ -419,6 +443,15 @@ type GetShipmentDetailsResponse struct {
 	Payload *ShipmentDetails `json:"payload,omitempty"`
 }
 
+// GetShipmentLabels The response schema for the GetShipmentLabels operation.
+type GetShipmentLabels struct {
+	// Errors A list of error responses returned when a request is unsuccessful.
+	Errors *ErrorList `json:"errors,omitempty"`
+
+	// Payload The request schema for the GetShipmentLabels operation.
+	Payload *TransportationLabels `json:"payload,omitempty"`
+}
+
 // ImportDetails Provide these fields only if this shipment is a direct import.
 type ImportDetails struct {
 	// BillableWeight The weight of the shipment.
@@ -502,6 +535,9 @@ type ItemQuantity struct {
 	// Amount Amount of units shipped for a specific item at a shipment level. If the item is present only in certain cartons or pallets within the shipment, please provide this at the appropriate carton or pallet level.
 	Amount int `json:"amount"`
 
+	// TotalWeight The total weight of units that are sold by weight in a shipment.
+	TotalWeight *TotalWeight `json:"totalWeight,omitempty"`
+
 	// UnitOfMeasure Unit of measure for the shipped quantity.
 	UnitOfMeasure ItemQuantityUnitOfMeasure `json:"unitOfMeasure"`
 
@@ -511,6 +547,27 @@ type ItemQuantity struct {
 
 // ItemQuantityUnitOfMeasure Unit of measure for the shipped quantity.
 type ItemQuantityUnitOfMeasure string
+
+// LabelData Label details as part of the transport label response
+type LabelData struct {
+	// CarrierCode Unique identification of the carrier.
+	CarrierCode *string `json:"carrierCode,omitempty"`
+
+	// Label The base-64 encoded string that represents the shipment label.
+	Label *string `json:"label,omitempty"`
+
+	// LabelFormat The format of the label.
+	LabelFormat *LabelDataLabelFormat `json:"labelFormat,omitempty"`
+
+	// LabelSequenceNumber A sequential number assigned to each label within a shipment.
+	LabelSequenceNumber *int `json:"labelSequenceNumber,omitempty"`
+
+	// TrackingId Tracking Id for the transportation.
+	TrackingId *string `json:"trackingId,omitempty"`
+}
+
+// LabelDataLabelFormat The format of the label.
+type LabelDataLabelFormat string
 
 // Location Location identifier.
 type Location struct {
@@ -788,6 +845,36 @@ type ShipmentDetails struct {
 	Shipments *[]Shipment `json:"shipments,omitempty"`
 }
 
+// ShipmentInformation Shipment Information details for Label request.
+type ShipmentInformation struct {
+	// BuyerReferenceNumber The buyer reference number is a unique identifier generated by the buyer for all Collect and WePay shipments.
+	BuyerReferenceNumber *string `json:"buyerReferenceNumber,omitempty"`
+
+	// MasterTrackingId Unique Id with  which  the shipment can be tracked for Small Parcels.
+	MasterTrackingId *string `json:"masterTrackingId,omitempty"`
+
+	// ShipFromParty Name/Address and tax details of the party.
+	ShipFromParty *PartyIdentification `json:"shipFromParty,omitempty"`
+
+	// ShipMode Type of shipment whether it is Small Parcel
+	ShipMode *ShipmentInformationShipMode `json:"shipMode,omitempty"`
+
+	// ShipToParty Name/Address and tax details of the party.
+	ShipToParty *PartyIdentification `json:"shipToParty,omitempty"`
+
+	// TotalLabelCount Number of Labels that are created as part of this shipment.
+	TotalLabelCount *int `json:"totalLabelCount,omitempty"`
+
+	// VendorDetails Vendor Details as part of Label response.
+	VendorDetails *VendorDetails `json:"vendorDetails,omitempty"`
+
+	// WarehouseId Vendor Warehouse ID from where the shipment is scheduled to be picked up by buyer / Carrier.
+	WarehouseId *string `json:"warehouseId,omitempty"`
+}
+
+// ShipmentInformationShipMode Type of shipment whether it is Small Parcel
+type ShipmentInformationShipMode string
+
 // ShipmentMeasurements Shipment measurement details.
 type ShipmentMeasurements struct {
 	// CartonCount Number of cartons present in the shipment. Provide the cartonCount only for non-palletized shipments.
@@ -866,10 +953,34 @@ type TaxRegistrationDetails struct {
 // TaxRegistrationDetailsTaxRegistrationType Tax registration type for the entity.
 type TaxRegistrationDetailsTaxRegistrationType string
 
+// TotalWeight The total weight of units that are sold by weight in a shipment.
+type TotalWeight struct {
+	// Amount A decimal number with no loss of precision. Useful when precision loss is unacceptable, as with currencies. Follows RFC7159 for number representation. <br>**Pattern** : `^-?(0|([1-9]\d*))(\.\d+)?([eE][+-]?\d+)?$`.
+	Amount Decimal `json:"amount"`
+
+	// UnitOfMeasure The unit of measure for the weight of items that are ordered by cases and support pricing by weight.
+	UnitOfMeasure TotalWeightUnitOfMeasure `json:"unitOfMeasure"`
+}
+
+// TotalWeightUnitOfMeasure The unit of measure for the weight of items that are ordered by cases and support pricing by weight.
+type TotalWeightUnitOfMeasure string
+
 // TransactionReference The response payload for the SubmitShipmentConfirmations operation.
 type TransactionReference struct {
 	// TransactionId GUID assigned by Buyer to identify this transaction. This value can be used with the Transaction Status API to return the status of this transaction.
 	TransactionId *string `json:"transactionId,omitempty"`
+}
+
+// TransportLabel A list of one or more ShipmentLabels.
+type TransportLabel struct {
+	// LabelCreateDateTime Date on which label is created.
+	LabelCreateDateTime *time.Time `json:"labelCreateDateTime,omitempty"`
+
+	// LabelData Indicates the label data,format and type associated .
+	LabelData *[]LabelData `json:"labelData,omitempty"`
+
+	// ShipmentInformation Shipment Information details for Label request.
+	ShipmentInformation *ShipmentInformation `json:"shipmentInformation,omitempty"`
 }
 
 // TransportShipmentMeasurements Shipment measurement details.
@@ -937,6 +1048,24 @@ type TransportationDetailsForShipmentConfirmation struct {
 
 // TransportationDetailsForShipmentConfirmationTransportationMode The mode of transportation for this shipment.
 type TransportationDetailsForShipmentConfirmationTransportationMode string
+
+// TransportationLabels The request schema for the GetShipmentLabels operation.
+type TransportationLabels struct {
+	// Pagination The pagination elements required to retrieve the remaining data.
+	Pagination *Pagination `json:"pagination,omitempty"`
+
+	// TransportLabels A list of one or more ShipmentLabels.
+	TransportLabels *[]TransportLabel `json:"transportLabels,omitempty"`
+}
+
+// VendorDetails Vendor Details as part of Label response.
+type VendorDetails struct {
+	// SellingParty Name/Address and tax details of the party.
+	SellingParty *PartyIdentification `json:"sellingParty,omitempty"`
+
+	// VendorShipmentIdentifier Unique vendor shipment id which is not used in last 365 days
+	VendorShipmentIdentifier *string `json:"vendorShipmentIdentifier,omitempty"`
+}
 
 // Volume The volume of the shipment.
 type Volume struct {
@@ -1039,6 +1168,36 @@ type GetShipmentDetailsParams struct {
 
 // GetShipmentDetailsParamsSortOrder defines parameters for GetShipmentDetails.
 type GetShipmentDetailsParamsSortOrder string
+
+// GetShipmentLabelsParams defines parameters for GetShipmentLabels.
+type GetShipmentLabelsParams struct {
+	// Limit The limit to the number of records returned. Default value is 50 records.
+	Limit *int64 `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// SortOrder Sort the list by shipment label creation date in ascending or descending order.
+	SortOrder *GetShipmentLabelsParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+
+	// NextToken A token that is used to retrieve the next page of results. The response includes `nextToken` when the number of results exceeds the specified `pageSize` value. To get the next page of results, call the operation with this token and include the same arguments as the call that produced the token. To get a complete list, call this operation until `nextToken` is null. Note that this operation can return empty pages.
+	NextToken *string `form:"nextToken,omitempty" json:"nextToken,omitempty"`
+
+	// LabelCreatedAfter Shipment labels created after this time will be included in the result. This field must be in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) datetime format.
+	LabelCreatedAfter *time.Time `form:"labelCreatedAfter,omitempty" json:"labelCreatedAfter,omitempty"`
+
+	// LabelCreatedBefore Shipment labels created before this time will be included in the result. This field must be in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) datetime format.
+	LabelCreatedBefore *time.Time `form:"labelCreatedBefore,omitempty" json:"labelCreatedBefore,omitempty"`
+
+	// BuyerReferenceNumber Get Shipment labels by passing buyer reference number.
+	BuyerReferenceNumber *string `form:"buyerReferenceNumber,omitempty" json:"buyerReferenceNumber,omitempty"`
+
+	// VendorShipmentIdentifier Get Shipment labels by passing vendor shipment identifier.
+	VendorShipmentIdentifier *string `form:"vendorShipmentIdentifier,omitempty" json:"vendorShipmentIdentifier,omitempty"`
+
+	// SellerWarehouseCode Get Shipping labels based on vendor warehouse code. This value must be same as the `sellingParty.partyId` in the shipment.
+	SellerWarehouseCode *string `form:"sellerWarehouseCode,omitempty" json:"sellerWarehouseCode,omitempty"`
+}
+
+// GetShipmentLabelsParamsSortOrder defines parameters for GetShipmentLabels.
+type GetShipmentLabelsParamsSortOrder string
 
 // SubmitShipmentConfirmationsJSONRequestBody defines body for SubmitShipmentConfirmations for application/json ContentType.
 type SubmitShipmentConfirmationsJSONRequestBody = SubmitShipmentConfirmationsRequest
@@ -1154,6 +1313,9 @@ type ClientInterface interface {
 	SubmitShipmentsWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error)
 
 	SubmitShipments(ctx context.Context, body SubmitShipmentsJSONRequestBody) (*http.Response, error)
+
+	// GetShipmentLabels request
+	GetShipmentLabels(ctx context.Context, params *GetShipmentLabelsParams) (*http.Response, error)
 }
 
 func (c *Client) SubmitShipmentConfirmationsWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
@@ -1256,10 +1418,30 @@ func (c *Client) SubmitShipments(ctx context.Context, body SubmitShipmentsJSONRe
 	return rsp, nil
 }
 
+func (c *Client) GetShipmentLabels(ctx context.Context, params *GetShipmentLabelsParams) (*http.Response, error) {
+	req, err := NewGetShipmentLabelsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("User-Agent", c.UserAgent)
+	if err := c.applyReqEditors(ctx, req); err != nil {
+		return nil, err
+	}
+	rsp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.applyRspEditor(ctx, rsp); err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
 // NewSubmitShipmentConfirmationsRequest calls the generic SubmitShipmentConfirmations builder with application/json body
 func NewSubmitShipmentConfirmationsRequest(server string, body SubmitShipmentConfirmationsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1716,7 +1898,7 @@ func NewGetShipmentDetailsRequest(server string, params *GetShipmentDetailsParam
 // NewSubmitShipmentsRequest calls the generic SubmitShipments builder with application/json body
 func NewSubmitShipmentsRequest(server string, body SubmitShipmentsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1749,6 +1931,167 @@ func NewSubmitShipmentsRequestWithBody(server string, contentType string, body i
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetShipmentLabelsRequest generates requests for GetShipmentLabels
+func NewGetShipmentLabelsRequest(server string, params *GetShipmentLabelsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/vendor/shipping/v1/transportLabels")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.SortOrder != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortOrder", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.NextToken != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "nextToken", runtime.ParamLocationQuery, *params.NextToken); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.LabelCreatedAfter != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelCreatedAfter", runtime.ParamLocationQuery, *params.LabelCreatedAfter); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.LabelCreatedBefore != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelCreatedBefore", runtime.ParamLocationQuery, *params.LabelCreatedBefore); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.BuyerReferenceNumber != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "buyerReferenceNumber", runtime.ParamLocationQuery, *params.BuyerReferenceNumber); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.VendorShipmentIdentifier != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "vendorShipmentIdentifier", runtime.ParamLocationQuery, *params.VendorShipmentIdentifier); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.SellerWarehouseCode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sellerWarehouseCode", runtime.ParamLocationQuery, *params.SellerWarehouseCode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -1810,6 +2153,9 @@ type ClientWithResponsesInterface interface {
 	SubmitShipmentsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*SubmitShipmentsResp, error)
 
 	SubmitShipmentsWithResponse(ctx context.Context, body SubmitShipmentsJSONRequestBody) (*SubmitShipmentsResp, error)
+
+	// GetShipmentLabelsWithResponse request
+	GetShipmentLabelsWithResponse(ctx context.Context, params *GetShipmentLabelsParams) (*GetShipmentLabelsResp, error)
 }
 
 type SubmitShipmentConfirmationsResp struct {
@@ -1902,6 +2248,36 @@ func (r SubmitShipmentsResp) StatusCode() int {
 	return 0
 }
 
+type GetShipmentLabelsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetShipmentLabels
+	JSON400      *GetShipmentLabels
+	JSON401      *GetShipmentLabels
+	JSON403      *GetShipmentLabels
+	JSON404      *GetShipmentLabels
+	JSON415      *GetShipmentLabels
+	JSON429      *GetShipmentLabels
+	JSON500      *GetShipmentLabels
+	JSON503      *GetShipmentLabels
+}
+
+// Status returns HTTPResponse.Status
+func (r GetShipmentLabelsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetShipmentLabelsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // SubmitShipmentConfirmationsWithBodyWithResponse request with arbitrary body returning *SubmitShipmentConfirmationsResp
 func (c *ClientWithResponses) SubmitShipmentConfirmationsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*SubmitShipmentConfirmationsResp, error) {
 	rsp, err := c.SubmitShipmentConfirmationsWithBody(ctx, contentType, body)
@@ -1943,6 +2319,15 @@ func (c *ClientWithResponses) SubmitShipmentsWithResponse(ctx context.Context, b
 		return nil, err
 	}
 	return ParseSubmitShipmentsResp(rsp)
+}
+
+// GetShipmentLabelsWithResponse request returning *GetShipmentLabelsResp
+func (c *ClientWithResponses) GetShipmentLabelsWithResponse(ctx context.Context, params *GetShipmentLabelsParams) (*GetShipmentLabelsResp, error) {
+	rsp, err := c.GetShipmentLabels(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetShipmentLabelsResp(rsp)
 }
 
 // ParseSubmitShipmentConfirmationsResp parses an HTTP response from a SubmitShipmentConfirmationsWithResponse call
@@ -2181,6 +2566,88 @@ func ParseSubmitShipmentsResp(rsp *http.Response) (*SubmitShipmentsResp, error) 
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
 		var dest SubmitShipmentConfirmationsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetShipmentLabelsResp parses an HTTP response from a GetShipmentLabelsWithResponse call
+func ParseGetShipmentLabelsResp(rsp *http.Response) (*GetShipmentLabelsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetShipmentLabelsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetShipmentLabels
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest GetShipmentLabels
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest GetShipmentLabels
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest GetShipmentLabels
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest GetShipmentLabels
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 415:
+		var dest GetShipmentLabels
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON415 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest GetShipmentLabels
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest GetShipmentLabels
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest GetShipmentLabels
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -269,6 +268,12 @@ type Box struct {
 	// Dimensions Measurement of a package's dimensions.
 	Dimensions *Dimensions `json:"dimensions,omitempty"`
 
+	// ExternalContainerIdentifier The external identifier for this container / box.
+	ExternalContainerIdentifier *string `json:"externalContainerIdentifier,omitempty"`
+
+	// ExternalContainerIdentifierType Type of the external identifier used. Can be: `AMAZON`, `SSCC`.
+	ExternalContainerIdentifierType *string `json:"externalContainerIdentifierType,omitempty"`
+
 	// Items Items contained within the box.
 	Items *[]Item `json:"items,omitempty"`
 
@@ -304,6 +309,12 @@ type BoxInput struct {
 
 	// Weight The weight of a package.
 	Weight Weight `json:"weight"`
+}
+
+// BoxRequirements The requirements for a box in the packing option.
+type BoxRequirements struct {
+	// Weight The range of weights that are allowed for a package.
+	Weight WeightRange `json:"weight"`
 }
 
 // BoxUpdateInput Input information for updating a box
@@ -1052,6 +1063,18 @@ type PackageGroupingInput struct {
 	ShipmentId *string `json:"shipmentId,omitempty"`
 }
 
+// PackingConfiguration A way to configure this packing option. Some box content information sources might not be allowed. Non-standard minimum and maximum box weights might be enforced.
+type PackingConfiguration struct {
+	// BoxPackingMethods The box content information sources that are allowed.
+	BoxPackingMethods *[]BoxContentInformationSource `json:"boxPackingMethods,omitempty"`
+
+	// BoxRequirements The requirements for a box in the packing option.
+	BoxRequirements *BoxRequirements `json:"boxRequirements,omitempty"`
+
+	// ShippingRequirements A list of supported shipping requirements for this packing configuration.
+	ShippingRequirements *[]ShippingRequirements `json:"shippingRequirements,omitempty"`
+}
+
 // PackingOption A packing option contains a set of pack groups plus additional information about the packing option, such as any discounts or fees if it's selected.
 type PackingOption struct {
 	// Discounts Discount for the offered option.
@@ -1072,7 +1095,10 @@ type PackingOption struct {
 	// Status The status of the packing option. Possible values: `OFFERED`, `ACCEPTED`, `EXPIRED`.
 	Status string `json:"status"`
 
-	// SupportedShippingConfigurations List of supported shipping modes.
+	// SupportedConfigurations A list of possible configurations for this option.
+	SupportedConfigurations []PackingConfiguration `json:"supportedConfigurations"`
+
+	// SupportedShippingConfigurations **This field is deprecated**. Use the `shippingRequirements` property under `supportedConfigurations` instead. List of supported shipping modes.
 	SupportedShippingConfigurations []ShippingConfiguration `json:"supportedShippingConfigurations"`
 }
 
@@ -1402,6 +1428,15 @@ type ShippingConfiguration struct {
 	ShippingSolution *string `json:"shippingSolution,omitempty"`
 }
 
+// ShippingRequirements The possible shipping modes for the packing option for a given shipping solution or program. Available solutions are Amazon-Partnered Carrier and Use Your Own Carrier. Available modes are ground small parcel, freight less-than-truckload (LTL), freight full-truckload (FTL) palletized, freight FTL non-palletized, ocean less-than-container-load (LCL), ocean full-container load (FCL), air small parcel, and air small parcel express.
+type ShippingRequirements struct {
+	// Modes Available shipment modes for this shipping program.
+	Modes []string `json:"modes"`
+
+	// Solution Shipping program for the option. Can be: `AMAZON_PARTNERED_CARRIER`, `USE_YOUR_OWN_CARRIER`.
+	Solution string `json:"solution"`
+}
+
 // SpdTrackingDetail Contains information related to Small Parcel Delivery (SPD) shipment tracking.
 type SpdTrackingDetail struct {
 	// SpdTrackingItems List of Small Parcel Delivery (SPD) tracking items.
@@ -1585,6 +1620,18 @@ type Weight struct {
 
 	// Value Value of a weight.
 	Value float32 `json:"value"`
+}
+
+// WeightRange The range of weights that are allowed for a package.
+type WeightRange struct {
+	// Maximum Maximum allowed weight.
+	Maximum float32 `json:"maximum"`
+
+	// Minimum Minimum allowed weight.
+	Minimum float32 `json:"minimum"`
+
+	// Unit Unit of the weight being measured.
+	Unit UnitOfWeight `json:"unit"`
 }
 
 // Window Contains a start and end DateTime representing a time range.
@@ -3436,7 +3483,7 @@ func NewListInboundPlansRequest(server string, params *ListInboundPlansParams) (
 // NewCreateInboundPlanRequest calls the generic CreateInboundPlan builder with application/json body
 func NewCreateInboundPlanRequest(server string, body CreateInboundPlanJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -3688,7 +3735,7 @@ func NewListInboundPlanItemsRequest(server string, inboundPlanId string, params 
 // NewUpdateInboundPlanNameRequest calls the generic UpdateInboundPlanName builder with application/json body
 func NewUpdateInboundPlanNameRequest(server string, inboundPlanId string, body UpdateInboundPlanNameJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -3893,7 +3940,7 @@ func NewListPackingGroupItemsRequest(server string, inboundPlanId string, packin
 // NewSetPackingInformationRequest calls the generic SetPackingInformation builder with application/json body
 func NewSetPackingInformationRequest(server string, inboundPlanId string, body SetPackingInformationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -4231,7 +4278,7 @@ func NewListPlacementOptionsRequest(server string, inboundPlanId string, params 
 // NewGeneratePlacementOptionsRequest calls the generic GeneratePlacementOptions builder with application/json body
 func NewGeneratePlacementOptionsRequest(server string, inboundPlanId string, body GeneratePlacementOptionsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -4518,7 +4565,7 @@ func NewListShipmentContentUpdatePreviewsRequest(server string, inboundPlanId st
 // NewGenerateShipmentContentUpdatePreviewsRequest calls the generic GenerateShipmentContentUpdatePreviews builder with application/json body
 func NewGenerateShipmentContentUpdatePreviewsRequest(server string, inboundPlanId string, shipmentId string, body GenerateShipmentContentUpdatePreviewsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -4956,7 +5003,7 @@ func NewListShipmentItemsRequest(server string, inboundPlanId string, shipmentId
 // NewUpdateShipmentNameRequest calls the generic UpdateShipmentName builder with application/json body
 func NewUpdateShipmentNameRequest(server string, inboundPlanId string, shipmentId string, body UpdateShipmentNameJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5089,7 +5136,7 @@ func NewListShipmentPalletsRequest(server string, inboundPlanId string, shipment
 // NewCancelSelfShipAppointmentRequest calls the generic CancelSelfShipAppointment builder with application/json body
 func NewCancelSelfShipAppointmentRequest(server string, inboundPlanId string, shipmentId string, body CancelSelfShipAppointmentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5222,7 +5269,7 @@ func NewGetSelfShipAppointmentSlotsRequest(server string, inboundPlanId string, 
 // NewGenerateSelfShipAppointmentSlotsRequest calls the generic GenerateSelfShipAppointmentSlots builder with application/json body
 func NewGenerateSelfShipAppointmentSlotsRequest(server string, inboundPlanId string, shipmentId string, body GenerateSelfShipAppointmentSlotsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5276,7 +5323,7 @@ func NewGenerateSelfShipAppointmentSlotsRequestWithBody(server string, inboundPl
 // NewScheduleSelfShipAppointmentRequest calls the generic ScheduleSelfShipAppointment builder with application/json body
 func NewScheduleSelfShipAppointmentRequest(server string, inboundPlanId string, shipmentId string, slotId string, body ScheduleSelfShipAppointmentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5337,7 +5384,7 @@ func NewScheduleSelfShipAppointmentRequestWithBody(server string, inboundPlanId 
 // NewUpdateShipmentSourceAddressRequest calls the generic UpdateShipmentSourceAddress builder with application/json body
 func NewUpdateShipmentSourceAddressRequest(server string, inboundPlanId string, shipmentId string, body UpdateShipmentSourceAddressJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5391,7 +5438,7 @@ func NewUpdateShipmentSourceAddressRequestWithBody(server string, inboundPlanId 
 // NewUpdateShipmentTrackingDetailsRequest calls the generic UpdateShipmentTrackingDetails builder with application/json body
 func NewUpdateShipmentTrackingDetailsRequest(server string, inboundPlanId string, shipmentId string, body UpdateShipmentTrackingDetailsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5549,7 +5596,7 @@ func NewListTransportationOptionsRequest(server string, inboundPlanId string, pa
 // NewGenerateTransportationOptionsRequest calls the generic GenerateTransportationOptions builder with application/json body
 func NewGenerateTransportationOptionsRequest(server string, inboundPlanId string, body GenerateTransportationOptionsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5596,7 +5643,7 @@ func NewGenerateTransportationOptionsRequestWithBody(server string, inboundPlanI
 // NewConfirmTransportationOptionsRequest calls the generic ConfirmTransportationOptions builder with application/json body
 func NewConfirmTransportationOptionsRequest(server string, inboundPlanId string, body ConfirmTransportationOptionsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5700,7 +5747,7 @@ func NewListItemComplianceDetailsRequest(server string, params *ListItemComplian
 // NewUpdateItemComplianceDetailsRequest calls the generic UpdateItemComplianceDetails builder with application/json body
 func NewUpdateItemComplianceDetailsRequest(server string, params *UpdateItemComplianceDetailsParams, body UpdateItemComplianceDetailsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5758,7 +5805,7 @@ func NewUpdateItemComplianceDetailsRequestWithBody(server string, params *Update
 // NewCreateMarketplaceItemLabelsRequest calls the generic CreateMarketplaceItemLabels builder with application/json body
 func NewCreateMarketplaceItemLabelsRequest(server string, body CreateMarketplaceItemLabelsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -5855,7 +5902,7 @@ func NewListPrepDetailsRequest(server string, params *ListPrepDetailsParams) (*h
 // NewSetPrepDetailsRequest calls the generic SetPrepDetails builder with application/json body
 func NewSetPrepDetailsRequest(server string, body SetPrepDetailsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

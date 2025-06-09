@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -86,22 +85,22 @@ type Address struct {
 	// Attention The attention name of the person at that address. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
 	Attention *string `json:"attention,omitempty"`
 
-	// City The city where the person, business, or institution is located. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
+	// City The city where the person, business or institution is located. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
 	City *string `json:"city,omitempty"`
 
 	// CountryCode The two digit country code. In ISO 3166-1 alpha-2 format.
 	CountryCode string `json:"countryCode"`
 
-	// County The county where the person, business, or institution is located. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
+	// County The county where person, business or institution is located. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
 	County *string `json:"county,omitempty"`
 
-	// District The district where the person, business, or institution is located. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
+	// District The district where person, business or institution is located. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
 	District *string `json:"district,omitempty"`
 
-	// Name The name of the person, business, or institution at that address. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
+	// Name The name of the person, business or institution at that address. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
 	Name string `json:"name"`
 
-	// Phone The phone number of the person, business, or institution located at that address. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
+	// Phone The phone number of the person, business or institution located at that address. For Amazon label only vendors, this field will have the value `xxxxx` within the object `shipToParty`.
 	Phone *string `json:"phone,omitempty"`
 
 	// PostalCode The postal code of that address. It conatins a series of letters or digits or both, sometimes including spaces or punctuation.
@@ -143,7 +142,7 @@ type GetOrdersResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Payload A purchase orders list returned as a response.
+	// Payload A list of purchase orders returned as response.
 	Payload *OrderList `json:"payload,omitempty"`
 }
 
@@ -200,10 +199,10 @@ type OrderAcknowledgementItem struct {
 	// PurchaseOrderNumber The purchase order number for this order. Formatting Notes: alpha-numeric code.
 	PurchaseOrderNumber string `json:"purchaseOrderNumber"`
 
-	// SellingParty Name, address, and tax details of a party.
+	// SellingParty Name, address and tax details of a party.
 	SellingParty PartyIdentification `json:"sellingParty"`
 
-	// ShipFromParty Name, address, and tax details of a party.
+	// ShipFromParty Name, address and tax details of a party.
 	ShipFromParty PartyIdentification `json:"shipFromParty"`
 
 	// VendorOrderNumber The vendor's order number for this order.
@@ -212,7 +211,7 @@ type OrderAcknowledgementItem struct {
 
 // OrderDetails Details of an order.
 type OrderDetails struct {
-	// BillToParty Name, address, and tax details of a party.
+	// BillToParty Name, address and tax details of a party.
 	BillToParty PartyIdentification `json:"billToParty"`
 
 	// CustomerOrderNumber The customer order number.
@@ -227,10 +226,10 @@ type OrderDetails struct {
 	// OrderStatus Current status of the order.
 	OrderStatus *OrderDetailsOrderStatus `json:"orderStatus,omitempty"`
 
-	// SellingParty Name, address, and tax details of a party.
+	// SellingParty Name, address and tax details of a party.
 	SellingParty PartyIdentification `json:"sellingParty"`
 
-	// ShipFromParty Name, address, and tax details of a party.
+	// ShipFromParty Name, address and tax details of a party.
 	ShipFromParty PartyIdentification `json:"shipFromParty"`
 
 	// ShipToParty Address of the party.
@@ -239,7 +238,7 @@ type OrderDetails struct {
 	// ShipmentDetails Shipment details required for the shipment.
 	ShipmentDetails ShipmentDetails `json:"shipmentDetails"`
 
-	// TaxTotal The total tax object within the shipment that relates to the order.
+	// TaxTotal The total Tax object within shipment that relates to the order.
 	TaxTotal *struct {
 		// TaxLineItem A list of tax line items.
 		TaxLineItem *TaxLineItem `json:"taxLineItem,omitempty"`
@@ -249,7 +248,7 @@ type OrderDetails struct {
 // OrderDetailsOrderStatus Current status of the order.
 type OrderDetailsOrderStatus string
 
-// OrderItem An order item.
+// OrderItem An item within an order
 type OrderItem struct {
 	// BuyerProductIdentifier Buyer's standard identification number (ASIN) of an item.
 	BuyerProductIdentifier *string `json:"buyerProductIdentifier,omitempty"`
@@ -285,7 +284,7 @@ type OrderItem struct {
 	VendorProductIdentifier *string `json:"vendorProductIdentifier,omitempty"`
 }
 
-// OrderItemAcknowledgement Individual item details within the acknowledged order.
+// OrderItemAcknowledgement Details of an individual item within the order being acknowledged.
 type OrderItemAcknowledgement struct {
 	// AcknowledgedQuantity Details of quantity ordered.
 	AcknowledgedQuantity ItemQuantity `json:"acknowledgedQuantity"`
@@ -300,9 +299,9 @@ type OrderItemAcknowledgement struct {
 	VendorProductIdentifier *string `json:"vendorProductIdentifier,omitempty"`
 }
 
-// OrderList A purchase orders list returned as a response.
+// OrderList A list of purchase orders returned as response.
 type OrderList struct {
-	// Orders Represents a purchase order within the `OrderList`.
+	// Orders Represents a purchase order within the OrderList.
 	Orders *[]Order `json:"orders,omitempty"`
 
 	// Pagination The pagination elements required to retrieve the remaining data.
@@ -315,7 +314,7 @@ type Pagination struct {
 	NextToken *string `json:"nextToken,omitempty"`
 }
 
-// PartyIdentification Name, address, and tax details of a party.
+// PartyIdentification Name, address and tax details of a party.
 type PartyIdentification struct {
 	// Address Address of the party.
 	Address *Address `json:"address,omitempty"`
@@ -383,11 +382,12 @@ type SubmitAcknowledgementResponse struct {
 	// Errors A list of error responses returned when a request is unsuccessful.
 	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Payload Response that contains the transaction ID.
+	// Payload Response containing the transaction ID.
 	Payload *TransactionId `json:"payload,omitempty"`
 }
 
-// TaxDetails The order's tax details.
+// TaxDetails The tax details for the order.
+// _Note:_ Amazon calculates tax on the list price (Amazon retail price).
 type TaxDetails struct {
 	// TaxAmount An amount of money, including units in the form of currency.
 	TaxAmount Money `json:"taxAmount"`
@@ -426,7 +426,7 @@ type TaxRegistrationDetails struct {
 // TaxRegistrationDetailsTaxRegistrationType Tax registration type for the entity.
 type TaxRegistrationDetailsTaxRegistrationType string
 
-// TransactionId Response that contains the transaction ID.
+// TransactionId Response containing the transaction ID.
 type TransactionId struct {
 	// TransactionId GUID assigned by Amazon to identify this transaction. This value can be used with the Transaction Status API to return the status of this transaction.
 	TransactionId *string `json:"transactionId,omitempty"`
@@ -659,7 +659,7 @@ func (c *Client) GetOrder(ctx context.Context, purchaseOrderNumber string) (*htt
 // NewSubmitAcknowledgementRequest calls the generic SubmitAcknowledgement builder with application/json body
 func NewSubmitAcknowledgementRequest(server string, body SubmitAcknowledgementJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

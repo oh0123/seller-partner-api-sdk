@@ -15,563 +15,202 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
-// Defines values for ConditionType.
+// Defines values for IdType.
 const (
-	ConditionTypeClub        ConditionType = "Club"
-	ConditionTypeCollectible ConditionType = "Collectible"
-	ConditionTypeNew         ConditionType = "New"
-	ConditionTypeRefurbished ConditionType = "Refurbished"
-	ConditionTypeUsed        ConditionType = "Used"
+	ASIN      IdType = "ASIN"
+	SellerSKU IdType = "SellerSKU"
 )
 
-// Defines values for CustomerType.
+// Defines values for OptionalFulfillmentProgram.
 const (
-	CustomerTypeBusiness CustomerType = "Business"
-	CustomerTypeConsumer CustomerType = "Consumer"
+	FBACORE OptionalFulfillmentProgram = "FBA_CORE"
+	FBAEFN  OptionalFulfillmentProgram = "FBA_EFN"
+	FBASNL  OptionalFulfillmentProgram = "FBA_SNL"
 )
 
-// Defines values for DetailedShippingTimeTypeAvailabilityType.
-const (
-	FUTUREWITHDATE    DetailedShippingTimeTypeAvailabilityType = "FUTURE_WITH_DATE"
-	FUTUREWITHOUTDATE DetailedShippingTimeTypeAvailabilityType = "FUTURE_WITHOUT_DATE"
-	NOW               DetailedShippingTimeTypeAvailabilityType = "NOW"
-)
-
-// Defines values for FulfillmentChannelType.
-const (
-	Amazon   FulfillmentChannelType = "Amazon"
-	Merchant FulfillmentChannelType = "Merchant"
-)
-
-// Defines values for HttpMethod.
-const (
-	DELETE HttpMethod = "DELETE"
-	GET    HttpMethod = "GET"
-	PATCH  HttpMethod = "PATCH"
-	POST   HttpMethod = "POST"
-	PUT    HttpMethod = "PUT"
-)
-
-// Defines values for ItemCondition.
-const (
-	ItemConditionClub        ItemCondition = "Club"
-	ItemConditionCollectible ItemCondition = "Collectible"
-	ItemConditionNew         ItemCondition = "New"
-	ItemConditionRefurbished ItemCondition = "Refurbished"
-	ItemConditionUsed        ItemCondition = "Used"
-)
-
-// Defines values for OfferCustomerType.
-const (
-	OfferCustomerTypeB2B OfferCustomerType = "B2B"
-	OfferCustomerTypeB2C OfferCustomerType = "B2C"
-)
-
-// Defines values for QuantityDiscountType.
-const (
-	QUANTITYDISCOUNT QuantityDiscountType = "QUANTITY_DISCOUNT"
-)
-
-// Defines values for GetCompetitivePricingParamsItemType.
-const (
-	GetCompetitivePricingParamsItemTypeAsin GetCompetitivePricingParamsItemType = "Asin"
-	GetCompetitivePricingParamsItemTypeSku  GetCompetitivePricingParamsItemType = "Sku"
-)
-
-// Defines values for GetCompetitivePricingParamsCustomerType.
-const (
-	GetCompetitivePricingParamsCustomerTypeBusiness GetCompetitivePricingParamsCustomerType = "Business"
-	GetCompetitivePricingParamsCustomerTypeConsumer GetCompetitivePricingParamsCustomerType = "Consumer"
-)
-
-// Defines values for GetItemOffersParamsItemCondition.
-const (
-	GetItemOffersParamsItemConditionClub        GetItemOffersParamsItemCondition = "Club"
-	GetItemOffersParamsItemConditionCollectible GetItemOffersParamsItemCondition = "Collectible"
-	GetItemOffersParamsItemConditionNew         GetItemOffersParamsItemCondition = "New"
-	GetItemOffersParamsItemConditionRefurbished GetItemOffersParamsItemCondition = "Refurbished"
-	GetItemOffersParamsItemConditionUsed        GetItemOffersParamsItemCondition = "Used"
-)
-
-// Defines values for GetItemOffersParamsCustomerType.
-const (
-	GetItemOffersParamsCustomerTypeBusiness GetItemOffersParamsCustomerType = "Business"
-	GetItemOffersParamsCustomerTypeConsumer GetItemOffersParamsCustomerType = "Consumer"
-)
-
-// Defines values for GetListingOffersParamsItemCondition.
-const (
-	GetListingOffersParamsItemConditionClub        GetListingOffersParamsItemCondition = "Club"
-	GetListingOffersParamsItemConditionCollectible GetListingOffersParamsItemCondition = "Collectible"
-	GetListingOffersParamsItemConditionNew         GetListingOffersParamsItemCondition = "New"
-	GetListingOffersParamsItemConditionRefurbished GetListingOffersParamsItemCondition = "Refurbished"
-	GetListingOffersParamsItemConditionUsed        GetListingOffersParamsItemCondition = "Used"
-)
-
-// Defines values for GetListingOffersParamsCustomerType.
-const (
-	GetListingOffersParamsCustomerTypeBusiness GetListingOffersParamsCustomerType = "Business"
-	GetListingOffersParamsCustomerTypeConsumer GetListingOffersParamsCustomerType = "Consumer"
-)
-
-// Defines values for GetPricingParamsItemType.
-const (
-	GetPricingParamsItemTypeAsin GetPricingParamsItemType = "Asin"
-	GetPricingParamsItemTypeSku  GetPricingParamsItemType = "Sku"
-)
-
-// Defines values for GetPricingParamsItemCondition.
-const (
-	Club        GetPricingParamsItemCondition = "Club"
-	Collectible GetPricingParamsItemCondition = "Collectible"
-	New         GetPricingParamsItemCondition = "New"
-	Refurbished GetPricingParamsItemCondition = "Refurbished"
-	Used        GetPricingParamsItemCondition = "Used"
-)
-
-// Defines values for GetPricingParamsOfferType.
-const (
-	GetPricingParamsOfferTypeB2B GetPricingParamsOfferType = "B2B"
-	GetPricingParamsOfferTypeB2C GetPricingParamsOfferType = "B2C"
-)
-
-// ASINIdentifier defines model for ASINIdentifier.
-type ASINIdentifier struct {
-	// ASIN The Amazon Standard Identification Number (ASIN) of the item.
-	ASIN string `json:"ASIN"`
-
-	// MarketplaceId A marketplace identifier.
-	MarketplaceId string `json:"MarketplaceId"`
-}
-
-// AttributeSetList A list of product attributes if they are applicable to the product that is returned.
-type AttributeSetList = []map[string]interface{}
-
-// BatchOffersRequestParams defines model for BatchOffersRequestParams.
-type BatchOffersRequestParams struct {
-	// CustomerType Indicates whether to request Consumer or Business offers. Default is Consumer.
-	CustomerType *CustomerType `json:"CustomerType,omitempty"`
-
-	// ItemCondition Filters the offer listings to be considered based on item condition. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition ItemCondition `json:"ItemCondition"`
-
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-	MarketplaceId MarketplaceId `json:"MarketplaceId"`
-}
-
-// BatchOffersResponse defines model for BatchOffersResponse.
-type BatchOffersResponse struct {
-	// Body The response schema for the `getListingOffers` and `getItemOffers` operations.
-	Body GetOffersResponse `json:"body"`
-
-	// Headers A mapping of additional HTTP headers to send/receive for the individual batch request.
-	Headers *HttpResponseHeaders `json:"headers,omitempty"`
-
-	// Status The HTTP status line associated with the response.  For more information, consult [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
-	Status *GetOffersHttpStatusLine `json:"status,omitempty"`
-}
-
-// BatchRequest Common properties of batch requests against individual APIs.
-type BatchRequest struct {
-	// Headers A mapping of additional HTTP headers to send/receive for the individual batch request.
-	Headers *HttpRequestHeaders `json:"headers,omitempty"`
-
-	// Method The HTTP method associated with the individual APIs being called as part of the batch request.
-	Method HttpMethod `json:"method"`
-
-	// Uri The resource path of the operation you are calling in batch without any query parameters.
-	//
-	// If you are calling `getItemOffersBatch`, supply the path of `getItemOffers`.
-	//
-	// **Example:** `/products/pricing/v0/items/B000P6Q7MY/offers`
-	//
-	// If you are calling `getListingOffersBatch`, supply the path of `getListingOffers`.
-	//
-	// **Example:** `/products/pricing/v0/listings/B000P6Q7MY/offers`
-	Uri string `json:"uri"`
-}
-
-// BuyBoxEligibleOffers defines model for BuyBoxEligibleOffers.
-type BuyBoxEligibleOffers = []OfferCountType
-
-// BuyBoxPriceType defines model for BuyBoxPriceType.
-type BuyBoxPriceType struct {
-	LandedPrice  MoneyType `json:"LandedPrice"`
-	ListingPrice MoneyType `json:"ListingPrice"`
-	Points       *Points   `json:"Points,omitempty"`
-	Shipping     MoneyType `json:"Shipping"`
-
-	// Condition Indicates the condition of the item. For example: New, Used, Collectible, Refurbished, or Club.
-	Condition            string                `json:"condition"`
-	OfferType            *OfferCustomerType    `json:"offerType,omitempty"`
-	QuantityDiscountType *QuantityDiscountType `json:"quantityDiscountType,omitempty"`
-
-	// QuantityTier Indicates at what quantity this price becomes active.
-	QuantityTier *int32 `json:"quantityTier,omitempty"`
-
-	// SellerId The seller identifier for the offer.
-	SellerId *string `json:"sellerId,omitempty"`
-}
-
-// BuyBoxPrices defines model for BuyBoxPrices.
-type BuyBoxPrices = []BuyBoxPriceType
-
-// CompetitivePriceList A list of competitive pricing information.
-type CompetitivePriceList = []CompetitivePriceType
-
-// CompetitivePriceType defines model for CompetitivePriceType.
-type CompetitivePriceType struct {
-	// CompetitivePriceId The pricing model for each price that is returned.
-	//
-	// Possible values:
-	//
-	// * 1 - New Buy Box Price.
-	// * 2 - Used Buy Box Price.
-	CompetitivePriceId string    `json:"CompetitivePriceId"`
-	Price              PriceType `json:"Price"`
-
-	// BelongsToRequester  Indicates whether or not the pricing information is for an offer listing that belongs to the requester. The requester is the seller associated with the SellerId that was submitted with the request. Possible values are: true and false.
-	BelongsToRequester *bool `json:"belongsToRequester,omitempty"`
-
-	// Condition Indicates the condition of the item whose pricing information is returned. Possible values are: New, Used, Collectible, Refurbished, or Club.
-	Condition            *string               `json:"condition,omitempty"`
-	OfferType            *OfferCustomerType    `json:"offerType,omitempty"`
-	QuantityDiscountType *QuantityDiscountType `json:"quantityDiscountType,omitempty"`
-
-	// QuantityTier Indicates at what quantity this price becomes active.
-	QuantityTier *int32 `json:"quantityTier,omitempty"`
-
-	// SellerId The seller identifier for the offer.
-	SellerId *string `json:"sellerId,omitempty"`
-
-	// Subcondition Indicates the subcondition of the item whose pricing information is returned. Possible values are: New, Mint, Very Good, Good, Acceptable, Poor, Club, OEM, Warranty, Refurbished Warranty, Refurbished, Open Box, or Other.
-	Subcondition *string `json:"subcondition,omitempty"`
-}
-
-// CompetitivePricingType Competitive pricing information for the item.
-type CompetitivePricingType struct {
-	// CompetitivePrices A list of competitive pricing information.
-	CompetitivePrices CompetitivePriceList `json:"CompetitivePrices"`
-
-	// NumberOfOfferListings The number of active offer listings for the item that was submitted. The listing count is returned by condition, one for each listing condition value that is returned.
-	NumberOfOfferListings NumberOfOfferListingsList `json:"NumberOfOfferListings"`
-	TradeInValue          *MoneyType                `json:"TradeInValue,omitempty"`
-}
-
-// ConditionType Indicates the condition of the item. Possible values: New, Used, Collectible, Refurbished, Club.
-type ConditionType string
-
-// CustomerType Indicates whether to request Consumer or Business offers. Default is Consumer.
-type CustomerType string
-
-// DetailedShippingTimeType The time range in which an item will likely be shipped once an order has been placed.
-type DetailedShippingTimeType struct {
-	// AvailabilityType Indicates whether the item is available for shipping now, or on a known or an unknown date in the future. If known, the availableDate property indicates the date that the item will be available for shipping. Possible values: NOW, FUTURE_WITHOUT_DATE, FUTURE_WITH_DATE.
-	AvailabilityType *DetailedShippingTimeTypeAvailabilityType `json:"availabilityType,omitempty"`
-
-	// AvailableDate The date when the item will be available for shipping. Only displayed for items that are not currently available for shipping.
-	AvailableDate *string `json:"availableDate,omitempty"`
-
-	// MaximumHours The maximum time, in hours, that the item will likely be shipped after the order has been placed.
-	MaximumHours *int64 `json:"maximumHours,omitempty"`
-
-	// MinimumHours The minimum time, in hours, that the item will likely be shipped after the order has been placed.
-	MinimumHours *int64 `json:"minimumHours,omitempty"`
-}
-
-// DetailedShippingTimeTypeAvailabilityType Indicates whether the item is available for shipping now, or on a known or an unknown date in the future. If known, the availableDate property indicates the date that the item will be available for shipping. Possible values: NOW, FUTURE_WITHOUT_DATE, FUTURE_WITH_DATE.
-type DetailedShippingTimeTypeAvailabilityType string
-
-// Error Error response returned when the request is unsuccessful.
+// Error defines model for Error.
 type Error struct {
 	// Code An error code that identifies the type of error that occurred.
 	Code string `json:"code"`
 
-	// Details Additional information that can help the caller understand or fix the issue.
+	// Details Additional details that can help the caller understand or fix the issue.
 	Details *string `json:"details,omitempty"`
 
-	// Message A message that describes the error condition in a human-readable form.
+	// Message A message that describes the error condition.
 	Message string `json:"message"`
 }
 
 // ErrorList A list of error responses returned when a request is unsuccessful.
 type ErrorList = []Error
 
-// Errors A list of error responses returned when a request is unsuccessful.
-type Errors struct {
-	// Errors A list of error responses returned when a request is unsuccessful.
-	Errors ErrorList `json:"errors"`
+// FeeDetail The type of fee, fee amount, and other details.
+type FeeDetail struct {
+	FeeAmount    MoneyType  `json:"FeeAmount"`
+	FeePromotion *MoneyType `json:"FeePromotion,omitempty"`
+
+	// FeeType The type of fee charged to a seller.
+	FeeType  string    `json:"FeeType"`
+	FinalFee MoneyType `json:"FinalFee"`
+
+	// IncludedFeeDetailList A list of other fees that contribute to a given fee.
+	IncludedFeeDetailList *IncludedFeeDetailList `json:"IncludedFeeDetailList,omitempty"`
+	TaxAmount             *MoneyType             `json:"TaxAmount,omitempty"`
 }
 
-// FulfillmentChannelType Indicates whether the item is fulfilled by Amazon or by the seller (merchant).
-type FulfillmentChannelType string
+// FeeDetailList A list of other fees that contribute to a given fee.
+type FeeDetailList = []FeeDetail
 
-// GetItemOffersBatchRequest The request associated with the `getItemOffersBatch` API call.
-type GetItemOffersBatchRequest struct {
-	// Requests A list of `getListingOffers` batched requests to run.
-	Requests *ItemOffersRequestList `json:"requests,omitempty"`
+// FeesEstimate The total estimated fees for an item and a list of details.
+type FeesEstimate struct {
+	// FeeDetailList A list of other fees that contribute to a given fee.
+	FeeDetailList *FeeDetailList `json:"FeeDetailList,omitempty"`
+
+	// TimeOfFeesEstimation The time at which the fees were estimated. This defaults to the time the request is made.
+	TimeOfFeesEstimation time.Time  `json:"TimeOfFeesEstimation"`
+	TotalFeesEstimate    *MoneyType `json:"TotalFeesEstimate,omitempty"`
 }
 
-// GetItemOffersBatchResponse The response associated with the `getItemOffersBatch` API call.
-type GetItemOffersBatchResponse struct {
-	// Responses A list of `getItemOffers` batched responses.
-	Responses *ItemOffersResponseList `json:"responses,omitempty"`
+// FeesEstimateByIdRequest A product, marketplace, and proposed price used to request estimated fees.
+type FeesEstimateByIdRequest struct {
+	// FeesEstimateRequest A product, marketplace, and proposed price used to request estimated fees.
+	FeesEstimateRequest *FeesEstimateRequest `json:"FeesEstimateRequest,omitempty"`
+
+	// IdType The type of product identifier used in a `FeesEstimateByIdRequest`.
+	IdType IdType `json:"IdType"`
+
+	// IdValue The item identifier.
+	IdValue string `json:"IdValue"`
 }
 
-// GetListingOffersBatchRequest The request associated with the `getListingOffersBatch` API call.
-type GetListingOffersBatchRequest struct {
-	// Requests A list of `getListingOffers` batched requests to run.
-	Requests *ListingOffersRequestList `json:"requests,omitempty"`
+// FeesEstimateError An unexpected error occurred during this operation.
+type FeesEstimateError struct {
+	// Code An error code that identifies the type of error that occurred.
+	Code string `json:"Code"`
+
+	// Detail Additional information that can help the caller understand or fix the issue.
+	Detail FeesEstimateErrorDetail `json:"Detail"`
+
+	// Message A message that describes the error condition.
+	Message string `json:"Message"`
+
+	// Type An error type, identifying either the receiver or the sender as the originator of the error.
+	Type string `json:"Type"`
 }
 
-// GetListingOffersBatchResponse The response associated with the `getListingOffersBatch` API call.
-type GetListingOffersBatchResponse struct {
-	// Responses A list of `getListingOffers` batched responses.
-	Responses *ListingOffersResponseList `json:"responses,omitempty"`
+// FeesEstimateErrorDetail Additional information that can help the caller understand or fix the issue.
+type FeesEstimateErrorDetail = []map[string]interface{}
+
+// FeesEstimateIdentifier An item identifier, marketplace, time of request, and other details that identify an estimate.
+type FeesEstimateIdentifier struct {
+	// IdType The type of product identifier used in a `FeesEstimateByIdRequest`.
+	IdType *IdType `json:"IdType,omitempty"`
+
+	// IdValue The item identifier.
+	IdValue *string `json:"IdValue,omitempty"`
+
+	// IsAmazonFulfilled When true, the offer is fulfilled by Amazon.
+	IsAmazonFulfilled *bool `json:"IsAmazonFulfilled,omitempty"`
+
+	// MarketplaceId A marketplace identifier.
+	MarketplaceId *string `json:"MarketplaceId,omitempty"`
+
+	// OptionalFulfillmentProgram An optional enrollment program to return the estimated fees when the offer is fulfilled by Amazon (IsAmazonFulfilled is set to true).
+	OptionalFulfillmentProgram *OptionalFulfillmentProgram `json:"OptionalFulfillmentProgram,omitempty"`
+
+	// PriceToEstimateFees Price information for an item, used to estimate fees.
+	PriceToEstimateFees *PriceToEstimateFees `json:"PriceToEstimateFees,omitempty"`
+
+	// SellerId The seller identifier.
+	SellerId *string `json:"SellerId,omitempty"`
+
+	// SellerInputIdentifier A unique identifier provided by the caller to track this request.
+	SellerInputIdentifier *string `json:"SellerInputIdentifier,omitempty"`
 }
 
-// GetOffersHttpStatusLine The HTTP status line associated with the response.  For more information, consult [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
-type GetOffersHttpStatusLine struct {
-	// ReasonPhrase The HTTP response Reason-Phase.
-	ReasonPhrase *string `json:"reasonPhrase,omitempty"`
+// FeesEstimateRequest A product, marketplace, and proposed price used to request estimated fees.
+type FeesEstimateRequest struct {
+	// Identifier A unique identifier provided by the caller to track this request.
+	Identifier string `json:"Identifier"`
 
-	// StatusCode The HTTP response Status Code.
-	StatusCode *int `json:"statusCode,omitempty"`
-}
+	// IsAmazonFulfilled When true, the offer is fulfilled by Amazon.
+	IsAmazonFulfilled *bool `json:"IsAmazonFulfilled,omitempty"`
 
-// GetOffersResponse The response schema for the `getListingOffers` and `getItemOffers` operations.
-type GetOffersResponse struct {
-	// Errors A list of error responses returned when a request is unsuccessful.
-	Errors  *ErrorList       `json:"errors,omitempty"`
-	Payload *GetOffersResult `json:"payload,omitempty"`
-}
-
-// GetOffersResult defines model for GetOffersResult.
-type GetOffersResult struct {
-	// ASIN The Amazon Standard Identification Number (ASIN) of the item.
-	ASIN *string `json:"ASIN,omitempty"`
-
-	// Identifier Information that identifies an item.
-	Identifier ItemIdentifier `json:"Identifier"`
-
-	// ItemCondition Indicates the condition of the item. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition ConditionType `json:"ItemCondition"`
-
-	// MarketplaceID A marketplace identifier.
-	MarketplaceID string          `json:"MarketplaceID"`
-	Offers        OfferDetailList `json:"Offers"`
-
-	// SKU The stock keeping unit (SKU) of the item.
-	SKU *string `json:"SKU,omitempty"`
-
-	// Summary Contains price information about the product, including the LowestPrices and BuyBoxPrices, the ListPrice, the SuggestedLowerPricePlusShipping, and NumberOfOffers and NumberOfBuyBoxEligibleOffers.
-	Summary Summary `json:"Summary"`
-
-	// Status The status of the operation.
-	Status string `json:"status"`
-}
-
-// GetPricingResponse The response schema for the `getPricing` and `getCompetitivePricing` operations.
-type GetPricingResponse struct {
-	// Errors A list of error responses returned when a request is unsuccessful.
-	Errors  *ErrorList `json:"errors,omitempty"`
-	Payload *PriceList `json:"payload,omitempty"`
-}
-
-// HttpMethod The HTTP method associated with the individual APIs being called as part of the batch request.
-type HttpMethod string
-
-// HttpRequestHeaders A mapping of additional HTTP headers to send/receive for the individual batch request.
-type HttpRequestHeaders map[string]string
-
-// HttpResponseHeaders A mapping of additional HTTP headers to send/receive for the individual batch request.
-type HttpResponseHeaders struct {
-	// Date The timestamp that the API request was received.  For more information, consult [RFC 2616 Section 14](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html).
-	Date *string `json:"Date,omitempty"`
-
-	// XAmznRequestId Unique request reference ID.
-	XAmznRequestId       *string           `json:"x-amzn-RequestId,omitempty"`
-	AdditionalProperties map[string]string `json:"-"`
-}
-
-// IdentifierType Specifies the identifiers used to uniquely identify an item.
-type IdentifierType struct {
-	MarketplaceASIN ASINIdentifier       `json:"MarketplaceASIN"`
-	SKUIdentifier   *SellerSKUIdentifier `json:"SKUIdentifier,omitempty"`
-}
-
-// ItemCondition Filters the offer listings to be considered based on item condition. Possible values: New, Used, Collectible, Refurbished, Club.
-type ItemCondition string
-
-// ItemIdentifier Information that identifies an item.
-type ItemIdentifier struct {
-	// ASIN The Amazon Standard Identification Number (ASIN) of the item.
-	ASIN *string `json:"ASIN,omitempty"`
-
-	// ItemCondition Indicates the condition of the item. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition ConditionType `json:"ItemCondition"`
-
-	// MarketplaceId A marketplace identifier. Specifies the marketplace from which prices are returned.
+	// MarketplaceId A marketplace identifier.
 	MarketplaceId string `json:"MarketplaceId"`
 
-	// SellerSKU The seller stock keeping unit (SKU) of the item.
-	SellerSKU *string `json:"SellerSKU,omitempty"`
+	// OptionalFulfillmentProgram An optional enrollment program to return the estimated fees when the offer is fulfilled by Amazon (IsAmazonFulfilled is set to true).
+	OptionalFulfillmentProgram *OptionalFulfillmentProgram `json:"OptionalFulfillmentProgram,omitempty"`
+
+	// PriceToEstimateFees Price information for an item, used to estimate fees.
+	PriceToEstimateFees PriceToEstimateFees `json:"PriceToEstimateFees"`
 }
 
-// ItemOffersRequest defines model for ItemOffersRequest.
-type ItemOffersRequest struct {
-	// CustomerType Indicates whether to request Consumer or Business offers. Default is Consumer.
-	CustomerType *CustomerType `json:"CustomerType,omitempty"`
+// FeesEstimateResult An item identifier and the estimated fees for the item.
+type FeesEstimateResult struct {
+	// Error An unexpected error occurred during this operation.
+	Error *FeesEstimateError `json:"Error,omitempty"`
 
-	// ItemCondition Filters the offer listings to be considered based on item condition. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition ItemCondition `json:"ItemCondition"`
+	// FeesEstimate The total estimated fees for an item and a list of details.
+	FeesEstimate *FeesEstimate `json:"FeesEstimate,omitempty"`
 
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-	MarketplaceId MarketplaceId `json:"MarketplaceId"`
+	// FeesEstimateIdentifier An item identifier, marketplace, time of request, and other details that identify an estimate.
+	FeesEstimateIdentifier *FeesEstimateIdentifier `json:"FeesEstimateIdentifier,omitempty"`
 
-	// Headers A mapping of additional HTTP headers to send/receive for the individual batch request.
-	Headers *HttpRequestHeaders `json:"headers,omitempty"`
-
-	// Method The HTTP method associated with the individual APIs being called as part of the batch request.
-	Method HttpMethod `json:"method"`
-
-	// Uri The resource path of the operation you are calling in batch without any query parameters.
-	//
-	// If you are calling `getItemOffersBatch`, supply the path of `getItemOffers`.
-	//
-	// **Example:** `/products/pricing/v0/items/B000P6Q7MY/offers`
-	//
-	// If you are calling `getListingOffersBatch`, supply the path of `getListingOffers`.
-	//
-	// **Example:** `/products/pricing/v0/listings/B000P6Q7MY/offers`
-	Uri string `json:"uri"`
+	// Status The status of the fee request. Possible values: Success, ClientError, ServiceError.
+	Status *string `json:"Status,omitempty"`
 }
 
-// ItemOffersRequestList A list of `getListingOffers` batched requests to run.
-type ItemOffersRequestList = []ItemOffersRequest
-
-// ItemOffersRequestParams defines model for ItemOffersRequestParams.
-type ItemOffersRequestParams struct {
-	// Asin The Amazon Standard Identification Number (ASIN) of the item. This is the same Asin passed as a request parameter.
-	Asin *string `json:"Asin,omitempty"`
-
-	// CustomerType Indicates whether to request Consumer or Business offers. Default is Consumer.
-	CustomerType *CustomerType `json:"CustomerType,omitempty"`
-
-	// ItemCondition Filters the offer listings to be considered based on item condition. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition ItemCondition `json:"ItemCondition"`
-
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-	MarketplaceId MarketplaceId `json:"MarketplaceId"`
+// GetMyFeesEstimateRequest Request schema.
+type GetMyFeesEstimateRequest struct {
+	// FeesEstimateRequest A product, marketplace, and proposed price used to request estimated fees.
+	FeesEstimateRequest *FeesEstimateRequest `json:"FeesEstimateRequest,omitempty"`
 }
 
-// ItemOffersResponse defines model for ItemOffersResponse.
-type ItemOffersResponse struct {
-	// Body The response schema for the `getListingOffers` and `getItemOffers` operations.
-	Body GetOffersResponse `json:"body"`
+// GetMyFeesEstimateResponse defines model for GetMyFeesEstimateResponse.
+type GetMyFeesEstimateResponse struct {
+	// Errors A list of error responses returned when a request is unsuccessful.
+	Errors *ErrorList `json:"errors,omitempty"`
 
-	// Headers A mapping of additional HTTP headers to send/receive for the individual batch request.
-	Headers *HttpResponseHeaders    `json:"headers,omitempty"`
-	Request ItemOffersRequestParams `json:"request"`
-
-	// Status The HTTP status line associated with the response.  For more information, consult [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
-	Status *GetOffersHttpStatusLine `json:"status,omitempty"`
+	// Payload Response schema.
+	Payload *GetMyFeesEstimateResult `json:"payload,omitempty"`
 }
 
-// ItemOffersResponseList A list of `getItemOffers` batched responses.
-type ItemOffersResponseList = []ItemOffersResponse
-
-// ListingOffersRequest defines model for ListingOffersRequest.
-type ListingOffersRequest struct {
-	// CustomerType Indicates whether to request Consumer or Business offers. Default is Consumer.
-	CustomerType *CustomerType `json:"CustomerType,omitempty"`
-
-	// ItemCondition Filters the offer listings to be considered based on item condition. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition ItemCondition `json:"ItemCondition"`
-
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-	MarketplaceId MarketplaceId `json:"MarketplaceId"`
-
-	// Headers A mapping of additional HTTP headers to send/receive for the individual batch request.
-	Headers *HttpRequestHeaders `json:"headers,omitempty"`
-
-	// Method The HTTP method associated with the individual APIs being called as part of the batch request.
-	Method HttpMethod `json:"method"`
-
-	// Uri The resource path of the operation you are calling in batch without any query parameters.
-	//
-	// If you are calling `getItemOffersBatch`, supply the path of `getItemOffers`.
-	//
-	// **Example:** `/products/pricing/v0/items/B000P6Q7MY/offers`
-	//
-	// If you are calling `getListingOffersBatch`, supply the path of `getListingOffers`.
-	//
-	// **Example:** `/products/pricing/v0/listings/B000P6Q7MY/offers`
-	Uri string `json:"uri"`
+// GetMyFeesEstimateResult Response schema.
+type GetMyFeesEstimateResult struct {
+	// FeesEstimateResult An item identifier and the estimated fees for the item.
+	FeesEstimateResult *FeesEstimateResult `json:"FeesEstimateResult,omitempty"`
 }
 
-// ListingOffersRequestList A list of `getListingOffers` batched requests to run.
-type ListingOffersRequestList = []ListingOffersRequest
-
-// ListingOffersRequestParams defines model for ListingOffersRequestParams.
-type ListingOffersRequestParams struct {
-	// CustomerType Indicates whether to request Consumer or Business offers. Default is Consumer.
-	CustomerType *CustomerType `json:"CustomerType,omitempty"`
-
-	// ItemCondition Filters the offer listings to be considered based on item condition. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition ItemCondition `json:"ItemCondition"`
-
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-	MarketplaceId MarketplaceId `json:"MarketplaceId"`
-
-	// SellerSKU The seller stock keeping unit (SKU) of the item. This is the same SKU passed as a path parameter.
-	SellerSKU string `json:"SellerSKU"`
+// GetMyFeesEstimatesErrorList A list of error responses returned when a request is unsuccessful.
+type GetMyFeesEstimatesErrorList struct {
+	Errors []Error `json:"errors"`
 }
 
-// ListingOffersResponse defines model for ListingOffersResponse.
-type ListingOffersResponse struct {
-	// Body The response schema for the `getListingOffers` and `getItemOffers` operations.
-	Body GetOffersResponse `json:"body"`
+// GetMyFeesEstimatesRequest Request for estimated fees for a list of products.
+type GetMyFeesEstimatesRequest = []FeesEstimateByIdRequest
 
-	// Headers A mapping of additional HTTP headers to send/receive for the individual batch request.
-	Headers *HttpResponseHeaders        `json:"headers,omitempty"`
-	Request *ListingOffersRequestParams `json:"request,omitempty"`
+// GetMyFeesEstimatesResponse Estimated fees for a list of products.
+type GetMyFeesEstimatesResponse = []FeesEstimateResult
 
-	// Status The HTTP status line associated with the response.  For more information, consult [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html).
-	Status *GetOffersHttpStatusLine `json:"status,omitempty"`
+// IdType The type of product identifier used in a `FeesEstimateByIdRequest`.
+type IdType string
+
+// IncludedFeeDetail The type of fee, fee amount, and other details.
+type IncludedFeeDetail struct {
+	FeeAmount    MoneyType  `json:"FeeAmount"`
+	FeePromotion *MoneyType `json:"FeePromotion,omitempty"`
+
+	// FeeType The type of fee charged to a seller.
+	FeeType   string     `json:"FeeType"`
+	FinalFee  MoneyType  `json:"FinalFee"`
+	TaxAmount *MoneyType `json:"TaxAmount,omitempty"`
 }
 
-// ListingOffersResponseList A list of `getListingOffers` batched responses.
-type ListingOffersResponseList = []ListingOffersResponse
-
-// LowestPriceType defines model for LowestPriceType.
-type LowestPriceType struct {
-	LandedPrice  *MoneyType `json:"LandedPrice,omitempty"`
-	ListingPrice MoneyType  `json:"ListingPrice"`
-	Points       *Points    `json:"Points,omitempty"`
-	Shipping     *MoneyType `json:"Shipping,omitempty"`
-
-	// Condition Indicates the condition of the item. For example: New, Used, Collectible, Refurbished, or Club.
-	Condition string `json:"condition"`
-
-	// FulfillmentChannel Indicates whether the item is fulfilled by Amazon or by the seller.
-	FulfillmentChannel   string                `json:"fulfillmentChannel"`
-	OfferType            *OfferCustomerType    `json:"offerType,omitempty"`
-	QuantityDiscountType *QuantityDiscountType `json:"quantityDiscountType,omitempty"`
-
-	// QuantityTier Indicates at what quantity this price becomes active.
-	QuantityTier *int32 `json:"quantityTier,omitempty"`
-}
-
-// LowestPrices defines model for LowestPrices.
-type LowestPrices = []LowestPriceType
-
-// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-type MarketplaceId = string
+// IncludedFeeDetailList A list of other fees that contribute to a given fee.
+type IncludedFeeDetailList = []IncludedFeeDetail
 
 // MoneyType defines model for MoneyType.
 type MoneyType struct {
@@ -582,426 +221,30 @@ type MoneyType struct {
 	CurrencyCode *string `json:"CurrencyCode,omitempty"`
 }
 
-// NumberOfOfferListingsList The number of active offer listings for the item that was submitted. The listing count is returned by condition, one for each listing condition value that is returned.
-type NumberOfOfferListingsList = []OfferListingCountType
-
-// NumberOfOffers defines model for NumberOfOffers.
-type NumberOfOffers = []OfferCountType
-
-// OfferCountType The total number of offers for the specified condition and fulfillment channel.
-type OfferCountType struct {
-	// OfferCount The number of offers in a fulfillment channel that meet a specific condition.
-	OfferCount *int32 `json:"OfferCount,omitempty"`
-
-	// Condition Indicates the condition of the item. For example: New, Used, Collectible, Refurbished, or Club.
-	Condition *string `json:"condition,omitempty"`
-
-	// FulfillmentChannel Indicates whether the item is fulfilled by Amazon or by the seller (merchant).
-	FulfillmentChannel *FulfillmentChannelType `json:"fulfillmentChannel,omitempty"`
-}
-
-// OfferCustomerType defines model for OfferCustomerType.
-type OfferCustomerType string
-
-// OfferDetail defines model for OfferDetail.
-type OfferDetail struct {
-	// ConditionNotes Information about the condition of the item.
-	ConditionNotes *string `json:"ConditionNotes,omitempty"`
-
-	// IsBuyBoxWinner When true, the offer is currently in the Buy Box. There can be up to two Buy Box winners at any time per ASIN, one that is eligible for Prime and one that is not eligible for Prime.
-	IsBuyBoxWinner *bool `json:"IsBuyBoxWinner,omitempty"`
-
-	// IsFeaturedMerchant When true, the seller of the item is eligible to win the Buy Box.
-	IsFeaturedMerchant *bool `json:"IsFeaturedMerchant,omitempty"`
-
-	// IsFulfilledByAmazon When true, the offer is fulfilled by Amazon.
-	IsFulfilledByAmazon bool      `json:"IsFulfilledByAmazon"`
-	ListingPrice        MoneyType `json:"ListingPrice"`
-
-	// MyOffer When true, this is the seller's offer.
-	MyOffer *bool   `json:"MyOffer,omitempty"`
-	Points  *Points `json:"Points,omitempty"`
-
-	// PrimeInformation Amazon Prime information.
-	PrimeInformation *PrimeInformationType `json:"PrimeInformation,omitempty"`
-
-	// SellerFeedbackRating Information about the seller's feedback, including the percentage of positive feedback, and the total number of ratings received.
-	SellerFeedbackRating *SellerFeedbackType `json:"SellerFeedbackRating,omitempty"`
-
-	// SellerId The seller identifier for the offer.
-	SellerId *string   `json:"SellerId,omitempty"`
-	Shipping MoneyType `json:"Shipping"`
-
-	// ShippingTime The time range in which an item will likely be shipped once an order has been placed.
-	ShippingTime DetailedShippingTimeType `json:"ShippingTime"`
-
-	// ShipsFrom The state and country from where the item is shipped.
-	ShipsFrom *ShipsFromType `json:"ShipsFrom,omitempty"`
-
-	// SubCondition The subcondition of the item. Subcondition values: New, Mint, Very Good, Good, Acceptable, Poor, Club, OEM, Warranty, Refurbished Warranty, Refurbished, Open Box, or Other.
-	SubCondition           string                       `json:"SubCondition"`
-	OfferType              *OfferCustomerType           `json:"offerType,omitempty"`
-	QuantityDiscountPrices *[]QuantityDiscountPriceType `json:"quantityDiscountPrices,omitempty"`
-}
-
-// OfferDetailList defines model for OfferDetailList.
-type OfferDetailList = []OfferDetail
-
-// OfferListingCountType The number of offer listings with the specified condition.
-type OfferListingCountType struct {
-	// Count The number of offer listings.
-	Count int32 `json:"Count"`
-
-	// Condition The condition of the item.
-	Condition string `json:"condition"`
-}
-
-// OfferType defines model for OfferType.
-type OfferType struct {
-	BuyingPrice PriceType `json:"BuyingPrice"`
-
-	// FulfillmentChannel The fulfillment channel for the offer listing. Possible values:
-	//
-	// * Amazon - Fulfilled by Amazon.
-	// * Merchant - Fulfilled by the seller.
-	FulfillmentChannel string `json:"FulfillmentChannel"`
-
-	// ItemCondition The item condition for the offer listing. Possible values: New, Used, Collectible, Refurbished, or Club.
-	ItemCondition string `json:"ItemCondition"`
-
-	// ItemSubCondition The item subcondition for the offer listing. Possible values: New, Mint, Very Good, Good, Acceptable, Poor, Club, OEM, Warranty, Refurbished Warranty, Refurbished, Open Box, or Other.
-	ItemSubCondition string    `json:"ItemSubCondition"`
-	RegularPrice     MoneyType `json:"RegularPrice"`
-
-	// SellerSKU The seller stock keeping unit (SKU) of the item.
-	SellerSKU              string                       `json:"SellerSKU"`
-	BusinessPrice          *MoneyType                   `json:"businessPrice,omitempty"`
-	OfferType              *OfferCustomerType           `json:"offerType,omitempty"`
-	QuantityDiscountPrices *[]QuantityDiscountPriceType `json:"quantityDiscountPrices,omitempty"`
-}
-
-// OffersList A list of offers.
-type OffersList = []OfferType
+// OptionalFulfillmentProgram An optional enrollment program to return the estimated fees when the offer is fulfilled by Amazon (IsAmazonFulfilled is set to true).
+type OptionalFulfillmentProgram string
 
 // Points defines model for Points.
 type Points struct {
 	PointsMonetaryValue *MoneyType `json:"PointsMonetaryValue,omitempty"`
-
-	// PointsNumber The number of points.
-	PointsNumber *int32 `json:"PointsNumber,omitempty"`
+	PointsNumber        *int32     `json:"PointsNumber,omitempty"`
 }
 
-// Price defines model for Price.
-type Price struct {
-	// ASIN The Amazon Standard Identification Number (ASIN) of the item.
-	ASIN *string `json:"ASIN,omitempty"`
-
-	// Product An item.
-	Product *Product `json:"Product,omitempty"`
-
-	// SellerSKU The seller stock keeping unit (SKU) of the item.
-	SellerSKU *string `json:"SellerSKU,omitempty"`
-
-	// Status The status of the operation.
-	Status string `json:"status"`
-}
-
-// PriceList defines model for PriceList.
-type PriceList = []Price
-
-// PriceType defines model for PriceType.
-type PriceType struct {
-	LandedPrice  *MoneyType `json:"LandedPrice,omitempty"`
+// PriceToEstimateFees Price information for an item, used to estimate fees.
+type PriceToEstimateFees struct {
 	ListingPrice MoneyType  `json:"ListingPrice"`
 	Points       *Points    `json:"Points,omitempty"`
 	Shipping     *MoneyType `json:"Shipping,omitempty"`
 }
 
-// PrimeInformationType Amazon Prime information.
-type PrimeInformationType struct {
-	// IsNationalPrime Indicates whether the offer is an Amazon Prime offer throughout the entire marketplace where it is listed.
-	IsNationalPrime bool `json:"IsNationalPrime"`
+// GetMyFeesEstimatesJSONRequestBody defines body for GetMyFeesEstimates for application/json ContentType.
+type GetMyFeesEstimatesJSONRequestBody = GetMyFeesEstimatesRequest
 
-	// IsPrime Indicates whether the offer is an Amazon Prime offer.
-	IsPrime bool `json:"IsPrime"`
-}
+// GetMyFeesEstimateForASINJSONRequestBody defines body for GetMyFeesEstimateForASIN for application/json ContentType.
+type GetMyFeesEstimateForASINJSONRequestBody = GetMyFeesEstimateRequest
 
-// Product An item.
-type Product struct {
-	// AttributeSets A list of product attributes if they are applicable to the product that is returned.
-	AttributeSets *AttributeSetList `json:"AttributeSets,omitempty"`
-
-	// CompetitivePricing Competitive pricing information for the item.
-	CompetitivePricing *CompetitivePricingType `json:"CompetitivePricing,omitempty"`
-
-	// Identifiers Specifies the identifiers used to uniquely identify an item.
-	Identifiers IdentifierType `json:"Identifiers"`
-
-	// Offers A list of offers.
-	Offers *OffersList `json:"Offers,omitempty"`
-
-	// Relationships A list that contains product variation information, if applicable.
-	Relationships *RelationshipList `json:"Relationships,omitempty"`
-
-	// SalesRankings A list of sales rank information for the item, by category.
-	SalesRankings *SalesRankList `json:"SalesRankings,omitempty"`
-}
-
-// QuantityDiscountPriceType Contains pricing information that includes special pricing when buying in bulk.
-type QuantityDiscountPriceType struct {
-	ListingPrice         MoneyType            `json:"listingPrice"`
-	QuantityDiscountType QuantityDiscountType `json:"quantityDiscountType"`
-
-	// QuantityTier Indicates at what quantity this price becomes active.
-	QuantityTier int32 `json:"quantityTier"`
-}
-
-// QuantityDiscountType defines model for QuantityDiscountType.
-type QuantityDiscountType string
-
-// RelationshipList A list that contains product variation information, if applicable.
-type RelationshipList = []map[string]interface{}
-
-// SalesRankList A list of sales rank information for the item, by category.
-type SalesRankList = []SalesRankType
-
-// SalesRankType defines model for SalesRankType.
-type SalesRankType struct {
-	// ProductCategoryId  Identifies the item category from which the sales rank is taken.
-	ProductCategoryId string `json:"ProductCategoryId"`
-
-	// Rank The sales rank of the item within the item category.
-	Rank int32 `json:"Rank"`
-}
-
-// SellerFeedbackType Information about the seller's feedback, including the percentage of positive feedback, and the total number of ratings received.
-type SellerFeedbackType struct {
-	// FeedbackCount The number of ratings received about the seller.
-	FeedbackCount int64 `json:"FeedbackCount"`
-
-	// SellerPositiveFeedbackRating The percentage of positive feedback for the seller in the past 365 days.
-	SellerPositiveFeedbackRating *float64 `json:"SellerPositiveFeedbackRating,omitempty"`
-}
-
-// SellerSKUIdentifier defines model for SellerSKUIdentifier.
-type SellerSKUIdentifier struct {
-	// MarketplaceId A marketplace identifier.
-	MarketplaceId string `json:"MarketplaceId"`
-
-	// SellerId The seller identifier submitted for the operation.
-	SellerId string `json:"SellerId"`
-
-	// SellerSKU The seller stock keeping unit (SKU) of the item.
-	SellerSKU string `json:"SellerSKU"`
-}
-
-// ShipsFromType The state and country from where the item is shipped.
-type ShipsFromType struct {
-	// Country The country from where the item is shipped.
-	Country *string `json:"Country,omitempty"`
-
-	// State The state from where the item is shipped.
-	State *string `json:"State,omitempty"`
-}
-
-// Summary Contains price information about the product, including the LowestPrices and BuyBoxPrices, the ListPrice, the SuggestedLowerPricePlusShipping, and NumberOfOffers and NumberOfBuyBoxEligibleOffers.
-type Summary struct {
-	BuyBoxEligibleOffers      *BuyBoxEligibleOffers `json:"BuyBoxEligibleOffers,omitempty"`
-	BuyBoxPrices              *BuyBoxPrices         `json:"BuyBoxPrices,omitempty"`
-	CompetitivePriceThreshold *MoneyType            `json:"CompetitivePriceThreshold,omitempty"`
-	ListPrice                 *MoneyType            `json:"ListPrice,omitempty"`
-	LowestPrices              *LowestPrices         `json:"LowestPrices,omitempty"`
-	NumberOfOffers            *NumberOfOffers       `json:"NumberOfOffers,omitempty"`
-
-	// OffersAvailableTime When the status is ActiveButTooSoonForProcessing, this is the time when the offers will be available for processing.
-	OffersAvailableTime *time.Time `json:"OffersAvailableTime,omitempty"`
-
-	// SalesRankings A list of sales rank information for the item, by category.
-	SalesRankings                   *SalesRankList `json:"SalesRankings,omitempty"`
-	SuggestedLowerPricePlusShipping *MoneyType     `json:"SuggestedLowerPricePlusShipping,omitempty"`
-
-	// TotalOfferCount The number of unique offers contained in NumberOfOffers.
-	TotalOfferCount int32 `json:"TotalOfferCount"`
-}
-
-// GetCompetitivePricingParams defines parameters for GetCompetitivePricing.
-type GetCompetitivePricingParams struct {
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-	MarketplaceId string `form:"MarketplaceId" json:"MarketplaceId"`
-
-	// Asins A list of up to twenty Amazon Standard Identification Number (ASIN) values used to identify items in the given marketplace.
-	Asins *[]string `form:"Asins,omitempty" json:"Asins,omitempty"`
-
-	// Skus A list of up to twenty seller SKU values used to identify items in the given marketplace.
-	Skus *[]string `form:"Skus,omitempty" json:"Skus,omitempty"`
-
-	// ItemType Indicates whether ASIN values or seller SKU values are used to identify items. If you specify Asin, the information in the response will be dependent on the list of Asins you provide in the Asins parameter. If you specify Sku, the information in the response will be dependent on the list of Skus you provide in the Skus parameter. Possible values: Asin, Sku.
-	ItemType GetCompetitivePricingParamsItemType `form:"ItemType" json:"ItemType"`
-
-	// CustomerType Indicates whether to request pricing information from the point of view of Consumer or Business buyers. Default is Consumer.
-	CustomerType *GetCompetitivePricingParamsCustomerType `form:"CustomerType,omitempty" json:"CustomerType,omitempty"`
-}
-
-// GetCompetitivePricingParamsItemType defines parameters for GetCompetitivePricing.
-type GetCompetitivePricingParamsItemType string
-
-// GetCompetitivePricingParamsCustomerType defines parameters for GetCompetitivePricing.
-type GetCompetitivePricingParamsCustomerType string
-
-// GetItemOffersParams defines parameters for GetItemOffers.
-type GetItemOffersParams struct {
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-	MarketplaceId string `form:"MarketplaceId" json:"MarketplaceId"`
-
-	// ItemCondition Filters the offer listings to be considered based on item condition. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition GetItemOffersParamsItemCondition `form:"ItemCondition" json:"ItemCondition"`
-
-	// CustomerType Indicates whether to request Consumer or Business offers. Default is Consumer.
-	CustomerType *GetItemOffersParamsCustomerType `form:"CustomerType,omitempty" json:"CustomerType,omitempty"`
-}
-
-// GetItemOffersParamsItemCondition defines parameters for GetItemOffers.
-type GetItemOffersParamsItemCondition string
-
-// GetItemOffersParamsCustomerType defines parameters for GetItemOffers.
-type GetItemOffersParamsCustomerType string
-
-// GetListingOffersParams defines parameters for GetListingOffers.
-type GetListingOffersParams struct {
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-	MarketplaceId string `form:"MarketplaceId" json:"MarketplaceId"`
-
-	// ItemCondition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition GetListingOffersParamsItemCondition `form:"ItemCondition" json:"ItemCondition"`
-
-	// CustomerType Indicates whether to request Consumer or Business offers. Default is Consumer.
-	CustomerType *GetListingOffersParamsCustomerType `form:"CustomerType,omitempty" json:"CustomerType,omitempty"`
-}
-
-// GetListingOffersParamsItemCondition defines parameters for GetListingOffers.
-type GetListingOffersParamsItemCondition string
-
-// GetListingOffersParamsCustomerType defines parameters for GetListingOffers.
-type GetListingOffersParamsCustomerType string
-
-// GetPricingParams defines parameters for GetPricing.
-type GetPricingParams struct {
-	// MarketplaceId A marketplace identifier. Specifies the marketplace for which prices are returned.
-	MarketplaceId string `form:"MarketplaceId" json:"MarketplaceId"`
-
-	// Asins A list of up to twenty Amazon Standard Identification Number (ASIN) values used to identify items in the given marketplace.
-	Asins *[]string `form:"Asins,omitempty" json:"Asins,omitempty"`
-
-	// Skus A list of up to twenty seller SKU values used to identify items in the given marketplace.
-	Skus *[]string `form:"Skus,omitempty" json:"Skus,omitempty"`
-
-	// ItemType Indicates whether ASIN values or seller SKU values are used to identify items. If you specify Asin, the information in the response will be dependent on the list of Asins you provide in the Asins parameter. If you specify Sku, the information in the response will be dependent on the list of Skus you provide in the Skus parameter.
-	ItemType GetPricingParamsItemType `form:"ItemType" json:"ItemType"`
-
-	// ItemCondition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club.
-	ItemCondition *GetPricingParamsItemCondition `form:"ItemCondition,omitempty" json:"ItemCondition,omitempty"`
-
-	// OfferType Indicates whether to request pricing information for the seller's B2C or B2B offers. Default is B2C.
-	OfferType *GetPricingParamsOfferType `form:"OfferType,omitempty" json:"OfferType,omitempty"`
-}
-
-// GetPricingParamsItemType defines parameters for GetPricing.
-type GetPricingParamsItemType string
-
-// GetPricingParamsItemCondition defines parameters for GetPricing.
-type GetPricingParamsItemCondition string
-
-// GetPricingParamsOfferType defines parameters for GetPricing.
-type GetPricingParamsOfferType string
-
-// GetItemOffersBatchJSONRequestBody defines body for GetItemOffersBatch for application/json ContentType.
-type GetItemOffersBatchJSONRequestBody = GetItemOffersBatchRequest
-
-// GetListingOffersBatchJSONRequestBody defines body for GetListingOffersBatch for application/json ContentType.
-type GetListingOffersBatchJSONRequestBody = GetListingOffersBatchRequest
-
-// Getter for additional properties for HttpResponseHeaders. Returns the specified
-// element and whether it was found
-func (a HttpResponseHeaders) Get(fieldName string) (value string, found bool) {
-	if a.AdditionalProperties != nil {
-		value, found = a.AdditionalProperties[fieldName]
-	}
-	return
-}
-
-// Setter for additional properties for HttpResponseHeaders
-func (a *HttpResponseHeaders) Set(fieldName string, value string) {
-	if a.AdditionalProperties == nil {
-		a.AdditionalProperties = make(map[string]string)
-	}
-	a.AdditionalProperties[fieldName] = value
-}
-
-// Override default JSON handling for HttpResponseHeaders to handle AdditionalProperties
-func (a *HttpResponseHeaders) UnmarshalJSON(b []byte) error {
-	object := make(map[string]json.RawMessage)
-	err := sonic.Unmarshal(b, &object)
-	if err != nil {
-		return err
-	}
-
-	if raw, found := object["Date"]; found {
-		err = sonic.Unmarshal(raw, &a.Date)
-		if err != nil {
-			return fmt.Errorf("error reading 'Date': %w", err)
-		}
-		delete(object, "Date")
-	}
-
-	if raw, found := object["x-amzn-RequestId"]; found {
-		err = sonic.Unmarshal(raw, &a.XAmznRequestId)
-		if err != nil {
-			return fmt.Errorf("error reading 'x-amzn-RequestId': %w", err)
-		}
-		delete(object, "x-amzn-RequestId")
-	}
-
-	if len(object) != 0 {
-		a.AdditionalProperties = make(map[string]string)
-		for fieldName, fieldBuf := range object {
-			var fieldVal string
-			err := sonic.Unmarshal(fieldBuf, &fieldVal)
-			if err != nil {
-				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
-			}
-			a.AdditionalProperties[fieldName] = fieldVal
-		}
-	}
-	return nil
-}
-
-// Override default JSON handling for HttpResponseHeaders to handle AdditionalProperties
-func (a HttpResponseHeaders) MarshalJSON() ([]byte, error) {
-	var err error
-	object := make(map[string]json.RawMessage)
-
-	if a.Date != nil {
-		object["Date"], err = sonic.Marshal(a.Date)
-		if err != nil {
-			return nil, fmt.Errorf("error marshaling 'Date': %w", err)
-		}
-	}
-
-	if a.XAmznRequestId != nil {
-		object["x-amzn-RequestId"], err = sonic.Marshal(a.XAmznRequestId)
-		if err != nil {
-			return nil, fmt.Errorf("error marshaling 'x-amzn-RequestId': %w", err)
-		}
-	}
-
-	for fieldName, field := range a.AdditionalProperties {
-		object[fieldName], err = sonic.Marshal(field)
-		if err != nil {
-			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
-		}
-	}
-	return sonic.Marshal(object)
-}
+// GetMyFeesEstimateForSKUJSONRequestBody defines body for GetMyFeesEstimateForSKU for application/json ContentType.
+type GetMyFeesEstimateForSKUJSONRequestBody = GetMyFeesEstimateRequest
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -1099,31 +342,24 @@ func WithResponseEditorFn(fn ResponseEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// GetItemOffersBatchWithBody request with any body
-	GetItemOffersBatchWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error)
+	// GetMyFeesEstimatesWithBody request with any body
+	GetMyFeesEstimatesWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error)
 
-	GetItemOffersBatch(ctx context.Context, body GetItemOffersBatchJSONRequestBody) (*http.Response, error)
+	GetMyFeesEstimates(ctx context.Context, body GetMyFeesEstimatesJSONRequestBody) (*http.Response, error)
 
-	// GetListingOffersBatchWithBody request with any body
-	GetListingOffersBatchWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error)
+	// GetMyFeesEstimateForASINWithBody request with any body
+	GetMyFeesEstimateForASINWithBody(ctx context.Context, asin string, contentType string, body io.Reader) (*http.Response, error)
 
-	GetListingOffersBatch(ctx context.Context, body GetListingOffersBatchJSONRequestBody) (*http.Response, error)
+	GetMyFeesEstimateForASIN(ctx context.Context, asin string, body GetMyFeesEstimateForASINJSONRequestBody) (*http.Response, error)
 
-	// GetCompetitivePricing request
-	GetCompetitivePricing(ctx context.Context, params *GetCompetitivePricingParams) (*http.Response, error)
+	// GetMyFeesEstimateForSKUWithBody request with any body
+	GetMyFeesEstimateForSKUWithBody(ctx context.Context, sellerSKU string, contentType string, body io.Reader) (*http.Response, error)
 
-	// GetItemOffers request
-	GetItemOffers(ctx context.Context, asin string, params *GetItemOffersParams) (*http.Response, error)
-
-	// GetListingOffers request
-	GetListingOffers(ctx context.Context, sellerSKU string, params *GetListingOffersParams) (*http.Response, error)
-
-	// GetPricing request
-	GetPricing(ctx context.Context, params *GetPricingParams) (*http.Response, error)
+	GetMyFeesEstimateForSKU(ctx context.Context, sellerSKU string, body GetMyFeesEstimateForSKUJSONRequestBody) (*http.Response, error)
 }
 
-func (c *Client) GetItemOffersBatchWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
-	req, err := NewGetItemOffersBatchRequestWithBody(c.Server, contentType, body)
+func (c *Client) GetMyFeesEstimatesWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewGetMyFeesEstimatesRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1142,8 +378,8 @@ func (c *Client) GetItemOffersBatchWithBody(ctx context.Context, contentType str
 	return rsp, nil
 }
 
-func (c *Client) GetItemOffersBatch(ctx context.Context, body GetItemOffersBatchJSONRequestBody) (*http.Response, error) {
-	req, err := NewGetItemOffersBatchRequest(c.Server, body)
+func (c *Client) GetMyFeesEstimates(ctx context.Context, body GetMyFeesEstimatesJSONRequestBody) (*http.Response, error) {
+	req, err := NewGetMyFeesEstimatesRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1162,8 +398,8 @@ func (c *Client) GetItemOffersBatch(ctx context.Context, body GetItemOffersBatch
 	return rsp, nil
 }
 
-func (c *Client) GetListingOffersBatchWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
-	req, err := NewGetListingOffersBatchRequestWithBody(c.Server, contentType, body)
+func (c *Client) GetMyFeesEstimateForASINWithBody(ctx context.Context, asin string, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewGetMyFeesEstimateForASINRequestWithBody(c.Server, asin, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1182,8 +418,8 @@ func (c *Client) GetListingOffersBatchWithBody(ctx context.Context, contentType 
 	return rsp, nil
 }
 
-func (c *Client) GetListingOffersBatch(ctx context.Context, body GetListingOffersBatchJSONRequestBody) (*http.Response, error) {
-	req, err := NewGetListingOffersBatchRequest(c.Server, body)
+func (c *Client) GetMyFeesEstimateForASIN(ctx context.Context, asin string, body GetMyFeesEstimateForASINJSONRequestBody) (*http.Response, error) {
+	req, err := NewGetMyFeesEstimateForASINRequest(c.Server, asin, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1202,8 +438,8 @@ func (c *Client) GetListingOffersBatch(ctx context.Context, body GetListingOffer
 	return rsp, nil
 }
 
-func (c *Client) GetCompetitivePricing(ctx context.Context, params *GetCompetitivePricingParams) (*http.Response, error) {
-	req, err := NewGetCompetitivePricingRequest(c.Server, params)
+func (c *Client) GetMyFeesEstimateForSKUWithBody(ctx context.Context, sellerSKU string, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewGetMyFeesEstimateForSKURequestWithBody(c.Server, sellerSKU, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1222,8 +458,8 @@ func (c *Client) GetCompetitivePricing(ctx context.Context, params *GetCompetiti
 	return rsp, nil
 }
 
-func (c *Client) GetItemOffers(ctx context.Context, asin string, params *GetItemOffersParams) (*http.Response, error) {
-	req, err := NewGetItemOffersRequest(c.Server, asin, params)
+func (c *Client) GetMyFeesEstimateForSKU(ctx context.Context, sellerSKU string, body GetMyFeesEstimateForSKUJSONRequestBody) (*http.Response, error) {
+	req, err := NewGetMyFeesEstimateForSKURequest(c.Server, sellerSKU, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1242,59 +478,19 @@ func (c *Client) GetItemOffers(ctx context.Context, asin string, params *GetItem
 	return rsp, nil
 }
 
-func (c *Client) GetListingOffers(ctx context.Context, sellerSKU string, params *GetListingOffersParams) (*http.Response, error) {
-	req, err := NewGetListingOffersRequest(c.Server, sellerSKU, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	req.Header.Set("User-Agent", c.UserAgent)
-	if err := c.applyReqEditors(ctx, req); err != nil {
-		return nil, err
-	}
-	rsp, err := c.Client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if err := c.applyRspEditor(ctx, rsp); err != nil {
-		return nil, err
-	}
-	return rsp, nil
-}
-
-func (c *Client) GetPricing(ctx context.Context, params *GetPricingParams) (*http.Response, error) {
-	req, err := NewGetPricingRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	req.Header.Set("User-Agent", c.UserAgent)
-	if err := c.applyReqEditors(ctx, req); err != nil {
-		return nil, err
-	}
-	rsp, err := c.Client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if err := c.applyRspEditor(ctx, rsp); err != nil {
-		return nil, err
-	}
-	return rsp, nil
-}
-
-// NewGetItemOffersBatchRequest calls the generic GetItemOffersBatch builder with application/json body
-func NewGetItemOffersBatchRequest(server string, body GetItemOffersBatchJSONRequestBody) (*http.Request, error) {
+// NewGetMyFeesEstimatesRequest calls the generic GetMyFeesEstimates builder with application/json body
+func NewGetMyFeesEstimatesRequest(server string, body GetMyFeesEstimatesJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewGetItemOffersBatchRequestWithBody(server, "application/json", bodyReader)
+	return NewGetMyFeesEstimatesRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewGetItemOffersBatchRequestWithBody generates requests for GetItemOffersBatch with any type of body
-func NewGetItemOffersBatchRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewGetMyFeesEstimatesRequestWithBody generates requests for GetMyFeesEstimates with any type of body
+func NewGetMyFeesEstimatesRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1302,7 +498,7 @@ func NewGetItemOffersBatchRequestWithBody(server string, contentType string, bod
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/batches/products/pricing/v0/itemOffers")
+	operationPath := fmt.Sprintf("/products/fees/v0/feesEstimate")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1322,153 +518,19 @@ func NewGetItemOffersBatchRequestWithBody(server string, contentType string, bod
 	return req, nil
 }
 
-// NewGetListingOffersBatchRequest calls the generic GetListingOffersBatch builder with application/json body
-func NewGetListingOffersBatchRequest(server string, body GetListingOffersBatchJSONRequestBody) (*http.Request, error) {
+// NewGetMyFeesEstimateForASINRequest calls the generic GetMyFeesEstimateForASIN builder with application/json body
+func NewGetMyFeesEstimateForASINRequest(server string, asin string, body GetMyFeesEstimateForASINJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewGetListingOffersBatchRequestWithBody(server, "application/json", bodyReader)
+	return NewGetMyFeesEstimateForASINRequestWithBody(server, asin, "application/json", bodyReader)
 }
 
-// NewGetListingOffersBatchRequestWithBody generates requests for GetListingOffersBatch with any type of body
-func NewGetListingOffersBatchRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/batches/products/pricing/v0/listingOffers")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetCompetitivePricingRequest generates requests for GetCompetitivePricing
-func NewGetCompetitivePricingRequest(server string, params *GetCompetitivePricingParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/products/pricing/v0/competitivePrice")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "MarketplaceId", runtime.ParamLocationQuery, params.MarketplaceId); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				values := make([]string, len(v))
-				copy(values, v)
-				queryValues.Add(k, strings.Join(values, ","))
-			}
-		}
-
-		if params.Asins != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "Asins", runtime.ParamLocationQuery, *params.Asins); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					values := make([]string, len(v))
-					copy(values, v)
-					queryValues.Add(k, strings.Join(values, ","))
-				}
-			}
-
-		}
-
-		if params.Skus != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "Skus", runtime.ParamLocationQuery, *params.Skus); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					values := make([]string, len(v))
-					copy(values, v)
-					queryValues.Add(k, strings.Join(values, ","))
-				}
-			}
-
-		}
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ItemType", runtime.ParamLocationQuery, params.ItemType); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				values := make([]string, len(v))
-				copy(values, v)
-				queryValues.Add(k, strings.Join(values, ","))
-			}
-		}
-
-		if params.CustomerType != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "CustomerType", runtime.ParamLocationQuery, *params.CustomerType); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					values := make([]string, len(v))
-					copy(values, v)
-					queryValues.Add(k, strings.Join(values, ","))
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetItemOffersRequest generates requests for GetItemOffers
-func NewGetItemOffersRequest(server string, asin string, params *GetItemOffersParams) (*http.Request, error) {
+// NewGetMyFeesEstimateForASINRequestWithBody generates requests for GetMyFeesEstimateForASIN with any type of body
+func NewGetMyFeesEstimateForASINRequestWithBody(server string, asin string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1483,7 +545,7 @@ func NewGetItemOffersRequest(server string, asin string, params *GetItemOffersPa
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/products/pricing/v0/items/%s/offers", pathParam0)
+	operationPath := fmt.Sprintf("/products/fees/v0/items/%s/feesEstimate", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1493,62 +555,29 @@ func NewGetItemOffersRequest(server string, asin string, params *GetItemOffersPa
 		return nil, err
 	}
 
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "MarketplaceId", runtime.ParamLocationQuery, params.MarketplaceId); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				values := make([]string, len(v))
-				copy(values, v)
-				queryValues.Add(k, strings.Join(values, ","))
-			}
-		}
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ItemCondition", runtime.ParamLocationQuery, params.ItemCondition); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				values := make([]string, len(v))
-				copy(values, v)
-				queryValues.Add(k, strings.Join(values, ","))
-			}
-		}
-
-		if params.CustomerType != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "CustomerType", runtime.ParamLocationQuery, *params.CustomerType); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					values := make([]string, len(v))
-					copy(values, v)
-					queryValues.Add(k, strings.Join(values, ","))
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
 
+	req.Header.Add("Content-Type", contentType)
+
 	return req, nil
 }
 
-// NewGetListingOffersRequest generates requests for GetListingOffers
-func NewGetListingOffersRequest(server string, sellerSKU string, params *GetListingOffersParams) (*http.Request, error) {
+// NewGetMyFeesEstimateForSKURequest calls the generic GetMyFeesEstimateForSKU builder with application/json body
+func NewGetMyFeesEstimateForSKURequest(server string, sellerSKU string, body GetMyFeesEstimateForSKUJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewGetMyFeesEstimateForSKURequestWithBody(server, sellerSKU, "application/json", bodyReader)
+}
+
+// NewGetMyFeesEstimateForSKURequestWithBody generates requests for GetMyFeesEstimateForSKU with any type of body
+func NewGetMyFeesEstimateForSKURequestWithBody(server string, sellerSKU string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1563,7 +592,7 @@ func NewGetListingOffersRequest(server string, sellerSKU string, params *GetList
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/products/pricing/v0/listings/%s/offers", pathParam0)
+	operationPath := fmt.Sprintf("/products/fees/v0/listings/%s/feesEstimate", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1573,177 +602,12 @@ func NewGetListingOffersRequest(server string, sellerSKU string, params *GetList
 		return nil, err
 	}
 
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "MarketplaceId", runtime.ParamLocationQuery, params.MarketplaceId); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				values := make([]string, len(v))
-				copy(values, v)
-				queryValues.Add(k, strings.Join(values, ","))
-			}
-		}
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ItemCondition", runtime.ParamLocationQuery, params.ItemCondition); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				values := make([]string, len(v))
-				copy(values, v)
-				queryValues.Add(k, strings.Join(values, ","))
-			}
-		}
-
-		if params.CustomerType != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "CustomerType", runtime.ParamLocationQuery, *params.CustomerType); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					values := make([]string, len(v))
-					copy(values, v)
-					queryValues.Add(k, strings.Join(values, ","))
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
 
-	return req, nil
-}
-
-// NewGetPricingRequest generates requests for GetPricing
-func NewGetPricingRequest(server string, params *GetPricingParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/products/pricing/v0/price")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "MarketplaceId", runtime.ParamLocationQuery, params.MarketplaceId); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				values := make([]string, len(v))
-				copy(values, v)
-				queryValues.Add(k, strings.Join(values, ","))
-			}
-		}
-
-		if params.Asins != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "Asins", runtime.ParamLocationQuery, *params.Asins); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					values := make([]string, len(v))
-					copy(values, v)
-					queryValues.Add(k, strings.Join(values, ","))
-				}
-			}
-
-		}
-
-		if params.Skus != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "Skus", runtime.ParamLocationQuery, *params.Skus); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					values := make([]string, len(v))
-					copy(values, v)
-					queryValues.Add(k, strings.Join(values, ","))
-				}
-			}
-
-		}
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ItemType", runtime.ParamLocationQuery, params.ItemType); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				values := make([]string, len(v))
-				copy(values, v)
-				queryValues.Add(k, strings.Join(values, ","))
-			}
-		}
-
-		if params.ItemCondition != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ItemCondition", runtime.ParamLocationQuery, *params.ItemCondition); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					values := make([]string, len(v))
-					copy(values, v)
-					queryValues.Add(k, strings.Join(values, ","))
-				}
-			}
-
-		}
-
-		if params.OfferType != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "OfferType", runtime.ParamLocationQuery, *params.OfferType); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					values := make([]string, len(v))
-					copy(values, v)
-					queryValues.Add(k, strings.Join(values, ","))
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -1793,44 +657,37 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetItemOffersBatchWithBodyWithResponse request with any body
-	GetItemOffersBatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*GetItemOffersBatchResp, error)
+	// GetMyFeesEstimatesWithBodyWithResponse request with any body
+	GetMyFeesEstimatesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*GetMyFeesEstimatesResp, error)
 
-	GetItemOffersBatchWithResponse(ctx context.Context, body GetItemOffersBatchJSONRequestBody) (*GetItemOffersBatchResp, error)
+	GetMyFeesEstimatesWithResponse(ctx context.Context, body GetMyFeesEstimatesJSONRequestBody) (*GetMyFeesEstimatesResp, error)
 
-	// GetListingOffersBatchWithBodyWithResponse request with any body
-	GetListingOffersBatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*GetListingOffersBatchResp, error)
+	// GetMyFeesEstimateForASINWithBodyWithResponse request with any body
+	GetMyFeesEstimateForASINWithBodyWithResponse(ctx context.Context, asin string, contentType string, body io.Reader) (*GetMyFeesEstimateForASINResp, error)
 
-	GetListingOffersBatchWithResponse(ctx context.Context, body GetListingOffersBatchJSONRequestBody) (*GetListingOffersBatchResp, error)
+	GetMyFeesEstimateForASINWithResponse(ctx context.Context, asin string, body GetMyFeesEstimateForASINJSONRequestBody) (*GetMyFeesEstimateForASINResp, error)
 
-	// GetCompetitivePricingWithResponse request
-	GetCompetitivePricingWithResponse(ctx context.Context, params *GetCompetitivePricingParams) (*GetCompetitivePricingResp, error)
+	// GetMyFeesEstimateForSKUWithBodyWithResponse request with any body
+	GetMyFeesEstimateForSKUWithBodyWithResponse(ctx context.Context, sellerSKU string, contentType string, body io.Reader) (*GetMyFeesEstimateForSKUResp, error)
 
-	// GetItemOffersWithResponse request
-	GetItemOffersWithResponse(ctx context.Context, asin string, params *GetItemOffersParams) (*GetItemOffersResp, error)
-
-	// GetListingOffersWithResponse request
-	GetListingOffersWithResponse(ctx context.Context, sellerSKU string, params *GetListingOffersParams) (*GetListingOffersResp, error)
-
-	// GetPricingWithResponse request
-	GetPricingWithResponse(ctx context.Context, params *GetPricingParams) (*GetPricingResp, error)
+	GetMyFeesEstimateForSKUWithResponse(ctx context.Context, sellerSKU string, body GetMyFeesEstimateForSKUJSONRequestBody) (*GetMyFeesEstimateForSKUResp, error)
 }
 
-type GetItemOffersBatchResp struct {
+type GetMyFeesEstimatesResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *GetItemOffersBatchResponse
-	JSON400      *Errors
-	JSON401      *Errors
-	JSON403      *Errors
-	JSON404      *Errors
-	JSON429      *Errors
-	JSON500      *Errors
-	JSON503      *Errors
+	JSON200      *GetMyFeesEstimatesResponse
+	JSON400      *GetMyFeesEstimatesErrorList
+	JSON401      *GetMyFeesEstimatesErrorList
+	JSON403      *GetMyFeesEstimatesErrorList
+	JSON404      *GetMyFeesEstimatesErrorList
+	JSON429      *GetMyFeesEstimatesErrorList
+	JSON500      *GetMyFeesEstimatesErrorList
+	JSON503      *GetMyFeesEstimatesErrorList
 }
 
 // Status returns HTTPResponse.Status
-func (r GetItemOffersBatchResp) Status() string {
+func (r GetMyFeesEstimatesResp) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1838,28 +695,28 @@ func (r GetItemOffersBatchResp) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetItemOffersBatchResp) StatusCode() int {
+func (r GetMyFeesEstimatesResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetListingOffersBatchResp struct {
+type GetMyFeesEstimateForASINResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *GetListingOffersBatchResponse
-	JSON400      *Errors
-	JSON401      *Errors
-	JSON403      *Errors
-	JSON404      *Errors
-	JSON429      *Errors
-	JSON500      *Errors
-	JSON503      *Errors
+	JSON200      *GetMyFeesEstimateResponse
+	JSON400      *GetMyFeesEstimateResponse
+	JSON401      *GetMyFeesEstimateResponse
+	JSON403      *GetMyFeesEstimateResponse
+	JSON404      *GetMyFeesEstimateResponse
+	JSON429      *GetMyFeesEstimateResponse
+	JSON500      *GetMyFeesEstimateResponse
+	JSON503      *GetMyFeesEstimateResponse
 }
 
 // Status returns HTTPResponse.Status
-func (r GetListingOffersBatchResp) Status() string {
+func (r GetMyFeesEstimateForASINResp) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1867,28 +724,28 @@ func (r GetListingOffersBatchResp) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetListingOffersBatchResp) StatusCode() int {
+func (r GetMyFeesEstimateForASINResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetCompetitivePricingResp struct {
+type GetMyFeesEstimateForSKUResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *GetPricingResponse
-	JSON400      *GetPricingResponse
-	JSON401      *GetPricingResponse
-	JSON403      *GetPricingResponse
-	JSON404      *GetPricingResponse
-	JSON429      *GetPricingResponse
-	JSON500      *GetPricingResponse
-	JSON503      *GetPricingResponse
+	JSON200      *GetMyFeesEstimateResponse
+	JSON400      *GetMyFeesEstimateResponse
+	JSON401      *GetMyFeesEstimateResponse
+	JSON403      *GetMyFeesEstimateResponse
+	JSON404      *GetMyFeesEstimateResponse
+	JSON429      *GetMyFeesEstimateResponse
+	JSON500      *GetMyFeesEstimateResponse
+	JSON503      *GetMyFeesEstimateResponse
 }
 
 // Status returns HTTPResponse.Status
-func (r GetCompetitivePricingResp) Status() string {
+func (r GetMyFeesEstimateForSKUResp) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1896,235 +753,129 @@ func (r GetCompetitivePricingResp) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetCompetitivePricingResp) StatusCode() int {
+func (r GetMyFeesEstimateForSKUResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetItemOffersResp struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *GetOffersResponse
-	JSON400      *GetOffersResponse
-	JSON401      *GetOffersResponse
-	JSON403      *GetOffersResponse
-	JSON404      *GetOffersResponse
-	JSON429      *GetOffersResponse
-	JSON500      *GetOffersResponse
-	JSON503      *GetOffersResponse
-}
-
-// Status returns HTTPResponse.Status
-func (r GetItemOffersResp) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetItemOffersResp) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetListingOffersResp struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *GetOffersResponse
-	JSON400      *GetOffersResponse
-	JSON401      *GetOffersResponse
-	JSON403      *GetOffersResponse
-	JSON404      *GetOffersResponse
-	JSON429      *GetOffersResponse
-	JSON500      *GetOffersResponse
-	JSON503      *GetOffersResponse
-}
-
-// Status returns HTTPResponse.Status
-func (r GetListingOffersResp) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetListingOffersResp) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetPricingResp struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *GetPricingResponse
-	JSON400      *GetPricingResponse
-	JSON401      *GetPricingResponse
-	JSON403      *GetPricingResponse
-	JSON404      *GetPricingResponse
-	JSON429      *GetPricingResponse
-	JSON500      *GetPricingResponse
-	JSON503      *GetPricingResponse
-}
-
-// Status returns HTTPResponse.Status
-func (r GetPricingResp) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetPricingResp) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// GetItemOffersBatchWithBodyWithResponse request with arbitrary body returning *GetItemOffersBatchResp
-func (c *ClientWithResponses) GetItemOffersBatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*GetItemOffersBatchResp, error) {
-	rsp, err := c.GetItemOffersBatchWithBody(ctx, contentType, body)
+// GetMyFeesEstimatesWithBodyWithResponse request with arbitrary body returning *GetMyFeesEstimatesResp
+func (c *ClientWithResponses) GetMyFeesEstimatesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*GetMyFeesEstimatesResp, error) {
+	rsp, err := c.GetMyFeesEstimatesWithBody(ctx, contentType, body)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetItemOffersBatchResp(rsp)
+	return ParseGetMyFeesEstimatesResp(rsp)
 }
 
-func (c *ClientWithResponses) GetItemOffersBatchWithResponse(ctx context.Context, body GetItemOffersBatchJSONRequestBody) (*GetItemOffersBatchResp, error) {
-	rsp, err := c.GetItemOffersBatch(ctx, body)
+func (c *ClientWithResponses) GetMyFeesEstimatesWithResponse(ctx context.Context, body GetMyFeesEstimatesJSONRequestBody) (*GetMyFeesEstimatesResp, error) {
+	rsp, err := c.GetMyFeesEstimates(ctx, body)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetItemOffersBatchResp(rsp)
+	return ParseGetMyFeesEstimatesResp(rsp)
 }
 
-// GetListingOffersBatchWithBodyWithResponse request with arbitrary body returning *GetListingOffersBatchResp
-func (c *ClientWithResponses) GetListingOffersBatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*GetListingOffersBatchResp, error) {
-	rsp, err := c.GetListingOffersBatchWithBody(ctx, contentType, body)
+// GetMyFeesEstimateForASINWithBodyWithResponse request with arbitrary body returning *GetMyFeesEstimateForASINResp
+func (c *ClientWithResponses) GetMyFeesEstimateForASINWithBodyWithResponse(ctx context.Context, asin string, contentType string, body io.Reader) (*GetMyFeesEstimateForASINResp, error) {
+	rsp, err := c.GetMyFeesEstimateForASINWithBody(ctx, asin, contentType, body)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetListingOffersBatchResp(rsp)
+	return ParseGetMyFeesEstimateForASINResp(rsp)
 }
 
-func (c *ClientWithResponses) GetListingOffersBatchWithResponse(ctx context.Context, body GetListingOffersBatchJSONRequestBody) (*GetListingOffersBatchResp, error) {
-	rsp, err := c.GetListingOffersBatch(ctx, body)
+func (c *ClientWithResponses) GetMyFeesEstimateForASINWithResponse(ctx context.Context, asin string, body GetMyFeesEstimateForASINJSONRequestBody) (*GetMyFeesEstimateForASINResp, error) {
+	rsp, err := c.GetMyFeesEstimateForASIN(ctx, asin, body)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetListingOffersBatchResp(rsp)
+	return ParseGetMyFeesEstimateForASINResp(rsp)
 }
 
-// GetCompetitivePricingWithResponse request returning *GetCompetitivePricingResp
-func (c *ClientWithResponses) GetCompetitivePricingWithResponse(ctx context.Context, params *GetCompetitivePricingParams) (*GetCompetitivePricingResp, error) {
-	rsp, err := c.GetCompetitivePricing(ctx, params)
+// GetMyFeesEstimateForSKUWithBodyWithResponse request with arbitrary body returning *GetMyFeesEstimateForSKUResp
+func (c *ClientWithResponses) GetMyFeesEstimateForSKUWithBodyWithResponse(ctx context.Context, sellerSKU string, contentType string, body io.Reader) (*GetMyFeesEstimateForSKUResp, error) {
+	rsp, err := c.GetMyFeesEstimateForSKUWithBody(ctx, sellerSKU, contentType, body)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetCompetitivePricingResp(rsp)
+	return ParseGetMyFeesEstimateForSKUResp(rsp)
 }
 
-// GetItemOffersWithResponse request returning *GetItemOffersResp
-func (c *ClientWithResponses) GetItemOffersWithResponse(ctx context.Context, asin string, params *GetItemOffersParams) (*GetItemOffersResp, error) {
-	rsp, err := c.GetItemOffers(ctx, asin, params)
+func (c *ClientWithResponses) GetMyFeesEstimateForSKUWithResponse(ctx context.Context, sellerSKU string, body GetMyFeesEstimateForSKUJSONRequestBody) (*GetMyFeesEstimateForSKUResp, error) {
+	rsp, err := c.GetMyFeesEstimateForSKU(ctx, sellerSKU, body)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetItemOffersResp(rsp)
+	return ParseGetMyFeesEstimateForSKUResp(rsp)
 }
 
-// GetListingOffersWithResponse request returning *GetListingOffersResp
-func (c *ClientWithResponses) GetListingOffersWithResponse(ctx context.Context, sellerSKU string, params *GetListingOffersParams) (*GetListingOffersResp, error) {
-	rsp, err := c.GetListingOffers(ctx, sellerSKU, params)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetListingOffersResp(rsp)
-}
-
-// GetPricingWithResponse request returning *GetPricingResp
-func (c *ClientWithResponses) GetPricingWithResponse(ctx context.Context, params *GetPricingParams) (*GetPricingResp, error) {
-	rsp, err := c.GetPricing(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetPricingResp(rsp)
-}
-
-// ParseGetItemOffersBatchResp parses an HTTP response from a GetItemOffersBatchWithResponse call
-func ParseGetItemOffersBatchResp(rsp *http.Response) (*GetItemOffersBatchResp, error) {
+// ParseGetMyFeesEstimatesResp parses an HTTP response from a GetMyFeesEstimatesWithResponse call
+func ParseGetMyFeesEstimatesResp(rsp *http.Response) (*GetMyFeesEstimatesResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetItemOffersBatchResp{
+	response := &GetMyFeesEstimatesResp{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetItemOffersBatchResponse
+		var dest GetMyFeesEstimatesResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest Errors
+		var dest GetMyFeesEstimatesErrorList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Errors
+		var dest GetMyFeesEstimatesErrorList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest Errors
+		var dest GetMyFeesEstimatesErrorList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest Errors
+		var dest GetMyFeesEstimatesErrorList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest Errors
+		var dest GetMyFeesEstimatesErrorList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest Errors
+		var dest GetMyFeesEstimatesErrorList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON500 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest Errors
+		var dest GetMyFeesEstimatesErrorList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2135,71 +886,71 @@ func ParseGetItemOffersBatchResp(rsp *http.Response) (*GetItemOffersBatchResp, e
 	return response, nil
 }
 
-// ParseGetListingOffersBatchResp parses an HTTP response from a GetListingOffersBatchWithResponse call
-func ParseGetListingOffersBatchResp(rsp *http.Response) (*GetListingOffersBatchResp, error) {
+// ParseGetMyFeesEstimateForASINResp parses an HTTP response from a GetMyFeesEstimateForASINWithResponse call
+func ParseGetMyFeesEstimateForASINResp(rsp *http.Response) (*GetMyFeesEstimateForASINResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetListingOffersBatchResp{
+	response := &GetMyFeesEstimateForASINResp{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetListingOffersBatchResponse
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest Errors
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Errors
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest Errors
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest Errors
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest Errors
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest Errors
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON500 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest Errors
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2210,296 +961,71 @@ func ParseGetListingOffersBatchResp(rsp *http.Response) (*GetListingOffersBatchR
 	return response, nil
 }
 
-// ParseGetCompetitivePricingResp parses an HTTP response from a GetCompetitivePricingWithResponse call
-func ParseGetCompetitivePricingResp(rsp *http.Response) (*GetCompetitivePricingResp, error) {
+// ParseGetMyFeesEstimateForSKUResp parses an HTTP response from a GetMyFeesEstimateForSKUWithResponse call
+func ParseGetMyFeesEstimateForSKUResp(rsp *http.Response) (*GetMyFeesEstimateForSKUResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetCompetitivePricingResp{
+	response := &GetMyFeesEstimateForSKUResp{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetPricingResponse
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest GetPricingResponse
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest GetPricingResponse
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest GetPricingResponse
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest GetPricingResponse
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest GetPricingResponse
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest GetPricingResponse
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON500 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest GetPricingResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON503 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetItemOffersResp parses an HTTP response from a GetItemOffersWithResponse call
-func ParseGetItemOffersResp(rsp *http.Response) (*GetItemOffersResp, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetItemOffersResp{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON429 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON503 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetListingOffersResp parses an HTTP response from a GetListingOffersWithResponse call
-func ParseGetListingOffersResp(rsp *http.Response) (*GetListingOffersResp, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetListingOffersResp{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON429 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest GetOffersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON503 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetPricingResp parses an HTTP response from a GetPricingWithResponse call
-func ParseGetPricingResp(rsp *http.Response) (*GetPricingResp, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetPricingResp{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetPricingResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest GetPricingResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest GetPricingResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest GetPricingResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest GetPricingResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest GetPricingResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON429 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest GetPricingResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest GetPricingResponse
+		var dest GetMyFeesEstimateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

@@ -39,6 +39,11 @@ const (
 	Sunday GetOrderMetricsParamsFirstDayOfWeek = "Sunday"
 )
 
+// Defines values for GetOrderMetricsParamsAmazonProgram.
+const (
+	AmazonHaul GetOrderMetricsParamsAmazonProgram = "AmazonHaul"
+)
+
 // Decimal A decimal number with no loss of precision. Useful when precision loss is unnaceptable, as with currencies. Follows RFC7159 for number representation.
 type Decimal = string
 
@@ -129,6 +134,9 @@ type GetOrderMetricsParams struct {
 
 	// Sku Filters the results by the SKU that you specify. Specifying both ASIN and SKU returns an error. Do not include this filter if you want the response to include order metrics for all SKUs. Example: TestSKU, if you want the response to include order metrics for only SKU TestSKU.
 	Sku *string `form:"sku,omitempty" json:"sku,omitempty"`
+
+	// AmazonProgram Filters the results by the Amazon program that you specify. Do not include this filter if you want the response to include order metrics for all programs. **Example:** `AmazonHaul` returns order metrics for the Amazon Haul program only.
+	AmazonProgram *GetOrderMetricsParamsAmazonProgram `form:"amazonProgram,omitempty" json:"amazonProgram,omitempty"`
 }
 
 // GetOrderMetricsParamsGranularity defines parameters for GetOrderMetrics.
@@ -139,6 +147,9 @@ type GetOrderMetricsParamsBuyerType string
 
 // GetOrderMetricsParamsFirstDayOfWeek defines parameters for GetOrderMetrics.
 type GetOrderMetricsParamsFirstDayOfWeek string
+
+// GetOrderMetricsParamsAmazonProgram defines parameters for GetOrderMetrics.
+type GetOrderMetricsParamsAmazonProgram string
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -401,6 +412,22 @@ func NewGetOrderMetricsRequest(server string, params *GetOrderMetricsParams) (*h
 		if params.Sku != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sku", runtime.ParamLocationQuery, *params.Sku); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					values := make([]string, len(v))
+					copy(values, v)
+					queryValues.Add(k, strings.Join(values, ","))
+				}
+			}
+
+		}
+
+		if params.AmazonProgram != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "amazonProgram", runtime.ParamLocationQuery, *params.AmazonProgram); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err

@@ -33,6 +33,7 @@ const (
 	INVOICEID             RelatedIdentifierRelatedIdentifierName = "INVOICE_ID"
 	ORDERID               RelatedIdentifierRelatedIdentifierName = "ORDER_ID"
 	REFUNDID              RelatedIdentifierRelatedIdentifierName = "REFUND_ID"
+	RELEASETRANSACTIONID  RelatedIdentifierRelatedIdentifierName = "RELEASE_TRANSACTION_ID"
 	SHIPMENTID            RelatedIdentifierRelatedIdentifierName = "SHIPMENT_ID"
 	TRANSFERID            RelatedIdentifierRelatedIdentifierName = "TRANSFER_ID"
 )
@@ -42,17 +43,17 @@ type AmazonPayContext struct {
 	// Channel Channel details of related transaction.
 	Channel *string `json:"channel,omitempty"`
 
-	// OrderType The transaction's order type.
+	// OrderType Order type of the transaction.
 	OrderType *string `json:"orderType,omitempty"`
 
-	// StoreName The name of the store that is related to the transaction.
+	// StoreName Store name related to transaction.
 	StoreName *string `json:"storeName,omitempty"`
 }
 
-// BigDecimal A signed decimal number.
+// BigDecimal Fields with a schema type of BigDecimal are a signed decimal number (for example CurrencyAmount).
 type BigDecimal = float32
 
-// Breakdown Details about the movement of money in the financial transaction. Breakdowns are further categorized into breakdown types, breakdown amounts, and further breakdowns.
+// Breakdown Breakdown provides details regarding the money movement under the financial transaction. Breakdowns get categorized further into breakdown types, breakdown amounts, and further breakdowns into a hierarchical structure.
 type Breakdown struct {
 	// BreakdownAmount A currency type and amount.
 	BreakdownAmount *Currency `json:"breakdownAmount,omitempty"`
@@ -60,97 +61,91 @@ type Breakdown struct {
 	// BreakdownType The type of charge.
 	BreakdownType *string `json:"breakdownType,omitempty"`
 
-	// Breakdowns Details about the movement of money in the financial transaction. Breakdowns are further categorized into breakdown types, breakdown amounts, and further breakdowns.
+	// Breakdowns Breakdown provides details regarding the money movement under the financial transaction. Breakdowns get categorized further into breakdown types, breakdown amounts, and further breakdowns into a hierarchical structure.
 	Breakdowns *Breakdown `json:"breakdowns,omitempty"`
 }
 
-// Breakdowns A list of breakdowns that provide details on how the total amount is calculated for the transaction.
+// Breakdowns List of breakdowns which will provide the details on how the total amount is calculated for the financial transaction.
 type Breakdowns = []Breakdown
 
 // Context defines model for Context.
 type Context struct {
-	// Asin The Amazon Standard Identification Number (ASIN) of the item.
+	// Asin Amazon Standard Identification Number (ASIN) of the item.
 	Asin *string `json:"asin,omitempty"`
 
 	// Channel Channel details of related transaction.
 	Channel     *string `json:"channel,omitempty"`
 	ContextType string  `json:"contextType"`
 
-	// DeferralReason Deferral policy applied on the transaction.
+	// DeferralReason The deferral policy applied to the transaction.
 	//
-	// **Examples:** `B2B`,`DD7`
+	// **Examples:** `B2B` (invoiced orders), `DD7` (delivery date policy)
 	DeferralReason *string `json:"deferralReason,omitempty"`
 
-	// DeferralStatus The status of the transaction. For example, `HOLD`,`RELEASE`.
-	DeferralStatus *string `json:"deferralStatus,omitempty"`
-
-	// EndTime A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	// EndTime Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	EndTime *Date `json:"endTime,omitempty"`
 
-	// FulfillmentNetwork The fulfillment network of the item.
+	// FulfillmentNetwork Fulfillment network of the item.
 	FulfillmentNetwork *string `json:"fulfillmentNetwork,omitempty"`
 
-	// MaturityDate A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	// MaturityDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	MaturityDate *Date `json:"maturityDate,omitempty"`
 
-	// OrderType The transaction's order type.
+	// OrderType Order type of the transaction.
 	OrderType *string `json:"orderType,omitempty"`
 
-	// PaymentDate A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	// PaymentDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PaymentDate *Date `json:"paymentDate,omitempty"`
 
-	// PaymentMethod The method of payment.
+	// PaymentMethod Method of payment made.
 	PaymentMethod *string `json:"paymentMethod,omitempty"`
 
-	// PaymentReference The reference number of the payment.
+	// PaymentReference Reference number of payment made.
 	PaymentReference *string `json:"paymentReference,omitempty"`
 
-	// PaymentType The type of payment.
+	// PaymentType Type of payment made.
 	PaymentType *string `json:"paymentType,omitempty"`
 
-	// QuantityShipped The quantity of the item shipped.
+	// QuantityShipped Quantity of the item shipped.
 	QuantityShipped *int32 `json:"quantityShipped,omitempty"`
 
-	// Sku The Stock Keeping Unit (SKU) of the item.
+	// Sku Stock keeping unit (SKU) of the item.
 	Sku *string `json:"sku,omitempty"`
 
-	// StartTime A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	// StartTime Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	StartTime *Date `json:"startTime,omitempty"`
 
-	// StoreName The name of the store that is related to the transaction.
+	// StoreName Store name related to transaction.
 	StoreName *string `json:"storeName,omitempty"`
 }
 
-// Contexts A list of additional information about the item.
+// Contexts List of additional Information about the item.
 type Contexts = []Context
 
 // Currency A currency type and amount.
 type Currency struct {
-	// CurrencyAmount A signed decimal number.
+	// CurrencyAmount Fields with a schema type of BigDecimal are a signed decimal number (for example CurrencyAmount).
 	CurrencyAmount *BigDecimal `json:"currencyAmount,omitempty"`
 
 	// CurrencyCode The three-digit currency code in ISO 4217 format.
 	CurrencyCode *string `json:"currencyCode,omitempty"`
 }
 
-// Date A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
-type Date = time.Time
+// Date Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
+type Date = string
 
-// DeferredContext Additional information related to deferred transactions.
+// DeferredContext Additional information related to Deferred transactions.
 type DeferredContext struct {
-	// DeferralReason Deferral policy applied on the transaction.
+	// DeferralReason The deferral policy applied to the transaction.
 	//
-	// **Examples:** `B2B`,`DD7`
+	// **Examples:** `B2B` (invoiced orders), `DD7` (delivery date policy)
 	DeferralReason *string `json:"deferralReason,omitempty"`
 
-	// DeferralStatus The status of the transaction. For example, `HOLD`,`RELEASE`.
-	DeferralStatus *string `json:"deferralStatus,omitempty"`
-
-	// MaturityDate A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	// MaturityDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	MaturityDate *Date `json:"maturityDate,omitempty"`
 }
 
-// Error An error response returned when the request is unsuccessful.
+// Error Error response returned when the request is unsuccessful.
 type Error struct {
 	// Code An error code that identifies the type of error that occurred.
 	Code string `json:"code"`
@@ -164,22 +159,22 @@ type Error struct {
 
 // ErrorList A list of error responses returned when a request is unsuccessful.
 type ErrorList struct {
-	// Errors The error responses that are returned when the request is unsuccessful.
+	// Errors Error response returned when the request is unsuccessful.
 	Errors []Error `json:"errors"`
 }
 
-// Item Additional information about the items in a transaction.
+// Item Additional information about the items in Transaction.
 type Item struct {
-	// Breakdowns A list of breakdowns that provide details on how the total amount is calculated for the transaction.
+	// Breakdowns List of breakdowns which will provide the details on how the total amount is calculated for the financial transaction.
 	Breakdowns *Breakdowns `json:"breakdowns,omitempty"`
 
-	// Contexts A list of additional information about the item.
+	// Contexts List of additional Information about the item.
 	Contexts *Contexts `json:"contexts,omitempty"`
 
-	// Description A description of the items in a transaction.
+	// Description Description of items in the transaction
 	Description *string `json:"description,omitempty"`
 
-	// RelatedIdentifiers Related business identifiers of the item in the transaction.
+	// RelatedIdentifiers Related Business identifiers of the item in Transaction.
 	RelatedIdentifiers *ItemRelatedIdentifiers `json:"relatedIdentifiers,omitempty"`
 
 	// TotalAmount A currency type and amount.
@@ -191,170 +186,171 @@ type ItemRelatedIdentifier struct {
 	// ItemRelatedIdentifierName Enumerated set of related item identifier names for the item.
 	ItemRelatedIdentifierName *ItemRelatedIdentifierItemRelatedIdentifierName `json:"itemRelatedIdentifierName,omitempty"`
 
-	// ItemRelatedIdentifierValue Corresponding value to `ItemRelatedIdentifierName`.
+	// ItemRelatedIdentifierValue Corresponding value of ItemRelatedIdentifierName
 	ItemRelatedIdentifierValue *string `json:"itemRelatedIdentifierValue,omitempty"`
 }
 
 // ItemRelatedIdentifierItemRelatedIdentifierName Enumerated set of related item identifier names for the item.
 type ItemRelatedIdentifierItemRelatedIdentifierName string
 
-// ItemRelatedIdentifiers Related business identifiers of the item in the transaction.
+// ItemRelatedIdentifiers Related Business identifiers of the item in Transaction.
 type ItemRelatedIdentifiers = []ItemRelatedIdentifier
 
-// Items A list of items in the transaction.
+// Items List of items in the transaction
 type Items = []Item
 
-// ListTransactionsResponse The response schema for the `listTransactions` operation.
+// ListTransactionsResponse The Response schema.
 type ListTransactionsResponse struct {
-	// NextToken The response includes `nextToken` when the number of results exceeds the specified `pageSize` value. To get the next page of results, call the operation with this token and include the same arguments as the call that produced the token. To get a complete list, call this operation until `nextToken` is null. Note that this operation can return empty pages.
+	// NextToken When present and not empty, pass this string token in the next request to return the next response page.
 	NextToken *string `json:"nextToken,omitempty"`
 
-	// Transactions A list of transactions within the specified time period.
+	// Transactions Contains transactions within a given time period.
 	Transactions *Transactions `json:"transactions,omitempty"`
 }
 
 // MarketplaceDetails Information about the marketplace where the transaction occurred.
 type MarketplaceDetails struct {
-	// MarketplaceId The identifier of the marketplace where the transaction occured.
+	// MarketplaceId The identifier of the marketplace where the transaction was made.
 	MarketplaceId *string `json:"marketplaceId,omitempty"`
 
-	// MarketplaceName The name of the marketplace where the transaction occurred. For example: `Amazon.com`,`Amazon.in`
+	// MarketplaceName The name of the marketplace where the transaction occurred.
+	//
+	// Example: 'Amazon.com','Amazon.in'
 	MarketplaceName *string `json:"marketplaceName,omitempty"`
 }
 
-// PaymentsContext Additional information related to payments-related transactions.
+// PaymentsContext Additional information related to Payments related transactions.
 type PaymentsContext struct {
-	// PaymentDate A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	// PaymentDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PaymentDate *Date `json:"paymentDate,omitempty"`
 
-	// PaymentMethod The method of payment.
+	// PaymentMethod Method of payment made.
 	PaymentMethod *string `json:"paymentMethod,omitempty"`
 
-	// PaymentReference The reference number of the payment.
+	// PaymentReference Reference number of payment made.
 	PaymentReference *string `json:"paymentReference,omitempty"`
 
-	// PaymentType The type of payment.
+	// PaymentType Type of payment made.
 	PaymentType *string `json:"paymentType,omitempty"`
 }
 
 // ProductContext Additional information related to the product.
 type ProductContext struct {
-	// Asin The Amazon Standard Identification Number (ASIN) of the item.
+	// Asin Amazon Standard Identification Number (ASIN) of the item.
 	Asin *string `json:"asin,omitempty"`
 
-	// FulfillmentNetwork The fulfillment network of the item.
+	// FulfillmentNetwork Fulfillment network of the item.
 	FulfillmentNetwork *string `json:"fulfillmentNetwork,omitempty"`
 
-	// QuantityShipped The quantity of the item shipped.
+	// QuantityShipped Quantity of the item shipped.
 	QuantityShipped *int32 `json:"quantityShipped,omitempty"`
 
-	// Sku The Stock Keeping Unit (SKU) of the item.
+	// Sku Stock keeping unit (SKU) of the item.
 	Sku *string `json:"sku,omitempty"`
 }
 
 // RelatedIdentifier Related business identifier of the transaction.
 type RelatedIdentifier struct {
-	// RelatedIdentifierName An enumerated set of related business identifier names.
+	// RelatedIdentifierName Enumerated set of related business identifier names.
 	RelatedIdentifierName *RelatedIdentifierRelatedIdentifierName `json:"relatedIdentifierName,omitempty"`
 
-	// RelatedIdentifierValue Corresponding value of `RelatedIdentifierName`.
+	// RelatedIdentifierValue Corresponding value of RelatedIdentifierName
 	RelatedIdentifierValue *string `json:"relatedIdentifierValue,omitempty"`
 }
 
-// RelatedIdentifierRelatedIdentifierName An enumerated set of related business identifier names.
+// RelatedIdentifierRelatedIdentifierName Enumerated set of related business identifier names.
 type RelatedIdentifierRelatedIdentifierName string
 
 // RelatedIdentifiers Related business identifiers of the transaction.
 type RelatedIdentifiers = []RelatedIdentifier
 
-// SellingPartnerMetadata Metadata that describes the seller.
+// SellingPartnerMetadata Metadata describing the seller.
 type SellingPartnerMetadata struct {
-	// AccountType The type of account in the transaction.
+	// AccountType Account type of transaction.
 	AccountType *string `json:"accountType,omitempty"`
 
-	// MarketplaceId The identifier of the marketplace where the transaction occurred.
+	// MarketplaceId Marketplace identifier of transaction.
 	MarketplaceId *string `json:"marketplaceId,omitempty"`
 
-	// SellingPartnerId A unique seller identifier.
+	// SellingPartnerId Unique seller identifier.
 	SellingPartnerId *string `json:"sellingPartnerId,omitempty"`
 }
 
-// TimeRangeContext Additional information that is related to the time range of the transaction.
+// TimeRangeContext Additional information related to time range for transaction.
 type TimeRangeContext struct {
-	// EndTime A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	// EndTime Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	EndTime *Date `json:"endTime,omitempty"`
 
-	// StartTime A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	// StartTime Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	StartTime *Date `json:"startTime,omitempty"`
 }
 
-// Transaction All the information related to a transaction.
+// Transaction Contains all information related to the transaction.
 type Transaction struct {
-	// Breakdowns A list of breakdowns that provide details on how the total amount is calculated for the transaction.
+	// Breakdowns List of breakdowns which will provide the details on how the total amount is calculated for the financial transaction.
 	Breakdowns *Breakdowns `json:"breakdowns,omitempty"`
 
-	// Contexts A list of additional information about the item.
+	// Contexts List of additional Information about the item.
 	Contexts *Contexts `json:"contexts,omitempty"`
 
 	// Description Describes the reasons for the transaction.
 	//
-	// **Example:** 'Order Payment', 'Refund Order'
+	// Example: 'Order Payment','Refund Order'
 	Description *string `json:"description,omitempty"`
 
-	// Items A list of items in the transaction.
+	// Items List of items in the transaction
 	Items *Items `json:"items,omitempty"`
 
 	// MarketplaceDetails Information about the marketplace where the transaction occurred.
 	MarketplaceDetails *MarketplaceDetails `json:"marketplaceDetails,omitempty"`
 
-	// PostedDate A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
+	// PostedDate Fields with a schema type of date are in ISO 8601 date time format (for example GroupBeginDate).
 	PostedDate *Date `json:"postedDate,omitempty"`
 
 	// RelatedIdentifiers Related business identifiers of the transaction.
 	RelatedIdentifiers *RelatedIdentifiers `json:"relatedIdentifiers,omitempty"`
 
-	// SellingPartnerMetadata Metadata that describes the seller.
+	// SellingPartnerMetadata Metadata describing the seller.
 	SellingPartnerMetadata *SellingPartnerMetadata `json:"sellingPartnerMetadata,omitempty"`
 
 	// TotalAmount A currency type and amount.
 	TotalAmount *Currency `json:"totalAmount,omitempty"`
 
-	// TransactionId The unique identifier of the transaction.
+	// TransactionId The unique identifier for the transaction.
 	TransactionId *string `json:"transactionId,omitempty"`
 
 	// TransactionStatus The status of the transaction.
 	//
 	// **Possible values:**
 	//
-	// * `Deferred`
-	// * `Released`
+	// * `DEFERRED`: the transaction is currently deferred.
+	// * `RELEASED`: the transaction is currently released.
+	// * `DEFERRED_RELEASED`: the transaction was deferred in the past, but is now released. Deferred transactions will have their status updated to `DEFERRED_RELEASED` when released.
 	TransactionStatus *string `json:"transactionStatus,omitempty"`
 
 	// TransactionType The type of transaction.
 	//
-	// **Possible value:** `Shipment`
+	// Possible values:
+	//
+	// * Shipment
 	TransactionType *string `json:"transactionType,omitempty"`
 }
 
-// Transactions A list of transactions within the specified time period.
+// Transactions Contains transactions within a given time period.
 type Transactions = []Transaction
 
 // ListTransactionsParams defines parameters for ListTransactions.
 type ListTransactionsParams struct {
-	// PostedAfter The response includes financial events posted after (or on) this date. This date must be in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format. The date-time must be more than two minutes before the time of the request.
+	// PostedAfter A date used for selecting transactions posted after (or at) a specified time. The date-time must be no later than two minutes before the request was submitted, in ISO 8601 date time format.
 	PostedAfter time.Time `form:"postedAfter" json:"postedAfter"`
 
-	// PostedBefore The response includes financial events posted before (but not on) this date. This date must be in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
-	//
-	// The date-time must be later than `PostedAfter` and more than two minutes before the request was submitted. If `PostedAfter` and `PostedBefore` are more than 180 days apart, the response is empty.
-	//
-	// **Default:** Two minutes before the time of the request.
+	// PostedBefore A date used for selecting transactions posted before (but not at) a specified time. The date-time must be later than PostedAfter and no later than two minutes before the request was submitted, in ISO 8601 date time format. If PostedAfter and PostedBefore are more than 180 days apart, no transactions are returned. You must specify the PostedAfter parameter if you specify the PostedBefore parameter. Default: Now minus two minutes.
 	PostedBefore *time.Time `form:"postedBefore,omitempty" json:"postedBefore,omitempty"`
 
-	// MarketplaceId The ID of the marketplace from which you want to retrieve transactions.
+	// MarketplaceId A string token used to select Marketplace ID.
 	MarketplaceId *string `form:"marketplaceId,omitempty" json:"marketplaceId,omitempty"`
 
-	// NextToken The response includes `nextToken` when the number of results exceeds the specified `pageSize` value. To get the next page of results, call the operation with this token and include the same arguments as the call that produced the token. To get a complete list, call this operation until `nextToken` is null. Note that this operation can return empty pages.
+	// NextToken A string token returned in the response of your previous request.
 	NextToken *string `form:"nextToken,omitempty" json:"nextToken,omitempty"`
 }
 

@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -402,6 +401,15 @@ type CreateServiceDocumentUploadDestination struct {
 	Payload *ServiceDocumentUploadDestination `json:"payload,omitempty"`
 }
 
+// DateTimeRange A range of time.
+type DateTimeRange struct {
+	// EndTime The end of the time range. Must be in UTC in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) format.
+	EndTime time.Time `json:"endTime"`
+
+	// StartTime The beginning of the time range. Must be in UTC in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) format.
+	StartTime time.Time `json:"startTime"`
+}
+
 // DayOfWeek The day of the week.
 type DayOfWeek string
 
@@ -431,7 +439,7 @@ type Error struct {
 	// ErrorLevel The type of error.
 	ErrorLevel *ErrorErrorLevel `json:"errorLevel,omitempty"`
 
-	// Message A message that describes the error condition in a human-readable form.
+	// Message A message that describes the error condition.
 	Message string `json:"message"`
 }
 
@@ -814,6 +822,9 @@ type ServiceUploadDocumentContentType string
 type SetAppointmentFulfillmentDataRequest struct {
 	// AppointmentResources List of resources that performs or performed job appointment fulfillment.
 	AppointmentResources *AppointmentResources `json:"appointmentResources,omitempty"`
+
+	// EstimatedArrivalTime A range of time.
+	EstimatedArrivalTime *DateTimeRange `json:"estimatedArrivalTime,omitempty"`
 
 	// FulfillmentDocuments List of documents captured during service appointment fulfillment.
 	FulfillmentDocuments *FulfillmentDocuments `json:"fulfillmentDocuments,omitempty"`
@@ -1895,7 +1906,7 @@ func NewGetAppointmentSlotsRequest(server string, params *GetAppointmentSlotsPar
 // NewCreateServiceDocumentUploadDestinationRequest calls the generic CreateServiceDocumentUploadDestination builder with application/json body
 func NewCreateServiceDocumentUploadDestinationRequest(server string, body CreateServiceDocumentUploadDestinationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1935,7 +1946,7 @@ func NewCreateServiceDocumentUploadDestinationRequestWithBody(server string, con
 // NewCreateReservationRequest calls the generic CreateReservation builder with application/json body
 func NewCreateReservationRequest(server string, params *CreateReservationParams, body CreateReservationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2045,7 +2056,7 @@ func NewCancelReservationRequest(server string, reservationId string, params *Ca
 // NewUpdateReservationRequest calls the generic UpdateReservation builder with application/json body
 func NewUpdateReservationRequest(server string, reservationId string, params *UpdateReservationParams, body UpdateReservationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2513,7 +2524,7 @@ func NewGetAppointmmentSlotsByJobIdRequest(server string, serviceJobId string, p
 // NewAddAppointmentForServiceJobByServiceJobIdRequest calls the generic AddAppointmentForServiceJobByServiceJobId builder with application/json body
 func NewAddAppointmentForServiceJobByServiceJobIdRequest(server string, serviceJobId string, body AddAppointmentForServiceJobByServiceJobIdJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2560,7 +2571,7 @@ func NewAddAppointmentForServiceJobByServiceJobIdRequestWithBody(server string, 
 // NewRescheduleAppointmentForServiceJobByServiceJobIdRequest calls the generic RescheduleAppointmentForServiceJobByServiceJobId builder with application/json body
 func NewRescheduleAppointmentForServiceJobByServiceJobIdRequest(server string, serviceJobId string, appointmentId string, body RescheduleAppointmentForServiceJobByServiceJobIdJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2614,7 +2625,7 @@ func NewRescheduleAppointmentForServiceJobByServiceJobIdRequestWithBody(server s
 // NewSetAppointmentFulfillmentDataRequest calls the generic SetAppointmentFulfillmentData builder with application/json body
 func NewSetAppointmentFulfillmentDataRequest(server string, serviceJobId string, appointmentId string, body SetAppointmentFulfillmentDataJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2668,7 +2679,7 @@ func NewSetAppointmentFulfillmentDataRequestWithBody(server string, serviceJobId
 // NewAssignAppointmentResourcesRequest calls the generic AssignAppointmentResources builder with application/json body
 func NewAssignAppointmentResourcesRequest(server string, serviceJobId string, appointmentId string, body AssignAppointmentResourcesJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2808,7 +2819,7 @@ func NewCompleteServiceJobByServiceJobIdRequest(server string, serviceJobId stri
 // NewGetFixedSlotCapacityRequest calls the generic GetFixedSlotCapacity builder with application/json body
 func NewGetFixedSlotCapacityRequest(server string, resourceId string, params *GetFixedSlotCapacityParams, body GetFixedSlotCapacityJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2889,7 +2900,7 @@ func NewGetFixedSlotCapacityRequestWithBody(server string, resourceId string, pa
 // NewGetRangeSlotCapacityRequest calls the generic GetRangeSlotCapacity builder with application/json body
 func NewGetRangeSlotCapacityRequest(server string, resourceId string, params *GetRangeSlotCapacityParams, body GetRangeSlotCapacityJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -2970,7 +2981,7 @@ func NewGetRangeSlotCapacityRequestWithBody(server string, resourceId string, pa
 // NewUpdateScheduleRequest calls the generic UpdateSchedule builder with application/json body
 func NewUpdateScheduleRequest(server string, resourceId string, params *UpdateScheduleParams, body UpdateScheduleJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

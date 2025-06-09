@@ -14,7 +14,6 @@ import (
 	runt "runtime"
 	"strings"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -169,13 +168,13 @@ type EmailAddress = string
 
 // Error An error response returned when the request is unsuccessful.
 type Error struct {
-	// Code An error code that identifies the type of error that occured.
+	// Code An error code that identifies the type of error that occurred.
 	Code string `json:"code"`
 
-	// Details The additional details that can help the caller understand or fix the issue.
+	// Details Additional details that can help the caller understand or fix the issue.
 	Details *string `json:"details,omitempty"`
 
-	// Message A message that describes the error condition in a human-readable form.
+	// Message A message that describes the error condition.
 	Message string `json:"message"`
 }
 
@@ -847,7 +846,7 @@ func NewGetSupplySourcesRequest(server string, params *GetSupplySourcesParams) (
 // NewCreateSupplySourceRequest calls the generic CreateSupplySource builder with application/json body
 func NewCreateSupplySourceRequest(server string, body CreateSupplySourceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -955,7 +954,7 @@ func NewGetSupplySourceRequest(server string, supplySourceId string) (*http.Requ
 // NewUpdateSupplySourceRequest calls the generic UpdateSupplySource builder with application/json body
 func NewUpdateSupplySourceRequest(server string, supplySourceId string, body UpdateSupplySourceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1002,7 +1001,7 @@ func NewUpdateSupplySourceRequestWithBody(server string, supplySourceId string, 
 // NewUpdateSupplySourceStatusRequest calls the generic UpdateSupplySourceStatus builder with application/json body
 func NewUpdateSupplySourceStatusRequest(server string, supplySourceId string, body UpdateSupplySourceStatusJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

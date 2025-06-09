@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -510,7 +509,7 @@ func NewGetShipmentDetailsRequest(server string, shipmentId string) (*http.Reque
 // NewSubmitInvoiceRequest calls the generic SubmitInvoice builder with application/json body
 func NewSubmitInvoiceRequest(server string, shipmentId string, body SubmitInvoiceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}

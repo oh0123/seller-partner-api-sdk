@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -798,7 +797,7 @@ func NewGetReportsRequest(server string, params *GetReportsParams) (*http.Reques
 // NewCreateReportRequest calls the generic CreateReport builder with application/json body
 func NewCreateReportRequest(server string, body CreateReportJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -951,7 +950,7 @@ func NewGetReportSchedulesRequest(server string, params *GetReportSchedulesParam
 // NewCreateReportScheduleRequest calls the generic CreateReportSchedule builder with application/json body
 func NewCreateReportScheduleRequest(server string, body CreateReportScheduleJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
-	buf, err := sonic.Marshal(body)
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
