@@ -8,7 +8,7 @@ import (
 	"net/http/httputil"
 
 	"github.com/google/uuid"
-	order "github.com/oh0123/seller-partner-api-sdk/codegen/ordersv0"
+	order "github.com/oh0123/seller-partner-api-sdk/codegen/ordersV0"
 	sign "github.com/oh0123/seller-partner-api-sdk/pkg/sign"
 )
 
