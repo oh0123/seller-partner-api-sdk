@@ -385,7 +385,7 @@ type Currency struct {
 }
 
 // Date A date in [ISO 8601](https://developer-docs.amazon.com/sp-api/docs/iso-8601) date-time format.
-type Date = time.Time
+type Date = string
 
 // DebtRecoveryEvent A debt payment or debt adjustment.
 type DebtRecoveryEvent struct {
