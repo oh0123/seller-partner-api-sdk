@@ -2,12 +2,12 @@ module examples
 
 go 1.26.1
 
-replace github.com/oh0123/seller-partner-api-sdk v0.0.0 => ../
+replace github.com/oh0123/seller-partner-api-sdk/v2 v2.0.0 => ../
 
 require (
 	github.com/bytedance/sonic v1.15.0
 	github.com/google/uuid v1.6.0
-	github.com/oh0123/seller-partner-api-sdk v0.0.0
+	github.com/oh0123/seller-partner-api-sdk/v2 v2.0.0
 )
 
 require (
