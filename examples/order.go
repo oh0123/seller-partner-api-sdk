@@ -9,7 +9,7 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/google/uuid"
-	"github.com/oh0123/seller-partner-api-sdk/v2/codegen/ordersv0"
+	ordersV0 "github.com/oh0123/seller-partner-api-sdk/v2/codegen/ordersv0"
 	"github.com/oh0123/seller-partner-api-sdk/v2/pkg/middleware"
 	"github.com/oh0123/seller-partner-api-sdk/v2/pkg/sign"
 )
@@ -61,7 +61,7 @@ func main() {
 
 	middleware.MaxLogBodyLength = 4096
 
-	logMW := middleware.Log(middleware.DefaultLog) // Default high-performance standard library logging
+	logMW := middleware.Log(log.Default()) // Default high-performance standard library logging
 
 	// 3. Chain the middlewares together in a single line:
 	// Execution order is inward: APM -> Retry -> headerMW -> Log -> DefaultTransport(Network)
