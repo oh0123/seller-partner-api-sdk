@@ -57,6 +57,7 @@ func NewSigner(cfg SignConfig) *AWSSigV4Signer {
 	return &s
 }
 
+// Deprecated: Util 20231231.
 func (s *AWSSigV4Signer) autoRefreshCredentials(ctx context.Context) error {
 
 	roleSessionName := uuid.New().String()
