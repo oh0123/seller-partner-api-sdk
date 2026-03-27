@@ -27,7 +27,7 @@ This completely modernized and refactored generator template is tailor-made for 
 ## ⚙️ Installation
 
 ```bash
-go get github.com/oh0123/seller-partner-api-sdk@latest
+go get github.com/oh0123/seller-partner-api-sdk/v2@latest
 ```
 
 *(Note: Ensure you run `go mod tidy` after fetching the library to synchronize dependencies.)*
@@ -84,9 +84,9 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/google/uuid"
-	"github.com/oh0123/seller-partner-api-sdk/codegen/ordersV0"
-	"github.com/oh0123/seller-partner-api-sdk/pkg/middleware"
-	"github.com/oh0123/seller-partner-api-sdk/pkg/sign"
+	"github.com/oh0123/seller-partner-api-sdk/v2/codegen/ordersV0"
+	"github.com/oh0123/seller-partner-api-sdk/v2/pkg/middleware"
+	"github.com/oh0123/seller-partner-api-sdk/v2/pkg/sign"
 )
 
 func main() {

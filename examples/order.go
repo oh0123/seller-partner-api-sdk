@@ -9,9 +9,9 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/google/uuid"
-	"github.com/oh0123/seller-partner-api-sdk/codegen/ordersV0"
-	"github.com/oh0123/seller-partner-api-sdk/pkg/middleware"
-	"github.com/oh0123/seller-partner-api-sdk/pkg/sign"
+	"github.com/oh0123/seller-partner-api-sdk/v2/codegen/ordersv0"
+	"github.com/oh0123/seller-partner-api-sdk/v2/pkg/middleware"
+	"github.com/oh0123/seller-partner-api-sdk/v2/pkg/sign"
 )
 
 func main() {

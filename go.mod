@@ -1,4 +1,4 @@
-module github.com/oh0123/seller-partner-api-sdk
+module github.com/oh0123/seller-partner-api-sdk/v2
 
 go 1.26.1
 
